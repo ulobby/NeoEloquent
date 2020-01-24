@@ -257,6 +257,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      * Attach properties to the relationship.
      *
      * @param array $properties
+     *
      * @return \Vinelab\NeoEloquent\Eloquent\Relations\HasOneOrMany
      */
     public function withProperties(array $properties = [])
