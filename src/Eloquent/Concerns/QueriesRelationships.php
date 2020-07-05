@@ -73,7 +73,8 @@ trait QueriesRelationships
         // Set the relationship match clause.
         $method = $this->getMatchMethodName($relation);
 
-        $this->$method($relation->getParent(),
+        $this->$method(
+            $relation->getParent(),
             $relation->getRelated(),
             $relatedNode,
             $relation->getForeignKeyName(),

@@ -699,9 +699,11 @@ class QueryingRelationsTest extends TestCase
         $yesterday = Carbon::now()->subDay();
         $dt = new DateTime();
 
-        $user = User::createWith(['name' => 'Some Name', 'dob' => $yesterday],
+        $user = User::createWith(
+            ['name' => 'Some Name', 'dob' => $yesterday],
             ['colleagues' => ['name' => 'Protectron', 'dob' => $dt],
-            ]);
+            ]
+        );
 
         $format = $user->getDateFormat();
         $houwe = User::find($user->id);

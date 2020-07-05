@@ -845,7 +845,8 @@ class Builder extends IlluminateBuilder
         }
 
         return Arr::add(
-            $values, $this->model->getUpdatedAtColumn(),
+            $values,
+            $this->model->getUpdatedAtColumn(),
             $this->model->freshTimestampString()
         );
     }

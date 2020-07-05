@@ -102,7 +102,10 @@ class MigrateMakeCommand extends BaseCommand
     protected function writeMigration($name, $label, $create)
     {
         $file = pathinfo($this->creator->create(
-            $name, $this->getMigrationPath(), $label, $create
+            $name,
+            $this->getMigrationPath(),
+            $label,
+            $create
         ), PATHINFO_FILENAME);
 
         $this->line("<info>Created Migration:</info> $file");

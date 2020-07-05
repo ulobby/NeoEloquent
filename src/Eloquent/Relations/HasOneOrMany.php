@@ -436,7 +436,8 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-            $changes, $this->attachNew($records, $current, false)
+            $changes,
+            $this->attachNew($records, $current, false)
         );
 
         $this->touchIfTouching();
