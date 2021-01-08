@@ -195,8 +195,6 @@ abstract class Relation extends Delegate
      */
     public function save()
     {
-        $this->updateTimestamps();
-
         /*
         * If this is a unique relationship we should check for an existing
         * one of the same type and direction for the $parent node before saving
