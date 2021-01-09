@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Tests\Functional\Relations\BelongsTo;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
+use Illuminate\Support\Facades\Config;
 
 class User extends Model
 {
@@ -96,6 +97,8 @@ class BelongsToRelationTest extends TestCase
 
     public function testAssociatingBelongingModel()
     {
+        Config::set('neoeleoquent.relationship-timestamps', true);
+
         $location = Location::create(['lat' => 89765, 'long' => -876521234, 'country' => 'The Netherlands', 'city' => 'Amsterdam']);
         $user = User::create(['name' => 'Daughter', 'alias' => 'daughter']);
         $relation = $location->user()->associate($user);
