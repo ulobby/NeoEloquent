@@ -26,6 +26,9 @@ Join the [Official Neo4j Slack Group](https://neo4j.com/blog/public-neo4j-users-
 
 Add the package to your `composer.json` and run `composer update`.
 
+You should publish the config/neoeloquent.php config file with:
+Run `php artisan vendor:publish --provider="Vinelab\NeoEloquent\NeoEloquentServiceProvider"`
+
 ### Laravel 5
 
 #### 5.8
@@ -708,7 +711,7 @@ $post    = $edge->related();
 
 #### Edge Attributes
 
-By default, edges will have the timestamps `created_at` and `updated_at` automatically set and updated **only if** timestamps are enabled by setting `$timestamps` to `true`
+By default, edges will have the timestamps `created_at` and `updated_at` automatically set and updated **only if** timestamps are enabled in config/neoeloquent.php and by setting `$timestamps` to `true`
 on the parent model.
 
 ```php
