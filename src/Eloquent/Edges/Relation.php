@@ -195,7 +195,6 @@ abstract class Relation extends Delegate
      */
     public function save()
     {
-
         $this->updateTimestamps();
 
         /*
@@ -627,7 +626,7 @@ abstract class Relation extends Delegate
          * In order not to break anything for users who already use these timestamps in their apps,
          * the old functionality is retained if the configuration is not set.
          */
-        if ( config()->has('neoeloquent.relationship-timestamps') && config('neoeloquent.relationship-timestamps') == false){
+        if (config()->has('neoeloquent.relationship-timestamps') && config('neoeloquent.relationship-timestamps') == false) {
             return;
         }
 

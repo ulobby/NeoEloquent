@@ -6,5 +6,5 @@ return [
      * As the maintainers of NeoEloquent we have found that timestamps on relationships are rarely used in practice,
      * and decided to preserve RAM by not set them unless the feature is explicitly enabled bellow.
      */
-    'relationship-timestamps' => env('NEOELOQUENT_RELATIONSHIP_TIMESTAMPS',false)
+    'relationship-timestamps' => env('NEOELOQUENT_RELATIONSHIP_TIMESTAMPS', false),
 ];

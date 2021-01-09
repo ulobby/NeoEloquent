@@ -2,10 +2,10 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional\Relations\HasMany;
 
+use Illuminate\Support\Facades\Config;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
-use Illuminate\Support\Facades\Config;
 
 class Book extends Model
 {
