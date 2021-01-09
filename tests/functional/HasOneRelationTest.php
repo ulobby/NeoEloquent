@@ -104,6 +104,8 @@ class HasOneRelationTest extends TestCase
         $relation = $user->profile()->save($profile);
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $relation);
 
+        $this->assertInstanceOf('Carbon\Carbon', $relation->created_at, 'make sure we set the created_at timestamp');
+        $this->assertInstanceOf('Carbon\Carbon', $relation->updated_at, 'make sure we set the updated_at timestamp');
         $this->assertEquals($user->profile->toArray(), $profile->toArray());
 
         // Let's retrieve it to make sure that NeoEloquent is not lying about it.

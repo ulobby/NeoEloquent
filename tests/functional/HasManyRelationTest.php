@@ -56,11 +56,15 @@ class HasManyRelationTest extends TestCase
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $writtenGot);
         $this->assertTrue($writtenGot->exists());
         $this->assertGreaterThanOrEqual(0, $writtenGot->id);
+        $this->assertNotNull($writtenGot->created_at);
+        $this->assertNotNull($writtenGot->updated_at);
         $this->assertEquals($writtenGot->ratings, 123);
 
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $writtenCok);
         $this->assertTrue($writtenCok->exists());
         $this->assertGreaterThanOrEqual(0, $writtenCok->id);
+        $this->assertNotNull($writtenCok->created_at);
+        $this->assertNotNull($writtenCok->updated_at);
         $this->assertEquals($writtenCok->chapters, 70);
 
         $books = $author->books;
@@ -110,6 +114,8 @@ class HasManyRelationTest extends TestCase
             $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $edge);
             $this->assertTrue($edge->exists());
             $this->assertGreaterThanOrEqual(0, $edge->id);
+            $this->assertNotNull($edge->created_at);
+            $this->assertNotNull($edge->updated_at);
             $edge->delete();
         }
     }
@@ -147,6 +153,8 @@ class HasManyRelationTest extends TestCase
             $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $edge);
             $this->assertTrue($edge->exists());
             $this->assertGreaterThanOrEqual(0, $edge->id);
+            $this->assertNotNull($edge->created_at);
+            $this->assertNotNull($edge->updated_at);
             $this->assertEquals($edge->on, $book['release_date']);
             $edge->delete();
         }
@@ -185,6 +193,8 @@ class HasManyRelationTest extends TestCase
             $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $edge);
             $this->assertTrue($edge->exists());
             $this->assertGreaterThanOrEqual(0, $edge->id);
+            $this->assertNotNull($edge->created_at);
+            $this->assertNotNull($edge->updated_at);
 
             $edge->delete();
         }
