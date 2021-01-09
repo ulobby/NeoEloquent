@@ -195,6 +195,9 @@ abstract class Relation extends Delegate
      */
     public function save()
     {
+
+        $this->updateTimestamps();
+
         /*
         * If this is a unique relationship we should check for an existing
         * one of the same type and direction for the $parent node before saving
@@ -620,6 +623,14 @@ abstract class Relation extends Delegate
      */
     protected function updateTimestamps()
     {
+        /* To reduce a lean database, reducing neo4j's use of memory, timestamps are only set if explicitly enabled in config.
+         * In order not to break anything for users who already use these timestamps in their apps,
+         * the old functionality is retained if the configuration is not set.
+         */
+        if ( config()->has('neoeloquent.relationship-timestamps') && config('neoeloquent.relationship-timestamps') == false){
+            return;
+        }
+
         if ($this->parent->timestamps) {
             $time = $this->freshTimestamp();
 
