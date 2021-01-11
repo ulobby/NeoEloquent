@@ -204,10 +204,18 @@ abstract class Relation extends Delegate
         */
         if ($this->unique && !$this->exists()) {
             $parent = $this->asNode($this->parent);
-            $existing = $parent->getFirstRelationship((array) $this->type, $this->getRealDirection($this->direction));
+            $realDirection = $this->getRealDirection($this->direction);
+            $relationships = $parent->getRelationships((array) $this->type, $realDirection);
 
-            if (!empty($existing)) {
-                $existing->delete();
+            foreach ($relationships as $relationship) {
+                $relatedNode = $realDirection === 'in' ? $relationship->getStartNode() : $relationship->getEndNode();
+                $relationshipLabels = $relatedNode->getLabels();
+
+                foreach ($relationshipLabels as $relationshipLabel) {
+                    if (in_array($relationshipLabel->getName(), (array) $this->related->getLabel())) {
+                        $relationship->delete();
+                    }
+                }
             }
         }
 

@@ -16,6 +16,16 @@ class User extends Model
     {
         return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Profile', 'PROFILE');
     }
+
+    public function dog()
+    {
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Dog', 'HAS');
+    }
+
+    public function cat()
+    {
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Cat', 'HAS');
+    }
 }
 
 class Profile extends Model
@@ -23,6 +33,20 @@ class Profile extends Model
     protected $label = 'Profile';
 
     protected $fillable = ['guid', 'service'];
+}
+
+class Cat extends Model
+{
+    protected $label = 'Cat';
+
+    protected $fillable = ['name'];
+}
+
+class Dog extends Model
+{
+    protected $label = 'Dog';
+
+    protected $fillable = ['name'];
 }
 
 class HasOneRelationTest extends TestCase
@@ -186,5 +210,32 @@ class HasOneRelationTest extends TestCase
         $this->assertEquals($relation->id, $retrieved->id);
         $this->assertEquals($relation->toArray(), $retrieved->toArray());
         $this->assertTrue($relation->delete());
+    }
+
+    public function testSavingAHasOneRelationDoNotRemoveOtherRelationsFromDifferentNodesThatHasTheSameRelationName()
+    {
+        $user = User::create(['name' => 'Dr. Dolittle']);
+        $dog = Dog::create(['name' => 'Bingo']);
+        $cat = Cat::create(['name' => 'Kitty']);
+
+        $user->dog()->save($dog);
+        $user->cat()->save($cat);
+
+        $resultUser = User::with(['dog', 'cat'])->find($user->id);
+        $this->assertEquals($dog->name, $resultUser->dog->name);
+        $this->assertEquals($cat->name, $resultUser->cat->name);
+    }
+
+    public function testSavingAHasOneRelationRemovesOtherRelationsFromTheSameNode()
+    {
+        $user = User::create(['name' => 'Dr. Dolittle']);
+        $dog1 = Dog::create(['name' => 'Bingo1']);
+        $dog2 = Dog::create(['name' => 'Bingo2']);
+
+        $user->dog()->save($dog1);
+        $user->dog()->save($dog2);
+
+        $resultUser = User::with(['dog', 'cat'])->find($user->id);
+        $this->assertEquals($dog2->name, $resultUser->dog->name);
     }
 }
