@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Config;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\NoEdgeDirectionException;
@@ -634,7 +635,7 @@ abstract class Relation extends Delegate
          * In order not to break anything for users who already use these timestamps in their apps,
          * the old functionality is retained if the configuration is not set.
          */
-        if (config()->has('neoeloquent.relationship-timestamps') && config('neoeloquent.relationship-timestamps') == false) {
+        if (Config::has('neoeloquent.relationship-timestamps') && Config::get('neoeloquent.relationship-timestamps') == false) {
             return;
         }
 
