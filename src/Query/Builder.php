@@ -105,7 +105,7 @@ class Builder extends IlluminateQueryBuilder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function from($label)
+    public function from($label, $as = null)
     {
         $this->from = $label;
 

@@ -437,7 +437,7 @@ class Connection extends IlluminateConnection
      *
      * @return \Vinelab\NeoEloquent\Query\Builder
      */
-    public function table($table)
+    public function table($table, $as = null)
     {
         $query = new Builder($this, $this->getQueryGrammar(), $this->getPostProcessor());
 
