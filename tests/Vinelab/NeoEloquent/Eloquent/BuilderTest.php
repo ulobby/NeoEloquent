@@ -2,11 +2,11 @@
 
 namespace Vinelab\NeoEloquent\Tests\Eloquent;
 
-use Mockery as M;
 use Illuminate\Support\Collection;
-use Vinelab\NeoEloquent\Tests\TestCase;
-use Vinelab\NeoEloquent\Eloquent\Builder;
+use Mockery as M;
 use PHPUnit\Framework\MockObject\MockBuilder;
+use Vinelab\NeoEloquent\Eloquent\Builder;
+use Vinelab\NeoEloquent\Tests\TestCase;
 
 class EloquentBuilderTest extends TestCase
 {
