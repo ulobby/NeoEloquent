@@ -2,12 +2,12 @@
 
 namespace Vinelab\NeoEloquent\Tests\Query;
 
-use Mockery as M;
-use InvalidArgumentException;
-use Vinelab\NeoEloquent\Query\Builder;
-use Vinelab\NeoEloquent\Tests\TestCase;
 use Illuminate\Database\Query\Processors\Processor;
+use InvalidArgumentException;
+use Mockery as M;
+use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Grammars\CypherGrammar;
+use Vinelab\NeoEloquent\Tests\TestCase;
 
 class BuilderTest extends TestCase
 {
