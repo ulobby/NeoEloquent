@@ -2,10 +2,10 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional\Relations\BelongsToMany;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class User extends Model
 {

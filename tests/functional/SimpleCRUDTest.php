@@ -2,13 +2,13 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional;
 
-use DateTime;
-use Mockery as M;
 use Carbon\Carbon;
-use Vinelab\NeoEloquent\Eloquent\Model;
-use Vinelab\NeoEloquent\Tests\TestCase;
-use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
+use DateTime;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Mockery as M;
+use Vinelab\NeoEloquent\Eloquent\Model;
+use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
+use Vinelab\NeoEloquent\Tests\TestCase;
 
 class Wiz extends Model
 {
@@ -55,7 +55,7 @@ class SimpleCRUDTest extends TestCase
     public function testFindingAndFailing()
     {
         $this->expectException(ModelNotFoundException::class);
-        
+
         User::findOrFail(0);
     }
 

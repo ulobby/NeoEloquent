@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\Tests\Eloquent;
 
 use Illuminate\Support\Collection;
 use Mockery as M;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Tests\TestCase;
 
