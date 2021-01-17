@@ -83,7 +83,7 @@ class ConnectionTest extends TestCase
         $port = $c->getPort();
 
         $this->assertEquals(7474, $port);
-        $this->assertInternalType('int', $port);
+        $this->assertIsInt($port);
     }
 
     public function testGettingQueryCypherGrammar()

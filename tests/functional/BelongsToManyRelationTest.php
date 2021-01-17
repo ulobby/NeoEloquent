@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Tests\Functional\Relations\BelongsToMany;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class User extends Model
 {
@@ -143,11 +144,10 @@ class BelongsToManyRelationTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testAttachingNonExistingModelId()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $user = User::create(['name' => 'Creepy Dude']);
         $user->roles()->attach(10);
     }

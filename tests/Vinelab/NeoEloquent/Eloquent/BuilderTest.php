@@ -373,6 +373,7 @@ class EloquentBuilderTest extends TestCase
         $this->model->shouldReceive('getKeyName')->twice()->andReturn('id');
         $this->model->shouldReceive('getTable')->once()->andReturn('Model');
         $this->model->shouldReceive('getConnectionName')->once()->andReturn('default');
+        $this->model->shouldReceive('hasNamedScope')->once()->andReturn(false);
 
         $collection = new \Illuminate\Support\Collection([M::mock('Everyman\Neo4j\Query\ResultSet')]);
         $this->model->shouldReceive('newCollection')->once()->andReturn($collection);
@@ -422,6 +423,7 @@ class EloquentBuilderTest extends TestCase
         $this->model->shouldReceive('newCollection')->once()->andReturn($collection)
                     ->shouldReceive('getKeyName')->twice()->andReturn('id')
                     ->shouldReceive('getTable')->once()->andReturn('Model')
+                    ->shouldReceive('hasNamedScope')->once()->andReturn(false)
                     ->shouldReceive('getConnectionName')->once()->andReturn('default')
                     ->shouldReceive('newFromBuilder')->once()->with($attributes)->andReturn($user);
 
@@ -688,7 +690,7 @@ class EloquentBuilderTest extends TestCase
         return $query;
     }
 
-    public function getMockBuilder($className = null): MockBuilder
+    protected function getBuilder()
     {
         $query = M::mock('Vinelab\NeoEloquent\Query\Builder');
         $query->shouldReceive('from')->andReturn('foo_table');
