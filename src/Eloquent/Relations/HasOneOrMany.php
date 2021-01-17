@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany as IlluminateHasOneOrMany;
+use Illuminate\Support\Str;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Edges\Finder;
 use Vinelab\NeoEloquent\Eloquent\Edges\Relation;
@@ -33,6 +34,13 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      * @var string
      */
     protected $edgeDirection = 'out';
+
+    /**
+     * The relationship properites.
+     *
+     * @var array
+     */
+    protected $properties = [];
 
     /**
      * Create a new has many relationship instance.
@@ -246,19 +254,32 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
     }
 
     /**
+     * Attach properties to the relationship.
+     *
+     * @param array $properties
+     *
+     * @return \Vinelab\NeoEloquent\Eloquent\Relations\HasOneOrMany
+     */
+    public function withProperties(array $properties = [])
+    {
+        $this->properties = $properties;
+
+        return $this;
+    }
+
+    /**
      * Create an array of new instances of the related model.
      *
-     * @param array $records
-     * @param array $properties The relationship properites
+     * @param iterable $records
      *
      * @return array
      */
-    public function createMany(array $records, array $properties = [])
+    public function createMany(iterable $records)
     {
         $instances = new Collection();
 
         foreach ($records as $record) {
-            $instances->push($this->create($record, $properties));
+            $instances->push($this->create($record, $this->properties));
         }
 
         return $instances;
@@ -538,7 +559,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      */
     protected function guessInverseRelation()
     {
-        return camel_case(str_plural(class_basename($this->getParent())));
+        return Str::camel(Str::plural(class_basename($this->getParent())));
     }
 
     /**

@@ -10,7 +10,7 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class EloquentBuilderTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -21,7 +21,7 @@ class EloquentBuilderTest extends TestCase
         $this->builder = new Builder($this->query);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
@@ -39,11 +39,10 @@ class EloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
@@ -51,11 +50,10 @@ class EloquentBuilderTest extends TestCase
         $result = $builder->findOrFail('bar', ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', [1, 2]);
@@ -63,11 +61,10 @@ class EloquentBuilderTest extends TestCase
         $result = $builder->findOrFail([1, 2], ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
@@ -481,7 +478,7 @@ class EloquentBuilderTest extends TestCase
 
         $models = $this->builder->getModels();
 
-        $this->assertInternalType('array', $models);
+        $this->assertIsArray($models);
         $this->assertInstanceOf('User', $models[0]);
         $this->assertInstanceOf('User', $models[1]);
     }
@@ -517,7 +514,7 @@ class EloquentBuilderTest extends TestCase
 
         $models = $this->builder->getModels($properties);
 
-        $this->assertInternalType('array', $models);
+        $this->assertIsArray($models);
         $this->assertInstanceOf('User', $models[0]);
     }
 
@@ -697,12 +694,7 @@ class EloquentBuilderTest extends TestCase
         $query->shouldReceive('from')->andReturn('foo_table');
         $query->shouldReceive('modelAsNode')->andReturn('n');
 
-        return $query;
-    }
-
-    protected function getBuilder()
-    {
-        return new Builder($this->getMockBuilder());
+        return new Builder($query);
     }
 }
 

@@ -15,7 +15,7 @@ class User extends Model
 
 class WheresTheTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
@@ -27,7 +27,7 @@ class WheresTheTest extends TestCase
         parent::tearDown();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

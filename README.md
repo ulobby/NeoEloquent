@@ -26,14 +26,14 @@ Join the [Official Neo4j Slack Group](https://neo4j.com/blog/public-neo4j-users-
 
 Add the package to your `composer.json` and run `composer update`.
 
-### Laravel 5
+### Laravel 6
 
-#### 5.8
+#### 6.0
 
 ```json
 {
     "require": {
-        "ulobby/neoeloquent": "^1.4.7"
+        "ulobby/neoeloquent": "^6.0"
     }
 }
 ```

@@ -11,7 +11,7 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class GrammarTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class GrammarTest extends TestCase
         $this->processor = new Processor();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 

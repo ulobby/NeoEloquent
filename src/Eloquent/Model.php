@@ -138,6 +138,15 @@ abstract class Model extends IlluminateModel
 
     /**
      * @override
+     * Override eloquents saveOrFail to avoid falling back on parent save or fail (that assumes a sql db)
+     */
+    public function saveOrFail(array $options = [])
+    {
+        return $this->save($options);
+    }
+
+    /**
+     * @override
      * Define an inverse one-to-one or many relationship.
      *
      * @param string $related
