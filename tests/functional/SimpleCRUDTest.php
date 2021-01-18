@@ -4,6 +4,7 @@ namespace Vinelab\NeoEloquent\Tests\Functional;
 
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
@@ -29,7 +30,7 @@ class WizDel extends Model
 
 class SimpleCRUDTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +39,7 @@ class SimpleCRUDTest extends TestCase
         Wiz::setConnectionResolver($resolver);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
@@ -51,11 +52,10 @@ class SimpleCRUDTest extends TestCase
         parent::tearDown();
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindingAndFailing()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         User::findOrFail(0);
     }
 
@@ -81,7 +81,7 @@ class SimpleCRUDTest extends TestCase
 
         $this->assertTrue($w->save());
         $this->assertTrue($w->exists);
-        $this->assertInternalType('int', $w->id);
+        $this->assertIsInt($w->id);
         $this->assertTrue($w->id > 0);
         $this->assertInstanceOf('Vinelab\NeoEloquent\Tests\Functional\Wiz', $w);
     }
@@ -127,7 +127,7 @@ class SimpleCRUDTest extends TestCase
 
         $this->assertInstanceOf('Vinelab\NeoEloquent\Tests\Functional\Wiz', $w);
         $this->assertTrue($w->exists);
-        $this->assertInternalType('int', $w->id);
+        $this->assertIsInt($w->id);
         $this->assertNull($w->nope);
     }
 
@@ -246,7 +246,7 @@ class SimpleCRUDTest extends TestCase
     {
         $id = Wiz::insertGetId(['foo' => 'fiz', 'boo' => 'biz']);
 
-        $this->assertInternalType('int', $id);
+        $this->assertIsInt($id);
         $this->assertGreaterThanOrEqual(0, $id, 'message');
     }
 
@@ -264,9 +264,9 @@ class SimpleCRUDTest extends TestCase
         $w = Wiz::create(['fiz' => 1, 'biz' => 8.276123, 'triz' => 0]);
 
         $g = Wiz::find($w->id);
-        $this->assertInternalType('int', $g->fiz);
-        $this->assertInternalType('int', $g->triz);
-        $this->assertInternalType('float', $g->biz);
+        $this->assertIsInt($g->fiz);
+        $this->assertIsInt($g->triz);
+        $this->assertIsFloat($g->biz);
     }
 
     public function testSoftDeletingModel()

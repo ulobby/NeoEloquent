@@ -2,20 +2,21 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional\Relations\HyperMorphTo;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
 
 class PolymorphicHyperMorphToTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
         parent::tearDown();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -225,11 +226,10 @@ class PolymorphicHyperMorphToTest extends TestCase
         $this->assertNotEquals($postComments, $videoComments);
     }
 
-    /**
-     * @expectedException Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testAttachingNonExistingModelIds()
     {
+        $this->expectException(ModelNotFoundException::class);
+
         $user = User::create(['name' => 'Hmm...']);
         $user->posts()->create(['title' => 'A little posty post.']);
         $post = $user->posts()->first();

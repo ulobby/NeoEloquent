@@ -26,17 +26,26 @@ Join the [Official Neo4j Slack Group](https://neo4j.com/blog/public-neo4j-users-
 
 Add the package to your `composer.json` and run `composer update`.
 
-You should publish the config/neoeloquent.php config file with:
-Run `php artisan vendor:publish --provider="Vinelab\NeoEloquent\NeoEloquentServiceProvider"`
+### Laravel 7
 
-### Laravel 5
-
-#### 5.8
+#### 7.0
 
 ```json
 {
     "require": {
-        "ulobby/neoeloquent": "^1.4.7"
+        "ulobby/neoeloquent": "^7.0"
+    }
+}
+```
+
+### Laravel 6
+
+#### 6.0
+
+```json
+{
+    "require": {
+        "ulobby/neoeloquent": "^6.0"
     }
 }
 ```

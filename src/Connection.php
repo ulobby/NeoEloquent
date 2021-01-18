@@ -12,7 +12,6 @@ use Illuminate\Database\Connection as IlluminateConnection;
 use Illuminate\Database\Schema\Grammars\Grammar as IlluminateSchemaGrammar;
 use Illuminate\Support\Arr;
 use Vinelab\NeoEloquent\Query\Builder;
-use Vinelab\NeoEloquent\Query\Processors\Processor;
 
 class Connection extends IlluminateConnection
 {
@@ -434,15 +433,16 @@ class Connection extends IlluminateConnection
      * Begin a fluent query against a database table.
      * In neo4j's terminologies this is a node.
      *
-     * @param string $table
+     * @param string      $table
+     * @param string|null $as
      *
      * @return \Vinelab\NeoEloquent\Query\Builder
      */
-    public function table($table)
+    public function table($table, $as = null)
     {
         $query = new Builder($this, $this->getQueryGrammar(), $this->getPostProcessor());
 
-        return $query->from($table);
+        return $query->from($table, $as);
     }
 
     /**

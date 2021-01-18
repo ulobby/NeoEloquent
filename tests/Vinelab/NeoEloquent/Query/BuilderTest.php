@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Tests\Query;
 
 use Illuminate\Database\Query\Processors\Processor;
+use InvalidArgumentException;
 use Mockery as M;
 use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Grammars\CypherGrammar;
@@ -10,7 +11,7 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class BuilderTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +25,7 @@ class BuilderTest extends TestCase
         $this->builder = new Builder($this->connection, $this->grammar, $this->processor);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
@@ -115,12 +116,11 @@ class BuilderTest extends TestCase
         $this->assertEquals($this->builder->columns, ['poop', 'head'], 'make sure the columns were set');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Value must be provided.
-     */
     public function testFailingWhereWithNullValue()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value must be provided.');
+
         $this->builder->where('id', '>', null);
     }
 

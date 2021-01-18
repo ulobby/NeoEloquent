@@ -10,14 +10,14 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class BelongsToTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
         parent::tearDown();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -30,17 +30,6 @@ class BelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Relations\BelongsTo', $relation);
-    }
-
-    public function testUpdateMethodRetrievesModelAndUpdates()
-    {
-        $relation = $this->getRelation();
-        $mock = M::mock('Vinelab\NeoEloquent\Eloquent\Model');
-        $mock->shouldReceive('fill')->once()->with(['attributes'])->andReturn($mock);
-        $mock->shouldReceive('save')->once()->andReturn(true);
-        $relation->getQuery()->shouldReceive('first')->once()->andReturn($mock);
-
-        $this->assertTrue($relation->update(['attributes']));
     }
 
     public function testEagerConstraintsAreProperlyAdded()

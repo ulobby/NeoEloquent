@@ -1,6 +1,7 @@
 language: php
 php:
 - 7.3
+- 7.4
 cache:
   directories:
     - "$HOME/.composer/cache"
@@ -9,7 +10,7 @@ before_script:
 - travis_retry composer install --prefer-source --no-interaction
 - mkdir -p build/coverage/xml
 script:
-- vendor/bin/phpunit --coverage-clover build/coverage/xml
+- XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover build/coverage/xml
 after_script:
 - php vendor/bin/codacycoverage clover build/coverage/xml
 notifications:

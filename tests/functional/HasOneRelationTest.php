@@ -51,7 +51,7 @@ class Dog extends Model
 
 class HasOneRelationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         M::close();
 
@@ -68,7 +68,7 @@ class HasOneRelationTest extends TestCase
         parent::tearDown();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

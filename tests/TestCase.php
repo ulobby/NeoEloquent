@@ -21,7 +21,7 @@ class TestCase extends PHPUnit
         $this->dbConfig = require 'config/database.php';
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class TestCase extends PHPUnit
         Stub::setConnectionResolver($resolver);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         // everything should be clean before every test
         $this->flushDb();
@@ -39,7 +39,7 @@ class TestCase extends PHPUnit
         parent::tearDown();
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         date_default_timezone_set('Asia/Beirut');
     }

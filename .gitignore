@@ -10,3 +10,5 @@ composer.lock
 *.sublime-workspace
 
 .idea
+
+.phpunit.result.cache

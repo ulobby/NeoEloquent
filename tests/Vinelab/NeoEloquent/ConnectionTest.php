@@ -6,7 +6,7 @@ use Mockery as M;
 
 class ConnectionTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -17,7 +17,7 @@ class ConnectionTest extends TestCase
         ];
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $query = 'MATCH (n:User) WHERE n.username = {username} DELETE n RETURN count(n)';
 
@@ -83,7 +83,7 @@ class ConnectionTest extends TestCase
         $port = $c->getPort();
 
         $this->assertEquals(7474, $port);
-        $this->assertInternalType('int', $port);
+        $this->assertIsInt($port);
     }
 
     public function testGettingQueryCypherGrammar()
@@ -463,10 +463,10 @@ class ConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $connection->setClient($client);
 
-        $result = $connection->transaction(function ($db) {
+        $result = $connection->beginTransaction(function ($db) {
             return $db;
         });
-        $this->assertEquals($connection, $result);
+        $this->assertNull($result);
     }
 
     public function testTransactionMethodRollsbackAndThrows()
