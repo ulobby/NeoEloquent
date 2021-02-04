@@ -208,20 +208,20 @@ class SimpleCRUDTest extends TestCase
     {
         $batch = [
             [
-                'fiz' => 'foo',
                 'biz' => 'boo',
+                'fiz' => 'foo',
             ],
             [
-                'fiz' => 'morefoo',
                 'biz' => 'moreboo',
+                'fiz' => 'morefoo',
             ],
             [
-                'fiz' => 'otherfoo',
                 'biz' => 'otherboo',
+                'fiz' => 'otherfoo',
             ],
             [
-                'fiz' => 'somefoo',
                 'biz' => 'someboo',
+                'fiz' => 'somefoo',
             ],
         ];
 

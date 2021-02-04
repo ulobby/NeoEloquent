@@ -2,9 +2,12 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4b18de9ea45b4b2c96a8f78a25db6480)](https://www.codacy.com/manual/berteltorp/NeoEloquent?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ulobby/NeoEloquent&amp;utm_campaign=Badge_Grade)
 
 # NeoEloquent
-Neo4j Graph Eloquent Driver for Laravel, this is a fork of [Vinelab/NeoEloquent](https://github.com/Vinelab/NeoEloquent) that created by [Ulobby](https://www.ulobby.eu) as we mistakenly believed that the original repo was not maintained anymore. After getting in touch with the orginal author ([Abed Halawi](https://github.com/Mulkave)) we have decided to pour our love and code into reinvigorating the original repo over at [Vinelab/NeoEloquent](https://github.com/Vinelab/NeoEloquent)
+Neo4j Graph Eloquent Driver for Laravel, this is a fork of [Vinelab/NeoEloquent](https://github.com/Vinelab/NeoEloquent) created by [Ulobby](https://www.ulobby.eu).
 
-At Ulobby use NeoEloquent in production for a lot of the crud operations in our Laravel based SaaS. We usually end up writing raw cypher for more complex operations, as a consequence of this we currently do not recommend using polymorphic-relationships.
+The versioning scheme for this repository follow Laravel, in so that the major version for this package corresponds to the major of laravel supported.
+Ex NeoEloquent v6 supports Laravel v6, and NeoEloquent v8 supports Laravel v8.
+
+At Ulobby we use NeoEloquent in production for a lot of the crud operations in our Laravel based SaaS. We usually end up writing raw cypher for more complex operations, as a consequence of this we currently do not recommend using polymorphic-relationships.
 
 ## Chat & Support
 Join the [Official Neo4j Slack Group](https://neo4j.com/blog/public-neo4j-users-slack-group/) and use the #neo4j-php channel.
@@ -25,6 +28,18 @@ Join the [Official Neo4j Slack Group](https://neo4j.com/blog/public-neo4j-users-
 ## Installation
 
 Add the package to your `composer.json` and run `composer update`.
+
+### Laravel 8
+
+#### 8.0
+
+```json
+{
+    "require": {
+        "ulobby/neoeloquent": "^8.0"
+    }
+}
+```
 
 ### Laravel 7
 

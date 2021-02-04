@@ -104,6 +104,13 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function deleteRepository()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function repositoryExists()
     {
         return $this->schema->hasLabel($this->getLabel());

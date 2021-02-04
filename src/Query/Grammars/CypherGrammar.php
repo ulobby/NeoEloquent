@@ -293,7 +293,7 @@ class CypherGrammar extends Grammar
      *
      * @return string
      */
-    protected function compileWheres(Builder $query)
+    public function compileWheres(Builder $query)
     {
         $cypher = [];
 
