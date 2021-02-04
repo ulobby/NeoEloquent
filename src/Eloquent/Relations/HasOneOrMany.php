@@ -690,6 +690,24 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
     }
 
     /**
+     * Returns the parent model
+     * @return Model
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Returns the related model
+     * @return Model 
+     */
+    public function getRelated()
+    {
+        return $this->related;
+    }
+
+    /**
      * Get the edge direction for this relationship.
      *
      * @return string

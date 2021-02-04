@@ -41,6 +41,18 @@ interface RelationInterface
     public function getRelatedNode();
 
     /**
+     * Returns the child of the relationship
+     * @return Model
+     */
+    public function getRelated();
+
+    /**
+     * Returns the parent of the relationship
+     * @return Model
+     */
+    public function getParent();
+
+    /**
      * Get the localKey.
      *
      * @return string

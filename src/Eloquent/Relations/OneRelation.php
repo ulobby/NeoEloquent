@@ -230,6 +230,24 @@ abstract class OneRelation extends BelongsTo implements RelationInterface
         return $this->query->getQuery()->modelAsNode($this->related->getTable());
     }
 
+    /**
+     * Returns the parent model
+     * @return Model
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Returns the related model
+     * @return Model 
+     */
+    public function getRelated()
+    {
+        return $this->related;
+    }
+
     public function getLocalKey()
     {
         return $this->ownerKey;
