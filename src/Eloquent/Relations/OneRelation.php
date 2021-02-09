@@ -231,7 +231,8 @@ abstract class OneRelation extends BelongsTo implements RelationInterface
     }
 
     /**
-     * Returns the parent model
+     * Returns the parent model.
+     *
      * @return Model
      */
     public function getParent()
@@ -240,8 +241,9 @@ abstract class OneRelation extends BelongsTo implements RelationInterface
     }
 
     /**
-     * Returns the related model
-     * @return Model 
+     * Returns the related model.
+     *
+     * @return Model
      */
     public function getRelated()
     {
