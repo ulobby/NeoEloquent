@@ -3,7 +3,6 @@
 namespace Vinelab\NeoEloquent\Migrations;
 
 use Illuminate\Database\Migrations\MigrationCreator as IlluminateMigrationCreator;
-use Illuminate\Support\Str;
 
 class MigrationCreator extends IlluminateMigrationCreator
 {
@@ -20,7 +19,8 @@ class MigrationCreator extends IlluminateMigrationCreator
     {
         $stub = str_replace(
             ['DummyClass', '{{ class }}', '{{class}}'],
-            $this->getClassName($name), $stub
+            $this->getClassName($name),
+            $stub
         );
 
         // Here we will replace the label place-holders with the label specified by
@@ -29,7 +29,8 @@ class MigrationCreator extends IlluminateMigrationCreator
         if (!is_null($label)) {
             $stub = str_replace(
                 ['DummyTable', '{{ table }}', '{{table}}'],
-                $table, $stub
+                $table,
+                $stub
             );
         }
 
