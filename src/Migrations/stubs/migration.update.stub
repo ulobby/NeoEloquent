@@ -3,8 +3,8 @@
 use Vinelab\NeoEloquent\Schema\Blueprint;
 use Vinelab\NeoEloquent\Migrations\Migration;
 
-class DummyClass extends Migration {
-
+class {{ class }} extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,8 +12,7 @@ class DummyClass extends Migration {
      */
     public function up()
     {
-        Neo4jSchema::label('DummyLabel', function(Blueprint $label)
-        {
+        Neo4jSchema::label('{{ table }}', function(Blueprint $label) {
             //
         });
     }
@@ -25,10 +24,8 @@ class DummyClass extends Migration {
      */
     public function down()
     {
-        Neo4jSchema::label('DummyLabel', function(Blueprint $label)
-        {
+        Neo4jSchema::label('{{ table }}', function(Blueprint $label) {
             //
         });
     }
-
 }

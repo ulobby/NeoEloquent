@@ -3,7 +3,6 @@
 namespace Vinelab\NeoEloquent\Migrations;
 
 use Illuminate\Database\Migrations\MigrationCreator as IlluminateMigrationCreator;
-use Illuminate\Support\Str;
 
 class MigrationCreator extends IlluminateMigrationCreator
 {
@@ -18,13 +17,21 @@ class MigrationCreator extends IlluminateMigrationCreator
      */
     protected function populateStub($name, $stub, $label)
     {
-        $stub = str_replace('DummyClass', Str::studly($name), $stub);
+        $stub = str_replace(
+            ['DummyClass', '{{ class }}', '{{class}}'],
+            $this->getClassName($name),
+            $stub
+        );
 
         // Here we will replace the label place-holders with the label specified by
         // the developer, which is useful for quickly creating a labels creation
         // or update migration from the console instead of typing it manually.
         if (!is_null($label)) {
-            $stub = str_replace('DummyLabel', $label, $stub);
+            $stub = str_replace(
+                ['DummyTable', '{{ table }}', '{{table}}'],
+                $table,
+                $stub
+            );
         }
 
         return $stub;
