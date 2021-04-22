@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional\Relations\HasMany;
 
+use Illuminate\Support\Facades\Config;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
@@ -47,6 +48,8 @@ class HasManyRelationTest extends TestCase
 
     public function testSavingSingleAndDynamicLoading()
     {
+        Config::set('neoeleoquent.relationship-timestamps', true);
+
         $author = Author::create(['name' => 'George R. R. Martin']);
         $got = new Book(['title' => 'A Game of Thrones', 'pages' => '704', 'release_date' => 'August 1996']);
         $cok = new Book(['title' => 'A Clash of Kings', 'pages' => '768', 'release_date' => 'February 1999']);
@@ -79,6 +82,8 @@ class HasManyRelationTest extends TestCase
 
     public function testSavingManyAndDynamicLoading()
     {
+        Config::set('neoeleoquent.relationship-timestamps', true);
+
         $author = Author::create(['name' => 'George R. R. Martin']);
 
         $novel = [

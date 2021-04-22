@@ -43,6 +43,12 @@ class NeoEloquentServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if (function_exists('config_path')) { // function not available and 'publish' not relevant in Lumen
+            $this->publishes([
+                __DIR__.'/../config/neoeloquent.php' => config_path('neoeloquent.php'),
+            ], 'config');
+        }
+
         $this->app['db']->extend('neo4j', function ($config) {
             $conn = new Connection($config);
             $conn->setSchemaGrammar(new CypherGrammar());

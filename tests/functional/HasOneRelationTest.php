@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne;
 
+use Illuminate\Support\Facades\Config;
 use Mockery as M;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Tests\TestCase;
@@ -122,6 +123,7 @@ class HasOneRelationTest extends TestCase
 
     public function testSavingRelatedHasOneModel()
     {
+        Config::set('neoeleoquent.relationship-timestamps', true);
         $user = User::create(['name' => 'Tests', 'email' => 'B']);
         $profile = Profile::create(['guid' => uniqid(), 'service' => 'twitter']);
 
@@ -139,6 +141,19 @@ class HasOneRelationTest extends TestCase
         // delete the relation and make sure it was deleted
         // so that we can delete the nodes when cleaning up.
         $this->assertTrue($relation->delete());
+    }
+
+    public function testSavingRelatedHasOneModelWithoutTimestamps()
+    {
+        Config::set('neoeleoquent.relationship-timestamps', false);
+        $user = User::create(['name' => 'Tests', 'email' => 'B']);
+        $profile = Profile::create(['guid' => uniqid(), 'service' => 'twitter']);
+
+        $relation = $user->profile()->save($profile);
+        $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut', $relation);
+
+        $this->assertNull($relation->created_at, 'make sure we do not set the created_at timestamp if disabled in config');
+        $this->assertNull($relation->updated_at, 'make sure we do not set the updated_at timestamp if disabled in config');
     }
 
     public function testRetrievingRelationWithAttributesSpecifyingEdgeModel()

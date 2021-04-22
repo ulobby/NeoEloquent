@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Config;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\NoEdgeDirectionException;
@@ -630,6 +631,14 @@ abstract class Relation extends Delegate
      */
     protected function updateTimestamps()
     {
+        /* To reduce a lean database, reducing neo4j's use of memory, timestamps are only set if explicitly enabled in config.
+         * In order not to break anything for users who already use these timestamps in their apps,
+         * the old functionality is retained if the configuration is not set.
+         */
+        if (Config::has('neoeloquent.relationship-timestamps') && Config::get('neoeloquent.relationship-timestamps') == false) {
+            return;
+        }
+
         if ($this->parent->timestamps) {
             $time = $this->freshTimestamp();
 

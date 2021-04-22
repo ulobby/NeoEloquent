@@ -735,7 +735,7 @@ $post    = $edge->related();
 
 #### Edge Attributes
 
-By default, edges will have the timestamps `created_at` and `updated_at` automatically set and updated **only if** timestamps are enabled by setting `$timestamps` to `true`
+By default, edges will have the timestamps `created_at` and `updated_at` automatically set and updated **only if** timestamps are enabled in config/neoeloquent.php and by setting `$timestamps` to `true`
 on the parent model.
 
 ```php
