@@ -3,6 +3,10 @@
 namespace Vinelab\NeoEloquent\Eloquent;
 
 use Closure;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\Node;
@@ -12,11 +16,6 @@ use Vinelab\NeoEloquent\Exceptions\ModelNotFoundException;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\Query\Builder as QueryBuilder;
 use Vinelab\NeoEloquent\Query\Expression;
-
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use Vinelab\NeoEloquent\Traits\ResultTrait;
 
 class Builder
@@ -130,9 +129,9 @@ class Builder
      * @param mixed $id
      * @param array $columns
      *
-     * @return Model|Collection
-     *
      * @throws ModelNotFoundException
+     *
+     * @return Model|Collection
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -166,9 +165,9 @@ class Builder
      *
      * @param array $columns
      *
-     * @return Model|static
-     *
      * @throws ModelNotFoundException
+     *
+     * @return Model|static
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -252,7 +251,7 @@ class Builder
                 break;
             }
 
-            ++$page;
+            $page++;
 
             $results = $this->forPage($page, $count)->get();
         }
@@ -390,7 +389,7 @@ class Builder
      *
      * @return array|static[]
      */
-    public function getModels($properties = array('*'))
+    public function getModels($properties = ['*'])
     {
         // First, we will simply get the raw results from the query builders which we
         // can use to populate an array with Eloquent models. We will pass columns
@@ -445,8 +444,8 @@ class Builder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param array    $models
-     * @param string   $name
+     * @param array   $models
+     * @param string  $name
      * @param Closure $constraints
      *
      * @return array
@@ -613,7 +612,7 @@ class Builder
     /**
      * Turn Neo4j result set into the corresponding model.
      *
-     * @param string $connection
+     * @param string      $connection
      * @param ?CypherList $results
      *
      * @return array
@@ -643,7 +642,7 @@ class Builder
                         $endNode = (is_array($resultsByIdentifier[$endIdentifier])) ? $resultsByIdentifier[$endIdentifier][$index] : reset($resultsByIdentifier[$endIdentifier]);
                         $models[] = [
                             $startIdentifier => $this->newModelFromNode($startNode, $startModelClass, $connection),
-                            $endIdentifier => $this->newModelFromNode($endNode, $endModelClass, $connection),
+                            $endIdentifier   => $this->newModelFromNode($endNode, $endModelClass, $connection),
                         ];
                     }
                 }
@@ -698,8 +697,8 @@ class Builder
     /**
      * Get a Model instance out of the given node.
      *
-     * @param Node $node
-     * @param Model $model
+     * @param Node   $node
+     * @param Model  $model
      * @param string $connection
      *
      * @return Model
@@ -730,8 +729,8 @@ class Builder
     /**
      * Turn Neo4j result set into the corresponding model with its relations.
      *
-     * @param string                                            $connection
-     * @param CypherList    $results
+     * @param string     $connection
+     * @param CypherList $results
      *
      * @return array
      */
@@ -914,9 +913,9 @@ class Builder
      * Get the properties (attribtues in Eloquent terms)
      * out of a result row.
      *
-     * @param array                     $columns The columns retrieved by the result
-     * @param Row $row
-     * @param array                     $columns
+     * @param array $columns The columns retrieved by the result
+     * @param Row   $row
+     * @param array $columns
      *
      * @return array
      *
@@ -925,7 +924,7 @@ class Builder
     public function getProperties(array $resultColumns, Row $row)
     {
         dd('Get Properties, Everyman dependent');
-        $attributes = array();
+        $attributes = [];
 
         $columns = $this->query->columns;
 
@@ -1003,9 +1002,9 @@ class Builder
     /**
      * Get the attributes of a result Row.
      *
-     * @param Row $row
-     * @param array                     $columns       The query columns
-     * @param array                     $resultColumns The result columns that can be extracted from a \Everyman\Neo4j\Query\ResultSet
+     * @param Row   $row
+     * @param array $columns       The query columns
+     * @param array $resultColumns The result columns that can be extracted from a \Everyman\Neo4j\Query\ResultSet
      *
      * @return array
      */
@@ -1080,9 +1079,9 @@ class Builder
      * @param string   $pageName
      * @param int|null $page
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     *
      * @throws InvalidArgumentException
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -1094,7 +1093,7 @@ class Builder
         );
 
         return new LengthAwarePaginator($this->get($columns), $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+            'path'     => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -1124,7 +1123,7 @@ class Builder
      *
      * @internal param \Illuminate\Pagination\Factory $paginator
      */
-    public function simplePaginate($perPage = null, $columns = array('*'), $pageName = 'page')
+    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
     {
         $paginator = $this->query->getConnection()->getPaginator();
         $page = $paginator->getCurrentPage();
@@ -1132,7 +1131,7 @@ class Builder
         $this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return new Paginator($this->get($columns), $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+            'path'     => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -1140,14 +1139,14 @@ class Builder
     /**
      * Add a mutation to the query.
      *
-     * @param string                                     $holder
+     * @param string       $holder
      * @param Model|string $model  String in the case of morphs where we do not know
-     *                                                           the morph model class name
+     *                             the morph model class name
      */
     public function addMutation($holder, $model, $type = 'one')
     {
         $this->mutations[$holder] = [
-            'type' => $type,
+            'type'  => $type,
             'model' => $model,
         ];
     }
@@ -1155,8 +1154,8 @@ class Builder
     /**
      * Add a mutation of the type 'many' to the query.
      *
-     * @param string                              $holder
-     * @param Model $model
+     * @param string $holder
+     * @param Model  $model
      */
     public function addManyMutation($holder, Model $model)
     {
@@ -1327,10 +1326,10 @@ class Builder
     /**
      * Add a relationship query condition.
      *
-     * @param string   $relation
-     * @param string   $operator
-     * @param int      $count
-     * @param string   $boolean
+     * @param string  $relation
+     * @param string  $operator
+     * @param int     $count
+     * @param string  $boolean
      * @param Closure $callback
      *
      * @return Builder|static
@@ -1383,7 +1382,8 @@ class Builder
         // Set the relationship match clause.
         $method = $this->getMatchMethodName($relation);
 
-        $this->$method($relation->getParent(),
+        $this->$method(
+            $relation->getParent(),
             $relation->getRelated(),
             $relatedNode,
             $relation->getRelationType(),
@@ -1413,10 +1413,10 @@ class Builder
     /**
      * Add nested relationship count conditions to the query.
      *
-     * @param string        $relations
-     * @param string        $operator
-     * @param int           $count
-     * @param string        $boolean
+     * @param string       $relations
+     * @param string       $operator
+     * @param int          $count
+     * @param string       $boolean
      * @param Closure|null $callback
      *
      * @return Builder|static
@@ -1428,7 +1428,7 @@ class Builder
         // In order to nest "has", we need to add count relation constraints on the
         // callback Closure. We'll do this by simply passing the Closure its own
         // reference to itself so it calls itself recursively on each segment.
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback) {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count , $callback) {
             if (count($relations) > 1) {
                 $q->whereHas(array_shift($relations), $closure);
             } else {
@@ -1442,8 +1442,8 @@ class Builder
     /**
      * Add a relationship count condition to the query.
      *
-     * @param string        $relation
-     * @param string        $boolean
+     * @param string       $relation
+     * @param string       $boolean
      * @param Closure|null $callback
      *
      * @return Builder|static
@@ -1456,10 +1456,10 @@ class Builder
     /**
      * Add a relationship count condition to the query with where clauses.
      *
-     * @param string   $relation
+     * @param string  $relation
      * @param Closure $callback
-     * @param string   $operator
-     * @param int      $count
+     * @param string  $operator
+     * @param int     $count
      *
      * @return Builder|static
      */
@@ -1485,7 +1485,7 @@ class Builder
     /**
      * Add a relationship count condition to the query with where clauses.
      *
-     * @param string        $relation
+     * @param string       $relation
      * @param Closure|null $callback
      *
      * @return Builder|static
@@ -1498,10 +1498,10 @@ class Builder
     /**
      * Add a relationship count condition to the query with where clauses and an "or".
      *
-     * @param string   $relation
+     * @param string  $relation
      * @param Closure $callback
-     * @param string   $operator
-     * @param int      $count
+     * @param string  $operator
+     * @param int     $count
      *
      * @return Builder|static
      */
@@ -1513,11 +1513,11 @@ class Builder
     /**
      * Add the "has" condition where clause to the query.
      *
-     * @param Builder $hasQuery
+     * @param Builder  $hasQuery
      * @param Relation $relation
-     * @param string                                           $operator
-     * @param int                                              $count
-     * @param string                                           $boolean
+     * @param string   $operator
+     * @param int      $count
+     * @param string   $boolean
      *
      * @return Builder
      */
@@ -1535,7 +1535,7 @@ class Builder
     /**
      * Merge the "wheres" from a relation query to a has query.
      *
-     * @param Builder $hasQuery
+     * @param Builder  $hasQuery
      * @param Relation $relation
      */
     protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
@@ -1548,7 +1548,8 @@ class Builder
         $hasQuery = $hasQuery->getModel()->removeGlobalScopes($hasQuery);
 
         $hasQuery->mergeWheres(
-            $relationQuery->wheres, $relationQuery->getBindings()
+            $relationQuery->wheres,
+            $relationQuery->getBindings()
         );
 
         $this->query->mergeBindings($hasQuery->getQuery());
@@ -1738,7 +1739,7 @@ class Builder
     /**
      * Extend the builder with a given callback.
      *
-     * @param string   $name
+     * @param string  $name
      * @param Closure $callback
      */
     public function macro($name, Closure $callback)
@@ -1897,7 +1898,7 @@ class Builder
      * Prefix query bindings and wheres with the relation's model Node placeholder.
      *
      * @param Builder $query
-     * @param string                                $prefix
+     * @param string  $prefix
      */
     protected function prefixAndMerge(Builder $query, $prefix)
     {
@@ -1921,7 +1922,7 @@ class Builder
         return array_map(function ($where) use ($prefix) {
             if ($where['type'] == 'Nested') {
                 $where['query']->wheres = $this->prefixWheres($where['query']->wheres, $prefix);
-            } else if ($where['type'] != 'Carried' && strpos($where['column'], '.') == false) {
+            } elseif ($where['type'] != 'Carried' && strpos($where['column'], '.') == false) {
                 $column = $where['column'];
                 $where['column'] = ($this->isId($column)) ? $column : $prefix.'.'.$column;
             }

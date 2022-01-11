@@ -2,10 +2,10 @@
 
 namespace Vinelab\NeoEloquent\Migrations;
 
-use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\ConnectionResolverInterface;
-use Vinelab\NeoEloquent\Schema\Builder as SchemaBuilder;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Vinelab\NeoEloquent\Eloquent\Model;
+use Vinelab\NeoEloquent\Schema\Builder as SchemaBuilder;
 
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -53,7 +53,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Get list of migrations.
      *
-     * @param  int  $steps
+     * @param int $steps
+     *
      * @return array
      */
     public function getMigrations($steps)
@@ -76,7 +77,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function log($file, $batch)
     {
-        $record = array('migration' => $file, 'batch' => $batch);
+        $record = ['migration' => $file, 'batch' => $batch];
 
         $this->model->create($record);
     }
@@ -110,7 +111,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function createRepository()
     {
-        return;
+
     }
 
     /**
@@ -128,7 +129,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     protected function label()
     {
-        return $this->getConnection()->table(array($this->getLabel()));
+        return $this->getConnection()->table([$this->getLabel()]);
     }
 
     /**
