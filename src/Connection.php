@@ -4,13 +4,18 @@ namespace Vinelab\NeoEloquent;
 
 use Closure;
 use DateTime;
-use Everyman\Neo4j\Client as NeoClient;
+//use Everyman\Neo4j\Client as NeoClient;
 use Everyman\Neo4j\Cypher\Query as CypherQuery;
-use Everyman\Neo4j\Query\ResultSet;
 use Exception;
 use Illuminate\Database\Connection as IlluminateConnection;
 use Illuminate\Database\Schema\Grammars\Grammar as IlluminateSchemaGrammar;
 use Illuminate\Support\Arr;
+use Laudis\Neo4j\Authentication\Authenticate;
+use Laudis\Neo4j\Client as NeoClient;
+use Laudis\Neo4j\ClientBuilder;
+use Laudis\Neo4j\Contracts\TransactionInterface;
+use Laudis\Neo4j\Databags\SummarizedResult;
+use Throwable;
 use Vinelab\NeoEloquent\Query\Builder;
 
 class Connection extends IlluminateConnection
@@ -18,7 +23,7 @@ class Connection extends IlluminateConnection
     /**
      * The Neo4j active client connection.
      *
-     * @var \Everyman\Neo4j\Client
+     * @var NeoClient
      */
     protected $neo;
 
@@ -79,10 +84,22 @@ class Connection extends IlluminateConnection
     /**
      * Create a new Neo4j client.
      *
-     * @return \Everyman\Neo4j\Client
+     * @return
      */
     public function createConnection()
     {
+        $client = ClientBuilder::create()
+            ->withDriver('bolt', 'bolt://neo4j:test@localhost') // creates a bolt driver
+//            ->withDriver('https', 'https://localhost', Authenticate::basic('neo4j', 'test')) // creates an http driver
+//            ->withDriver('neo4j', 'neo4j://neo4j.test.com?database=my-database', Authenticate::kerberos('token')) // creates an auto routed driver
+//            ->withDefaultDriver('bolt')
+            ->build();
+
+        return $client;
+        exit;
+
+        return $client;
+
         $client = new NeoClient($this->getHost(), $this->getPort());
         $client->getTransport()->useHttps($this->getSsl())->setAuth($this->getUsername(), $this->getPassword());
 
@@ -92,7 +109,7 @@ class Connection extends IlluminateConnection
     /**
      * Get the currenty active database client.
      *
-     * @return \Everyman\Neo4j\Client
+     * @return NeoClient
      */
     public function getClient()
     {
@@ -103,7 +120,7 @@ class Connection extends IlluminateConnection
      * Set the client responsible for the
      * database communication.
      *
-     * @param \Everyman\Neo4j\Client $client
+     * @param NeoClient $client
      */
     public function setClient(NeoClient $client)
     {
@@ -201,9 +218,9 @@ class Connection extends IlluminateConnection
             // For select statements, we'll simply execute the query and return an array
             // of the database result set. Each element in the array will be a single
             // node from the database, and will either be an array or objects.
-            $statement = $me->getCypherQuery($query, $bindings);
+            $query = $me->getCypherQuery($query, $bindings);
 
-            return $statement->getResultSet();
+            return $this->getClient()->run($query['statement'], $query['parameters']);
         });
     }
 
@@ -225,9 +242,12 @@ class Connection extends IlluminateConnection
             // For update or delete statements, we want to get the number of rows affected
             // by the statement and return that back to the developer. We'll first need
             // to execute the statement and then we'll use CypherQuery to fetch the affected.
-            $statement = $me->getCypherQuery($query, $bindings);
+            $query = $me->getCypherQuery($query, $bindings);
 
-            return $statement->getResultSet();
+            /** @var SummarizedResult $summarizedResult */
+            return $this->getClient()->writeTransaction(static function (TransactionInterface $tsx) use ($query) {
+                return $tsx->run($query['statement'], $query['parameters']);
+            });
         });
     }
 
@@ -246,11 +266,11 @@ class Connection extends IlluminateConnection
                 return true;
             }
 
-            $statement = $me->getCypherQuery($query, $bindings);
+            $query = $me->getCypherQuery($query, $bindings);
 
-            $result = $statement->getResultSet();
+            $results = $this->getClient()->run($query['statement'], $query['parameters']);
 
-            return ($rawResults === true) ? $result : $result instanceof ResultSet;
+            return ($rawResults === true) ? $results : true;
         });
     }
 
@@ -260,12 +280,10 @@ class Connection extends IlluminateConnection
      *
      * @param string $query
      * @param array  $bindings
-     *
-     * @return CypherQuery
      */
     public function getCypherQuery($query, array $bindings)
     {
-        return new CypherQuery($this->getClient(), $query, $this->prepareBindings($bindings));
+        return ['statement' => $query, 'parameters' => $this->prepareBindings($bindings)];
     }
 
     /**
@@ -380,6 +398,39 @@ class Connection extends IlluminateConnection
     }
 
     /**
+     * Execute a Closure within a transaction.
+     *
+     * @param Closure $callback
+     *
+     * @throws Throwable
+     *
+     * @return mixed
+     */
+    public function transaction(Closure $callback, $attempts = 1)
+    {
+        $this->beginTransaction();
+
+        // We'll simply execute the given callback within a try / catch block
+        // and if we catch any exception we can rollback the transaction
+        // so that none of the changes are persisted to the database.
+        try {
+            $result = $callback($this);
+
+            $this->commit();
+        }
+            // If we catch an exception, we will roll back so nothing gets messed
+            // up in the database. Then we'll re-throw the exception so it can
+            // be handled how the developer sees fit for their applications.
+        catch (Exception $e) {
+            $this->rollBack();
+
+            throw $e;
+        }
+
+        return $result;
+    }
+
+    /**
      * Start a new database transaction.
      *
      * @return void
@@ -467,9 +518,9 @@ class Connection extends IlluminateConnection
             $result = $callback($this, $query, $bindings);
         }
 
-        // If an exception occurs when attempting to run a query, we'll format the error
-        // message to include the bindings with Cypher, which will make this exception a
-        // lot more helpful to the developer instead of just the database's errors.
+            // If an exception occurs when attempting to run a query, we'll format the error
+            // message to include the bindings with Cypher, which will make this exception a
+            // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             throw new QueryException($query, $bindings, $e);
         }
@@ -542,5 +593,18 @@ class Connection extends IlluminateConnection
         $result = $statement->getResultSet();
 
         return $result[0][0];
+    }
+
+    /**
+     * Run an insert statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return mixed
+     */
+    public function insert($query, $bindings = [])
+    {
+        return $this->statement($query, $bindings, true);
     }
 }

@@ -2,13 +2,22 @@
 
 namespace Vinelab\NeoEloquent\Tests;
 
+use Laudis\Neo4j\Databags\SummarizedResult;
+use Laudis\Neo4j\Types\CypherList;
+use Laudis\Neo4j\Types\CypherMap;
 use Mockery as M;
 
 class ConnectionTest extends TestCase
 {
+    protected $client;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        $connection = (new Stub())->getConnection();
+
+        $this->client = $connection->getClient();
 
         $this->user = [
             'name'     => 'Mulkave',
@@ -17,16 +26,16 @@ class ConnectionTest extends TestCase
         ];
     }
 
+    protected function flushDb()
+    {
+        $flushQuery = 'MATCH (n) DETACH DELETE n';
+
+        $this->client->run($flushQuery);
+    }
+
     public function tearDown(): void
     {
-        $query = 'MATCH (n:User) WHERE n.username = {username} DELETE n RETURN count(n)';
-
-        $c = $this->getConnectionWithConfig('default');
-
-        $cypher = $c->getCypherQuery($query, [['username' => $this->user['username']]]);
-        $cypher->getResultSet();
-
-        M::close();
+        $this->flushDb();
 
         parent::tearDown();
     }
@@ -44,7 +53,7 @@ class ConnectionTest extends TestCase
 
         $client = $c->getClient();
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $client);
+        $this->assertInstanceOf('Laudis\Neo4j\Client', $client);
     }
 
     public function testGettingConfigParam()
@@ -66,7 +75,7 @@ class ConnectionTest extends TestCase
     {
         $c = $this->getConnectionWithConfig('neo4j');
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $c->getClient());
+        $this->assertInstanceOf('Laudis\Neo4j\Client', $c->getClient());
     }
 
     public function testGettingDefaultHost()
@@ -207,9 +216,13 @@ class ConnectionTest extends TestCase
     {
         $c = $this->getConnectionWithConfig('default');
 
-        $query = $c->getCypherQuery('MATCH (u:`User`) RETURN * LIMIT 10', []);
+        $cypher = 'MATCH (u:`User`) RETURN * LIMIT 10';
+        $query = $c->getCypherQuery($cypher, []);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Cypher\Query', $query);
+        $this->assertIsArray($query);
+        $this->assertArrayHasKey('statement', $query);
+        $this->assertArrayHasKey('parameters', $query);
+        $this->assertEquals($cypher, $query['statement']);
     }
 
     public function testCheckingIfBindingIsABinding()
@@ -233,7 +246,7 @@ class ConnectionTest extends TestCase
 
         $connection = $c->createConnection();
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $connection);
+        $this->assertInstanceOf('Laudis\Neo4j\Client', $connection);
     }
 
     public function testSelectWithBindings()
@@ -254,12 +267,12 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($log['query'], $query);
         $this->assertEquals($log['bindings'], $bindings);
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf('Laudis\Neo4j\Databags\SummarizedResult', $results);
 
         // This is how we get the first row of the result (first [0])
         // and then we get the Node instance (the 2nd [0])
         // and then ask it to return its properties
-        $selected = $results[0][0]->getProperties();
+        $selected = $results->first()->first()->getValue()->properties()->toArray();
 
         $this->assertEquals($this->user, $selected, 'The fetched User must be the same as the one we just created');
     }
@@ -280,7 +293,7 @@ class ConnectionTest extends TestCase
         // Get the ID of the created record
         $results = $c->select($query, [['username' => $this->user['username']]]);
 
-        $node = $results[0][0];
+        $node = $results->first()->first()->getValue();
         $id = $node->getId();
 
         $bindings = [
@@ -296,9 +309,9 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($log[1]['query'], $query);
         $this->assertEquals($log[1]['bindings'], $bindings);
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf('Laudis\Neo4j\Databags\SummarizedResult', $results);
 
-        $selected = $results[0][0]->getProperties();
+        $selected = $results->first()->first()->getValue()->properties()->toArray();
 
         $this->assertEquals($this->user, $selected);
     }
@@ -307,14 +320,14 @@ class ConnectionTest extends TestCase
     {
         $c = $this->getConnectionWithConfig('default');
 
-        $created = $this->createUser();
+        $this->createUser();
 
         $type = 'dev';
 
         // Now we update the type and set it to $type
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} '.
-                 'SET n.type = {type}, n.updated_at = {updated_at} '.
-                 'RETURN count(n)';
+        $query = 'MATCH (n:`User`) WHERE n.username = $username '.
+            'SET n.type = $type, n.updated_at = $updated_at '.
+            'RETURN count(n)';
 
         $bindings = [
             ['type'       => $type],
@@ -324,27 +337,23 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(SummarizedResult::class, $results);
 
+        /** @var CypherMap $result */
         foreach ($results as $result) {
-            $count = $result[0];
+            $count = $result->first()->getValue();
             $this->assertEquals(1, $count);
         }
 
         // Try to find the updated one and make sure it was updated successfully
-        $query = 'MATCH (n:User) WHERE n.username = {username} RETURN n';
-        $cypher = $c->getCypherQuery($query, [['username' => $this->user['username']]]);
+        $query = 'MATCH (n:User) WHERE n.username = $username RETURN n';
+        $cypher = $c->getCypherQuery($query, ['username' => $this->user['username']]);
 
-        $results = $cypher->getResultSet();
+        $results = $this->client->run($cypher['statement'], $cypher['parameters']);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(CypherList::class, $results);
 
-        $user = null;
-
-        foreach ($results as $result) {
-            $node = $result[0];
-            $user = $node->getProperties();
-        }
+        $user = $results->first()->first()->getValue()->getProperties()->toArray();
 
         $this->assertEquals($type, $user['type']);
     }
@@ -356,9 +365,9 @@ class ConnectionTest extends TestCase
         $type = 'dev';
 
         // Now we update the type and set it to $type
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} '.
-                 'SET n.type = {type}, n.updated_at = {updated_at} '.
-                 'RETURN count(n)';
+        $query = 'MATCH (n:`User`) WHERE n.username = $username '.
+            'SET n.type = $type, n.updated_at = $updated_at '.
+            'RETURN count(n)';
 
         $bindings = [
             ['type'       => $type],
@@ -368,10 +377,11 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(SummarizedResult::class, $results);
 
+        /** @var CypherMap $result */
         foreach ($results as $result) {
-            $count = $result[0];
+            $count = $result->first()->getValue();
             $this->assertEquals(0, $count);
         }
     }
@@ -456,32 +466,20 @@ class ConnectionTest extends TestCase
 
     public function testTransactionMethodRunsSuccessfully()
     {
-        $client = M::mock('Everyman\Neo4j\Client');
-        $client->shouldReceive('beginTransaction')->once()
-            ->andReturn(M::mock('Everyman\Neo4j\Transaction')->makePartial());
-
         $connection = $this->getMockConnection();
-        $connection->setClient($client);
+        $connection->setClient($this->client);
 
-        $result = $connection->beginTransaction(function ($db) {
-            return $db;
-        });
-        $this->assertNull($result);
+        $result = $connection->transaction(function ($db) { return $db; });
+        $this->assertEquals($connection, $result);
     }
 
     public function testTransactionMethodRollsbackAndThrows()
     {
-        $neo = M::mock('Everyman\Neo4j\Client');
-        $neo->shouldReceive('beginTransaction')->once()
-            ->andReturn(M::mock('Everyman\Neo4j\Transaction')->makePartial());
-
         $connection = $this->getMockConnection();
-        $connection->setClient($neo);
+        $connection->setClient($this->client);
 
         try {
-            $connection->transaction(function () {
-                throw new \Exception('foo');
-            });
+            $connection->transaction(function () { throw new \Exception('foo'); });
         } catch (\Exception $e) {
             $this->assertEquals('foo', $e->getMessage());
         }
@@ -516,7 +514,7 @@ class ConnectionTest extends TestCase
             ['username' => $this->user['username']],
         ]);
 
-        return $createCypher->getResultSet();
+        return $this->client->run($createCypher['statement'], $createCypher['parameters']);
     }
 
     protected function getMockConnection($methods = [])
@@ -524,9 +522,9 @@ class ConnectionTest extends TestCase
         $defaults = ['getDefaultQueryGrammar', 'getDefaultPostProcessor', 'getDefaultSchemaGrammar', 'getDoctrineSchemaManager', 'getDoctrineConnection'];
 
         return $this->getMockBuilder(\Vinelab\NeoEloquent\Connection::class)
-        ->setMethods(array_merge($defaults, $methods))
-        ->setConstructorArgs([])
-        ->getMock();
+            ->setMethods(array_merge($defaults, $methods))
+            ->setConstructorArgs([])
+            ->getMock();
     }
 }
 
