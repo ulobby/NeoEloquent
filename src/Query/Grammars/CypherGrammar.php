@@ -594,7 +594,7 @@ class CypherGrammar extends Grammar
             // with query bindings.
             $postfix = $updating ? '_update' : '_create';
 
-            $columns[] = $this->wrap($key).' = '.$this->parameter(array('column' => $key.$postfix));
+            $columns[] = $this->wrap($key).' = '.$this->parameter(['column' => $key.$postfix]);
         }
 
         return implode(', ', $columns);

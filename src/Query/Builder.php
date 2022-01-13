@@ -130,6 +130,7 @@ class Builder extends IlluminateQueryBuilder
 
         /** @var Node $node */
         $node = $results->first()->first()->getValue();
+
         return $node->getId();
     }
 
