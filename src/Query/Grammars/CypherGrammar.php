@@ -582,6 +582,43 @@ class CypherGrammar extends Grammar
         return 'CREATE '.$this->prepareEntities($values);
     }
 
+    public function columnsFromValues(array $values, $updating = false)
+    {
+        $columns = [];
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+
+        foreach ($values as $key => $value) {
+            // Update bindings are differentiated with an _update postfix to make sure the don't clash
+            // with query bindings.
+            $postfix = $updating ? '_update' : '_create';
+
+            $columns[] = $this->wrap($key).' = '.$this->parameter(array('column' => $key.$postfix));
+        }
+
+        return implode(', ', $columns);
+    }
+
+    /**
+     * Compile a create statement into Cypher.
+     *
+     * @param \Vinelab\NeoEloquent\Query\Builder $query
+     * @param array                              $values
+     *
+     * @return string
+     */
+    public function compileCreate(Builder $query, $values)
+    {
+        $labels = $this->prepareLabels($query->from);
+
+        $columns = $this->columnsFromValues($values);
+
+        $node = $query->modelAsNode();
+
+        return "CREATE ({$node}{$labels}) SET {$columns} RETURN {$node}";
+    }
+
     /**
      * Compile a query that creates multiple nodes of multiple model types related all together.
      *

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
+use Laudis\Neo4j\Types\CypherList;
+use Laudis\Neo4j\Types\Node;
 use Vinelab\NeoEloquent\Connection;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 
@@ -122,27 +124,14 @@ class Builder extends IlluminateQueryBuilder
      */
     public function insertGetId(array $values, $sequence = null)
     {
-        // create a neo4j Node
-        $node = $this->client->makeNode();
+        $cypher = $this->grammar->compileCreate($this, $values);
+        $bindings = $this->getBindingsMergedWithValues($values);
+        /** @var CypherList $results */
+        $results = $this->connection->insert($cypher, $bindings);
 
-        // set its properties
-        foreach ($values as $key => $value) {
-            $value = $this->formatValue($value);
-
-            $node->setProperty($key, $value);
-        }
-
-        // save the node
-        $node->save();
-
-        // get the saved node id
-        $id = $node->getId();
-
-        // set the labels
-        $from = is_array($this->from) ? $this->from : [$this->from];
-        $node->addLabels(array_map([$this, 'makeLabel'], $from));
-
-        return $id;
+        /** @var Node $node */
+        $node = $results->first()->first()->getValue();
+        return $node->getId();
     }
 
     /**
@@ -172,12 +161,14 @@ class Builder extends IlluminateQueryBuilder
      *
      * @return array
      */
-    protected function getBindingsMergedWithValues(array $values)
+    protected function getBindingsMergedWithValues(array $values, $updating = false)
     {
         $bindings = [];
 
+        $values = $this->getGrammar()->postfixValues($values, $updating);
+
         foreach ($values as $key => $value) {
-            $bindings[$key.'_update'] = $value;
+            $bindings[$key] = $value;
         }
 
         return array_merge($this->getBindings(), $bindings);

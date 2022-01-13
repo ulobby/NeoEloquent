@@ -173,6 +173,19 @@ class Grammar extends IlluminateGrammar
         return implode(', ', $values);
     }
 
+    public function postfixValues(array $values, $updating = false)
+    {
+        $postfix = $updating ? '_update' : '_create';
+
+        $processed = [];
+
+        foreach ($values as $key => $value) {
+            $processed[$key.$postfix] = $value;
+        }
+
+        return $processed;
+    }
+
     /**
      * Get a model's name as a Node placeholder.
      *

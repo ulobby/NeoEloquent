@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\Tests;
 
+use Laudis\Neo4j\Databags\SummarizedResult;
 use Mockery as M;
 use PHPUnit\Framework\TestCase as PHPUnit;
 use Vinelab\NeoEloquent\Connection;
@@ -78,5 +79,35 @@ class TestCase extends PHPUnit
         $connection = (new Stub())->getConnection();
 
         return $connection->getClient();
+    }
+
+    /**
+     * get the node by the given id.
+     *
+     * @param int $id
+     *
+     * @return \Neoxygen\NeoClient\Formatter\Node
+     */
+    protected function getNodeById($id)
+    {
+        //get the labels using NeoClient
+        $connection = $this->getConnectionWithConfig('neo4j');
+        $client = $connection->getClient();
+        /** @var SummarizedResult $result */
+        $result = $client->run("MATCH (n) WHERE id(n)=$id RETURN n");
+
+        return $result->first()->first()->getValue();
+    }
+
+    /**
+     * Get node labels of a node by the given id.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    protected function getNodeLabels($id)
+    {
+        return $this->getNodeById($id)->labels()->toArray();
     }
 }
