@@ -8,7 +8,6 @@ use DateTime;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
 use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\Node;
 use Vinelab\NeoEloquent\Connection;
@@ -83,8 +82,8 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Create a new query builder instance.
      *
-     * @param Vinelab\NeoEloquent\Connection                  $connection
-     * @param \Illuminate\Database\Query\Grammars\Grammar     $grammar
+     * @param Vinelab\NeoEloquent\Connection              $connection
+     * @param \Illuminate\Database\Query\Grammars\Grammar $grammar
      *
      * @return void
      */
@@ -131,11 +130,11 @@ class Builder extends IlluminateQueryBuilder
         $bindings = $this->getBindingsMergedWithValues($values);
 
         /** @var CypherList $results */
-
         $results = $this->connection->insert($cypher, $bindings);
 
         /** @var Node $node */
         $node = $results->first()->first()->getValue();
+
         return $node->getId();
     }
 
@@ -660,7 +659,7 @@ class Builder extends IlluminateQueryBuilder
             ],
         ];
 
-        $this->addBinding(array($this->wrap($property) => $value), 'matches');
+        $this->addBinding([$this->wrap($property) => $value], 'matches');
 
         return $this;
     }
@@ -672,7 +671,7 @@ class Builder extends IlluminateQueryBuilder
 
         $this->matches[] = [
             'type'      => 'MorphTo',
-            'optional' => 'and',
+            'optional'  => 'and',
             'property'  => $property,
             'direction' => $direction,
             'related'   => ['node' => $relatedNode],

@@ -157,7 +157,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
          * node placeholder.
          */
         foreach ($models as $model) {
-            $matched = $results->filter(function ($result) use ($parent, $model, $models) {
+            $matched = $results->filter(function ($result) use ($parent, $model) {
                 if ($result[$parent] instanceof Model) {
                     // In the case of fetching nested relations, we will get an array
                     // with the first key being the model we need, and the other being

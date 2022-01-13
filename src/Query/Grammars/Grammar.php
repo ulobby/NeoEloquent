@@ -62,7 +62,7 @@ class Grammar extends IlluminateGrammar
     {
         if (is_array($labels)) {
             // get the labels prepared and back to a string imploded by : they go.
-            $labels = implode('', array_map(array($this, 'wrapLabel'), $labels));
+            $labels = implode('', array_map([$this, 'wrapLabel'], $labels));
         }
 
         return $labels;
@@ -215,7 +215,6 @@ class Grammar extends IlluminateGrammar
             }
 
             return $value;
-
         }, $values);
 
         // stringify them.
@@ -336,11 +335,11 @@ class Grammar extends IlluminateGrammar
         return "($label { ".implode(', ', $properties).'})';
     }
 
-
     /**
      * Concatenate an array of segments, removing empties.
      *
-     * @param  array   $segments
+     * @param array $segments
+     *
      * @return string
      */
     protected function concatenate($segments)
@@ -412,7 +411,6 @@ class Grammar extends IlluminateGrammar
     {
         return $bindings;
     }
-
 
     /**
      * Convert an array of column names into a delimited string.

@@ -54,11 +54,11 @@ class BuilderTest extends TestCase
         ];
 
         $query = [
-            'statement' => 'CREATE (hero:`Hero`) SET hero.length = $length_create, hero.height = $height_create, hero.power = $power_create RETURN hero',
+            'statement'  => 'CREATE (hero:`Hero`) SET hero.length = $length_create, hero.height = $height_create, hero.power = $power_create RETURN hero',
             'parameters' => [
                 'length_create' => $values['length'],
                 'height_create' => $values['height'],
-                'power_create' => $values['power'],
+                'power_create'  => $values['power'],
             ],
         ];
 
@@ -242,7 +242,7 @@ class BuilderTest extends TestCase
 
         $bindings = $builder->getBindings();
         $this->assertEquals('MATCH (user:User) WHERE user.username = $userusername RETURN *', $builder->toCypher());
-        $this->assertEquals(array('userusername' => 'bakalazma'), $bindings);
+        $this->assertEquals(['userusername' => 'bakalazma'], $bindings);
     }
 
     public function testBasicSelectDistinct()

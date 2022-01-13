@@ -217,7 +217,7 @@ class ConnectionTest extends TestCase
         $c = $this->getConnectionWithConfig('default');
 
         $cypher = 'MATCH (u:`User`) RETURN * LIMIT 10';
-        $query = $c->getCypherQuery($cypher, array());
+        $query = $c->getCypherQuery($cypher, []);
 
         $this->assertIsArray($query);
         $this->assertArrayHasKey('statement', $query);
@@ -347,7 +347,7 @@ class ConnectionTest extends TestCase
 
         // Try to find the updated one and make sure it was updated successfully
         $query = 'MATCH (n:User) WHERE n.username = $username RETURN n';
-        $cypher = $c->getCypherQuery($query, array('username' => $this->user['username']));
+        $cypher = $c->getCypherQuery($query, ['username' => $this->user['username']]);
 
         $results = $this->client->run($cypher['statement'], $cypher['parameters']);
 

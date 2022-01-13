@@ -391,15 +391,15 @@ class EloquentBuilderTest extends TestCase
         $id = 6;
 
         // the expected result set
-        $result = array(
+        $result = [
 
-            'id' => $id,
-            'name' => 'Some Name',
+            'id'    => $id,
+            'name'  => 'Some Name',
             'email' => 'some@mail.net',
-        );
+        ];
 
         // the properties that we need returned of our model
-        $properties = array('id(n)', 'n.name', 'n.email', 'n.somthing');
+        $properties = ['id(n)', 'n.name', 'n.email', 'n.somthing'];
 
         $resultSet = $this->createNodeResultSet($result, $properties);
 
@@ -408,17 +408,17 @@ class EloquentBuilderTest extends TestCase
             ->shouldReceive('take')->once()->with(1)->andReturn($this->query)
             ->shouldReceive('get')->once()->with($properties)->andReturn($resultSet)
             ->shouldReceive('from')->once()->with('Model')
-            ->andReturn(array('Model'));
+            ->andReturn(['Model']);
 
         // our User object that we expect to have returned
         $user = M::mock('User');
         $user->shouldReceive('setConnection')->once()->with('default');
 
         // model method calls expectations
-        $attributes = array_merge($result, array('id' => $id));
+        $attributes = array_merge($result, ['id' => $id]);
 
         // the Collection that represents the returned result by Eloquent holding the User as an item
-        $collection = new \Illuminate\Support\Collection(array($user));
+        $collection = new \Illuminate\Support\Collection([$user]);
 
         $this->model->shouldReceive('newCollection')->once()->andReturn($collection)
             ->shouldReceive('getKeyName')->times(3)->andReturn('id')
@@ -595,7 +595,6 @@ class EloquentBuilderTest extends TestCase
      *                          [ [name => something, username => here] ]
      *                          or specify the attributes straight in the array
      * @param array $properties The expected properties (columns)
-     *
      */
     public function createNodeResultSet($data = [], $properties = [])
     {
