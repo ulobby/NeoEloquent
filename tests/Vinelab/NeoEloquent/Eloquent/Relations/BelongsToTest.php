@@ -77,7 +77,7 @@ class BelongsToTest extends TestCase
     protected function getEagerRelation($models)
     {
         $query = M::mock('Vinelab\NeoEloquent\Query\Builder');
-        $query->shouldReceive('modelAsNode')->with(['Stub'])->andReturn('parent');
+        $query->shouldReceive('modelAsNode')->with(array('Stub'))->andReturn('parent');
 
         $builder = M::mock('Vinelab\NeoEloquent\Eloquent\Builder');
         $builder->shouldReceive('getQuery')->times(4)->andReturn($query);
@@ -86,7 +86,7 @@ class BelongsToTest extends TestCase
 
         $related = M::mock('Vinelab\NeoEloquent\Eloquent\Model')->makePartial();
         $related->shouldReceive('getKeyName')->andReturn('id');
-        $related->shouldReceive('getTable')->andReturn('relation');
+        $related->shouldReceive('nodeLabel')->andReturn('relation');
 
         $id = 19;
         $parent = new Stub(['id' => $id]);
@@ -123,7 +123,7 @@ class BelongsToTest extends TestCase
 
         $related = M::mock('Vinelab\NeoEloquent\Eloquent\Model')->makePartial();
         $related->shouldReceive('getKeyName')->andReturn('id');
-        $related->shouldReceive('getTable')->andReturn('relation');
+        $related->shouldReceive('nodeLabel')->andReturn('relation');
 
         $builder->shouldReceive('getModel')->once()->andReturn($related);
 

@@ -171,7 +171,7 @@ abstract class OneRelation extends BelongsTo implements RelationInterface
     public function match(array $models, Collection $results, $relation)
     {
         // We will need the parent node placeholder so that we use it to extract related results.
-        $parent = $this->query->getQuery()->modelAsNode($this->parent->getTable());
+        $parent = $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
 
         /*
          * Looping into all the parents to match back onto their children using
@@ -222,12 +222,12 @@ abstract class OneRelation extends BelongsTo implements RelationInterface
 
     public function getParentNode()
     {
-        return $this->query->getQuery()->modelAsNode($this->parent->getTable());
+        return $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
     }
 
     public function getRelatedNode()
     {
-        return $this->query->getQuery()->modelAsNode($this->related->getTable());
+        return $this->query->getQuery()->modelAsNode($this->related->nodeLabel());
     }
 
     /**

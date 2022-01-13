@@ -2,8 +2,10 @@
 
 namespace Vinelab\NeoEloquent\Tests\Query;
 
-use Illuminate\Database\Query\Processors\Processor;
 use InvalidArgumentException;
+use Laudis\Neo4j\Types\CypherList;
+use Laudis\Neo4j\Types\CypherMap;
+use Laudis\Neo4j\Types\Node;
 use Mockery as M;
 use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Grammars\CypherGrammar;
@@ -17,12 +19,11 @@ class BuilderTest extends TestCase
 
         $this->grammar = M::mock('Vinelab\NeoEloquent\Query\Grammars\CypherGrammar')->makePartial();
         $this->connection = M::mock('Vinelab\NeoEloquent\Connection');
-        $this->processor = new Processor();
 
         $this->neoClient = M::mock('Everyman\Neo4j\Client');
         $this->connection->shouldReceive('getClient')->once()->andReturn($this->neoClient);
 
-        $this->builder = new Builder($this->connection, $this->grammar, $this->processor);
+        $this->builder = new Builder($this->connection, $this->grammar);
     }
 
     public function tearDown(): void
@@ -52,23 +53,25 @@ class BuilderTest extends TestCase
             'power'  => 'Strong Fart Noises',
         ];
 
-        $node = M::mock('Everyman\Neo4j\Node');
+        $query = [
+            'statement' => 'CREATE (hero:`Hero`) SET hero.length = $length_create, hero.height = $height_create, hero.power = $power_create RETURN hero',
+            'parameters' => [
+                'length_create' => $values['length'],
+                'height_create' => $values['height'],
+                'power_create' => $values['power'],
+            ],
+        ];
 
-        $this->neoClient->shouldReceive('makeNode')->once()->andReturn($node);
-        $this->neoClient->shouldReceive('makeLabel')->once()->andReturn($label);
+        $id = 69;
+        $node = new Node($id, new CypherList(['Hero']), new CypherMap($values));
+        $result = new CypherList([new CypherMap(['hero' => $node])]);
 
-        foreach ($values as $key => $value) {
-            $node->shouldReceive('setProperty')->once()->with($key, $value);
-        }
+        $this->neoClient->shouldReceive('run')
+            ->once()
+            ->with($query['statement'], $query['parameters'])
+            ->andReturn(new CypherList($result));
 
-        // node should save
-        $node->shouldReceive('save')->once();
-        // get the node id
-        $node->shouldReceive('getId')->once()->andReturn(9);
-        // add the labels
-        $node->shouldReceive('addLabels')->once()->with(M::type('array'));
-
-        $this->builder->insertGetId($values);
+        $this->assertEquals($id, $this->builder->insertGetId($values));
     }
 
     public function testTransformingQueryToCypher()
@@ -238,8 +241,8 @@ class BuilderTest extends TestCase
         $builder->select('*')->from('User')->where('username', '=', 'bakalazma');
 
         $bindings = $builder->getBindings();
-        $this->assertEquals('MATCH (user:User) WHERE user.username = {userusername} RETURN *', $builder->toCypher());
-        $this->assertEquals(['userusername' => 'bakalazma'], $bindings);
+        $this->assertEquals('MATCH (user:User) WHERE user.username = $userusername RETURN *', $builder->toCypher());
+        $this->assertEquals(array('userusername' => 'bakalazma'), $bindings);
     }
 
     public function testBasicSelectDistinct()
@@ -316,6 +319,6 @@ class BuilderTest extends TestCase
         $connection->shouldReceive('getClient')->once()->andReturn($client);
         $grammar = new CypherGrammar();
 
-        return new Builder($connection, $grammar, $this->processor);
+        return new Builder($connection, $grammar);
     }
 }

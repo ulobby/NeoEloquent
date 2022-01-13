@@ -40,7 +40,7 @@ class MorphTo extends OneRelation
     {
         if (static::$constraints) {
             // Get the parent node's placeholder.
-            $parentNode = $this->query->getQuery()->modelAsNode($this->parent->getTable());
+            $parentNode = $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
             // Tell the query that we need the morph model and the relationship represented by CypherGrammar
             // statically with 'r'.
             $this->query->select($this->relation, 'r');
@@ -67,7 +67,7 @@ class MorphTo extends OneRelation
     public function addEagerConstraints(array $models)
     {
         // Get the parent node's placeholder.
-        $parentNode = $this->query->getQuery()->modelAsNode($this->parent->getTable());
+        $parentNode = $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
         // Tell the query that we need the morph model and the relationship represented by CypherGrammar
         // statically with 'r'.
         $this->query->select('r', $parentNode, $this->relation);

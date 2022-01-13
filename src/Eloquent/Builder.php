@@ -9,12 +9,15 @@ use Illuminate\Database\Eloquent\Builder as IlluminateBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Laudis\Neo4j\Types\CypherList;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\QueryException;
+use Vinelab\NeoEloquent\Traits\ResultTrait;
 
 class Builder extends IlluminateBuilder
 {
     use Concerns\QueriesRelationships;
+    use ResultTrait;
 
     /**
      * The loaded models that should be transformed back
@@ -38,17 +41,16 @@ class Builder extends IlluminateBuilder
      */
     public function find($id, $properties = ['*'])
     {
-        //If the ID is numeric we cast it to int.
-        //otherwise we leave it as it is.
+        // If the dev did not specify the $id as an int it would break
+        // so we cast it anyways.
+
         if (is_array($id)) {
-            return $this->findMany(array_map(function ($id) {
-                return is_numeric($id) ? (int) $id : $id;
-            }, $id), $properties);
+            return $this->findMany(array_map('intval', $id), $properties);
         }
 
         if ($this->model->getKeyName() === 'id') {
             // ids are treated differently in neo4j so we have to adapt the query to them.
-            $this->query->where($this->model->getKeyName().'('.$this->query->modelAsNode().')', '=', $id);
+            $this->query->where($this->model->getKeyName().'('.$this->query->modelAsNode().')', '=', (int) $id);
         } else {
             $this->query->where($this->model->getKeyName(), '=', $id);
         }
@@ -85,41 +87,79 @@ class Builder extends IlluminateBuilder
         // that should be selected as well, which are typically just everything.
         $results = $this->query->get($properties);
 
+        $models = $this->resultsToModels($this->model->getConnectionName(), $results);
+        // hold the unique results (discarding duplicates resulting from the query)
+
+        // $unique = [];
+
+        // FIXME: when we detect relationships, we need to remove duplicate
+        // records returned by query.
+
+        // $index = 0;
+        // if (!empty($this->mutations)) {
+        //     foreach ($results->getRelationships() as $relationship) {
+        //         $unique[] = $models[$index];
+        //         ++$index;
+        //     }
+
+        //     $models = $unique;
+        // }
+
         // Once we have the results, we can spin through them and instantiate a fresh
         // model instance for each records we retrieved from the database. We will
         // also set the proper connection name for the model after we create it.
-        return $this->resultsToModels($this->model->getConnectionName(), $results, $properties);
+        return $models;
     }
 
     /**
      * Turn Neo4j result set into the corresponding model.
      *
-     * @param string                          $connection
-     * @param \Everyman\Neo4j\Query\ResultSet $results
+     * @param string $connection
+     * @param ?CypherList $results
      *
      * @return array
      */
-    protected function resultsToModels($connection, ResultSet $results, array $columns = [])
+    protected function resultsToModels($connection, ?CypherList $results = null)
     {
         $models = [];
 
-        if ($results->valid()) {
-            $resultColumns = $results->getColumns();
+        $results = $results ?? new CypherList();
 
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($resultColumns, $result, $columns);
+        if ($results) {
+            $resultsByIdentifier = $this->getRecordsByPlaceholders($results);
+            $relationships = $this->getRelationshipRecords($results);
 
-                // Now that we have the attributes, we first check for mutations
-                // and if exists, we will need to mutate the attributes accordingly.
-                if ($this->shouldMutate($attributes)) {
-                    $models[] = $this->mutateToOrigin($result, $attributes);
+            if (!empty($relationships) && !empty($this->mutations)) {
+                $startIdentifier = $this->getStartNodeIdentifier($resultsByIdentifier, $relationships);
+                $endIdentifier = $this->getEndNodeIdentifier($resultsByIdentifier, $relationships);
+
+                foreach ($relationships as $index => $resultRelationship) {
+                    $startModelClass = $this->getMutationModel($startIdentifier);
+                    $endModelClass = $this->getMutationModel($endIdentifier);
+
+                    if ($this->shouldMutate($endIdentifier) && $this->isMorphMutation($endIdentifier)) {
+                        $models[] = $this->mutateToOrigin($results, $resultsByIdentifier);
+                    } else {
+                        $startNode = (is_array($resultsByIdentifier[$startIdentifier])) ? $resultsByIdentifier[$startIdentifier][$index] : reset($resultsByIdentifier[$startIdentifier]);
+                        $endNode = (is_array($resultsByIdentifier[$endIdentifier])) ? $resultsByIdentifier[$endIdentifier][$index] : reset($resultsByIdentifier[$endIdentifier]);
+                        $models[] = [
+                            $startIdentifier => $this->newModelFromNode($startNode, $startModelClass, $connection),
+                            $endIdentifier => $this->newModelFromNode($endNode, $endModelClass, $connection),
+                        ];
+                    }
                 }
-                // This is a regular record that we should deal with the normal way, creating an instance
-                // of the model out of the fetched attributes.
-                else {
-                    $model = $this->model->newFromBuilder($attributes);
-                    $model->setConnection($connection);
-                    $models[] = $model;
+            } else {
+                foreach ($resultsByIdentifier as $identifier => $nodes) {
+                    if ($this->shouldMutate($identifier)) {
+                        $models[] = $this->mutateToOrigin($results, $resultsByIdentifier);
+                    } else {
+                        foreach ($nodes as $result) {
+                            if ($result instanceof Node) {
+                                $model = $this->newModelFromNode($result, $this->model, $connection);
+                                $models[] = $model;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -131,36 +171,57 @@ class Builder extends IlluminateBuilder
      * Turn Neo4j result set into the corresponding model with its relations.
      *
      * @param string                          $connection
-     * @param \Everyman\Neo4j\Query\ResultSet $results
+     * @param CypherList    $results
      *
      * @return array
      */
-    protected function resultsToModelsWithRelations($connection, ResultSet $results)
+    protected function resultsToModelsWithRelations($connection, CypherList $results)
     {
         $models = [];
 
-        if ($results->valid()) {
+        if (!$results->isEmpty()) {
             $grammar = $this->getQuery()->getGrammar();
-            $columns = $results->getColumns();
 
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($columns, $result);
+//            $nodesByIdentifier = $results->getAllByIdentifier();
+//
+//            foreach ($nodesByIdentifier as $identifier => $nodes) {
+//                // Now that we have the attributes, we first check for mutations
+//                // and if exists, we will need to mutate the attributes accordingly.
+//                if ($this->shouldMutate($identifier)) {
+//                    foreach ($nodes as $node) {
+//                        $attributes = $node->getProperties();
+//                        $cropped = $grammar->cropLabelIdentifier($identifier);
+//
+//                        if (!isset($models[$cropped])) {
+//                            $models[$cropped] = [];
+//                        }
+//
+//                        if (isset($this->mutations[$cropped])) {
+//                            $mutationModel = $this->getMutationModel($cropped);
+//                            $models[$cropped][] = $this->newModelFromNode($node, $mutationModel);
+//                        }
+//                    }
+//                }
+//            }
+
+            $recordsByPlaceholders = $this->getRecordsByPlaceholders($results);
+
+            foreach ($recordsByPlaceholders as $placeholder => $records) {
+
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
-                if ($this->shouldMutate($attributes)) {
-                    foreach ($attributes as $identifier => $values) {
-                        $cropped = $grammar->cropLabelIdentifier($identifier);
+                if ($this->shouldMutate($placeholder)) {
+                    $cropped = $grammar->cropLabelIdentifier($placeholder);
+//                    $attributes = $record->values();
 
+                    foreach ($records as $record) {
                         if (!isset($models[$cropped])) {
                             $models[$cropped] = [];
                         }
 
                         if (isset($this->mutations[$cropped])) {
                             $mutationModel = $this->getMutationModel($cropped);
-                            $model = $mutationModel->newFromBuilder($values);
-                            $model->setConnection($mutationModel->getConnectionName());
-
-                            $models[$cropped][] = $model;
+                            $models[$cropped][] = $this->newModelFromNode($record, $mutationModel);
                         }
                     }
                 }
@@ -192,7 +253,7 @@ class Builder extends IlluminateBuilder
             // Since this mutation should be resolved by us then we check whether it is
             // a Many or One mutation.
             if ($this->isManyMutation($mutation)) {
-                return $this->mutateManyToOrigin($attributes);
+                $mutations = $this->mutateManyToOrigin($attributes);
             }
             // Dealing with Morphing relations requires that we determine the morph_type out of the relationship
             // and mutating back to that class.
@@ -208,9 +269,8 @@ class Builder extends IlluminateBuilder
             // Dealing with One mutations is simply returning an associative array with the mutation
             // label being the $key and the related model is $value.
             else {
-                $model = $this->getMutationModel($mutation)->newFromBuilder($values);
-                $model->setConnection($model->getConnectionName());
-                $mutations[$mutation] = $model;
+                $node = current($values);
+                $mutations[$mutation] = $this->newModelFromNode($node, $this->getMutationModel($mutation));
             }
         }
 
@@ -226,21 +286,19 @@ class Builder extends IlluminateBuilder
      *
      * @return void
      */
-    public function mutateManyToOrigin($attributes)
+    public function mutateManyToOrigin($results)
     {
         $mutations = [];
 
         foreach ($this->getMutations() as $label => $info) {
             $mutationModel = $this->getMutationModel($label);
-            $model = $mutationModel->newFromBuilder($attributes[$label]);
-            $model->setConnection($mutationModel->getConnectionName());
-            $mutations[$label] = $model;
+            $mutations[$label] = $this->newModelFromNode(current($results[$label]), $mutationModel);
         }
 
         return $mutations;
     }
 
-    protected function mutateMorphToOrigin($result, $attributes)
+    protected function mutateMorphToOrigin($result, $attributesByLabel)
     {
         $mutations = [];
 
@@ -251,12 +309,23 @@ class Builder extends IlluminateBuilder
             // value being the model that we should mutate to as set earlier by a HyperEdge.
             // NOTE: 'r' is statically set in CypherGrammer to represent the relationship.
             // Now we have an \Everyman\Neo4j\Relationship instance that has our morph class name.
-            $relationship = $result['r'];
-
+            /** @var \Laudis\Neo4j\Types\Relationship $relationship */
+            $relationship = current($this->getRelationshipRecords($result));
             // Get the morph class name.
-            $class = $relationship->getProperty($mutationModelProperty);
+            $class = $relationship->getProperties()->get($mutationModelProperty);
+            // we need the model attributes though we might receive a nested
+            // array that includes them on level 2 so we check
+            // whether what we have is the array of attrs
+            if (!Helpers::isAssocArray($attributesByLabel[$label])) {
+                $attributes = current($attributesByLabel[$label]);
+                if ($attributes instanceof Node) {
+                    $attributes = $this->getNodeAttributes($attributes);
+                }
+            } else {
+                $attributes = $attributesByLabel[$label];
+            }
             // Create a new instance of it from builder.
-            $model = (new $class())->newFromBuilder($attributes[$label]);
+            $model = (new $class())->newFromBuilder($attributes);
             // And that my friend, is our mutations model =)
             $mutations[] = $model;
         }
@@ -270,19 +339,15 @@ class Builder extends IlluminateBuilder
      * a mutation only when the attributes' keys
      * and mutations keys match.
      *
-     * @param array $attributes
-     *
      * @return bool
      */
-    public function shouldMutate(array $attributes)
+    public function shouldMutate($identifier)
     {
         $grammar = $this->getQuery()->getGrammar();
-        $attributes = array_map([$grammar, 'cropLabelIdentifier'], array_keys($attributes));
+        $identifier = $grammar->cropLabelIdentifier($identifier);
         $mutations = array_keys($this->mutations);
 
-        $intersect = array_intersect($attributes, $mutations);
-
-        return !empty($intersect);
+        return in_array($identifier, $mutations);
     }
 
     /**
@@ -360,14 +425,12 @@ class Builder extends IlluminateBuilder
     /**
      * Gather the properties of a Node including its id.
      *
-     * @param \Everyman\Neo4j\Node $node
-     *
      * @return array
      */
     public function getNodeAttributes(Node $node)
     {
         // Extract the properties of the node
-        $attributes = $node->getProperties();
+        $attributes = $node->getProperties()->toArray();
 
         // Add the node id to the attributes since \Everyman\Neo4j\Node
         // does not consider it to be a property, it is treated differently
@@ -406,10 +469,10 @@ class Builder extends IlluminateBuilder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function matchIn($parent, $related, $relatedNode, $relationship, $property, $value = null)
+    public function matchIn($parent, $related, $relatedNode, $relationship, $property, $value = null, $boolean = 'and')
     {
         // Add a MATCH clause for a relation to the query
-        $this->query->matchRelation($parent, $related, $relatedNode, $relationship, $property, $value, 'in');
+        $this->query->matchRelation($parent, $related, $relatedNode, $relationship, $property, $value, 'in', $boolean);
 
         return $this;
     }
@@ -423,9 +486,9 @@ class Builder extends IlluminateBuilder
      *
      * @return \Vinelab\NeoEloquent\Eloquent|static
      */
-    public function matchOut($parent, $related, $relatedNode, $relationship, $property, $value = null)
+    public function matchOut($parent, $related, $relatedNode, $relationship, $property, $value = null, $boolean = 'and')
     {
-        $this->query->matchRelation($parent, $related, $relatedNode, $relationship, $property, $value, 'out');
+        $this->query->matchRelation($parent, $related, $relatedNode, $relationship, $property, $value, 'out', $boolean);
 
         return $this;
     }
@@ -442,9 +505,9 @@ class Builder extends IlluminateBuilder
      *
      * @return \Vinelab\NeoEloquent\Eloquent|static
      */
-    public function matchMorphOut($parent, $relatedNode, $property, $value = null)
+    public function matchMorphOut($parent, $relatedNode, $property, $value = null, $boolean = 'and')
     {
-        $this->query->matchMorphRelation($parent, $relatedNode, $property, $value);
+        $this->query->matchMorphRelation($parent, $relatedNode, $property, $value, $boolean);
 
         return $this;
     }
@@ -471,7 +534,7 @@ class Builder extends IlluminateBuilder
         $this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return new Paginator($this->get($columns), $perPage, $page, [
-            'path'     => Paginator::resolveCurrentPath(),
+            'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -654,10 +717,10 @@ class Builder extends IlluminateBuilder
         // Collect the model attributes and label in the form of ['label' => $label, 'attributes' => $attributes]
         // as expected by the Query Builder.
         $attributes = $this->prepareForCreation($this->model, $attributes);
-        $model = ['label' => $this->model->getTable(), 'attributes' => $attributes];
+        $model = ['label' => $this->model->nodeLabel(), 'attributes' => $attributes];
 
-        /**
-         * Collect the related models in the following for as expected by the Query Builder:.
+        /*
+         * Collect the related models in the following for as expected by the Query Builder:
          *
          *  [
          *       'label' => ['Permission'],
@@ -680,6 +743,7 @@ class Builder extends IlluminateBuilder
             if (!method_exists($this->model, $relation)) {
                 throw new QueryException("The relation method $relation() does not exist on ".get_class($this->model));
             }
+
             $relationship = $this->model->$relation();
             // Bring the model from the relationship.
             $relatedModel = $relationship->getRelated();
@@ -689,11 +753,15 @@ class Builder extends IlluminateBuilder
             // In the case of a model Id or an associative array or a Model instance it means that
             // this is probably a One-To-One relationship or the dev decided not to add
             // multiple records as relations so we'll wrap it up in an array.
-            if (!is_array($values) || Helpers::isAssocArray($values) || $values instanceof Model) {
+            if (
+                (!is_array($values) || Helpers::isAssocArray($values) || $values instanceof Model)
+                && !($values instanceof Collection)
+            ) {
                 $values = [$values];
             }
 
-            $label = $relationship->getRelated()->getTable();
+            $id = $relatedModel->getKeyName();
+            $label = $relationship->getRelated()->nodeLabel();
             $direction = $relationship->getEdgeDirection();
             $type = $relationship->getRelationType();
 
@@ -706,13 +774,13 @@ class Builder extends IlluminateBuilder
             foreach ($values as $value) {
                 // If this is a Model then the $exists property will indicate what we need
                 // so we'll add its id to be attached.
-                if ($value instanceof Model && $value->exists === true) {
+                if ($value instanceof Model and $value->exists === true) {
                     $attach[] = $value->getKey();
                 }
                 // Next we will check whether we got a Collection in so that we deal with it
                 // accordingly, which guarantees sending an Eloquent result straight in would work.
                 elseif ($value instanceof Collection) {
-                    $attach = array_merge($attach, $value->pluck('id')->toArray());
+                    $attach = array_merge($attach, $value->lists('id'));
                 }
                 // Or in the case where the attributes are neither an array nor a model instance
                 // then this is assumed to be the model Id that the dev means to attach and since
@@ -727,11 +795,11 @@ class Builder extends IlluminateBuilder
             }
 
             $relation = compact('name', 'type', 'direction');
-            $related[] = compact('relation', 'label', 'create', 'attach');
+            $related[] = compact('relation', 'label', 'create', 'attach', 'id');
         }
 
-        $result = $this->query->createWith($model, $related);
-        $models = $this->resultsToModelsWithRelations($this->model->getConnectionName(), $result);
+        $results = $this->query->createWith($model, $related);
+        $models = $this->resultsToModelsWithRelations($this->model->getConnectionName(), $results);
 
         return (!empty($models)) ? $models : null;
     }
@@ -779,32 +847,35 @@ class Builder extends IlluminateBuilder
      *
      * @return void
      */
-    protected function prefixAndMerge(self $query, $prefix)
+    protected function prefixAndMerge(Builder $query, $prefix)
     {
-        $this->prefixWheres($query, $prefix);
+        if (is_array($query->getQuery()->wheres)) {
+            $query->getQuery()->wheres = $this->prefixWheres($query->getQuery()->wheres, $prefix);
+        }
+
         $this->query->mergeWheres($query->getQuery()->wheres, $query->getQuery()->getBindings());
     }
 
     /**
      * Prefix where clauses' columns.
      *
-     * @param \Vinelab\NeoEloquent\Eloquent\Builder $query
-     * @param string                                $prefix
+     * @param array  $wheres
+     * @param string $prefix
      *
-     * @return void
+     * @return array
      */
-    protected function prefixWheres(self $query, $prefix)
+    protected function prefixWheres(array $wheres, $prefix)
     {
-        if (is_array($query->getQuery()->wheres)) {
-            $query->getQuery()->wheres = array_map(function ($where) use ($prefix) {
-                if ($where['type'] != 'Carried' && $where['type'] != 'raw' && strpos($where['column'], '.') == false) {
-                    $column = $where['column'];
-                    $where['column'] = ($this->isId($column)) ? $column : $prefix.'.'.$column;
-                }
+        return array_map(function ($where) use ($prefix) {
+            if ($where['type'] == 'Nested') {
+                $where['query']->wheres = $this->prefixWheres($where['query']->wheres, $prefix);
+            } else if ($where['type'] != 'Carried' && strpos($where['column'], '.') == false) {
+                $column = $where['column'];
+                $where['column'] = ($this->isId($column)) ? $column : $prefix.'.'.$column;
+            }
 
-                return $where;
-            }, $query->getQuery()->wheres);
-        }
+            return $where;
+        }, $wheres);
     }
 
     /**
@@ -822,7 +893,7 @@ class Builder extends IlluminateBuilder
     /**
      * Get the match[In|Out] method name out of a relation.
      *
-     * @param \Vinelab\NeoEloquent\Eloquent\Relations\* $relation
+     * @param * $relation
      *
      * @return [type]
      */

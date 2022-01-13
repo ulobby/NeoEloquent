@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
+use Laudis\Neo4j\Types\CypherList;
+use Laudis\Neo4j\Types\Node;
 use Vinelab\NeoEloquent\Connection;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 
@@ -83,15 +85,13 @@ class Builder extends IlluminateQueryBuilder
      *
      * @param Vinelab\NeoEloquent\Connection                  $connection
      * @param \Illuminate\Database\Query\Grammars\Grammar     $grammar
-     * @param \Illuminate\Database\Query\Processors\Processor $processor
      *
      * @return void
      */
-    public function __construct(Connection $connection, Grammar $grammar, IlluminateProcessor $processor)
+    public function __construct(Connection $connection, Grammar $grammar)
     {
         $this->grammar = $grammar;
         $this->grammar->setQuery($this);
-        $this->processor = $processor;
 
         $this->connection = $connection;
 
@@ -126,27 +126,17 @@ class Builder extends IlluminateQueryBuilder
      */
     public function insertGetId(array $values, $sequence = null)
     {
-        // create a neo4j Node
-        $node = $this->client->makeNode();
+        $cypher = $this->grammar->compileCreate($this, $values);
 
-        // set its properties
-        foreach ($values as $key => $value) {
-            $value = $this->formatValue($value);
+        $bindings = $this->getBindingsMergedWithValues($values);
 
-            $node->setProperty($key, $value);
-        }
+        /** @var CypherList $results */
 
-        // save the node
-        $node->save();
+        $results = $this->connection->insert($cypher, $bindings);
 
-        // get the saved node id
-        $id = $node->getId();
-
-        // set the labels
-        $from = is_array($this->from) ? $this->from : [$this->from];
-        $node->addLabels(array_map([$this, 'makeLabel'], $from));
-
-        return $id;
+        /** @var Node $node */
+        $node = $results->first()->first()->getValue();
+        return $node->getId();
     }
 
     /**
@@ -160,11 +150,11 @@ class Builder extends IlluminateQueryBuilder
     {
         $cypher = $this->grammar->compileUpdate($this, $values);
 
-        $bindings = $this->getBindingsMergedWithValues($values);
+        $bindings = $this->getBindingsMergedWithValues($values, true);
 
         $updated = $this->connection->update($cypher, $bindings);
 
-        return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
+        return ($updated) ? count(current($this->getRecordsByPlaceholders($updated))) : 0;
     }
 
     /**
@@ -176,12 +166,14 @@ class Builder extends IlluminateQueryBuilder
      *
      * @return array
      */
-    protected function getBindingsMergedWithValues(array $values)
+    protected function getBindingsMergedWithValues(array $values, $updating = false)
     {
         $bindings = [];
 
+        $values = $this->getGrammar()->postfixValues($values, $updating);
+
         foreach ($values as $key => $value) {
-            $bindings[$key.'_update'] = $value;
+            $bindings[$key] = $value;
         }
 
         return array_merge($this->getBindings(), $bindings);
@@ -646,14 +638,15 @@ class Builder extends IlluminateQueryBuilder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function matchRelation($parent, $related, $relatedNode, $relationship, $property, $value = null, $direction = 'out')
+    public function matchRelation($parent, $related, $relatedNode, $relationship, $property, $value = null, $direction = 'out', $boolean = 'and')
     {
-        $parentLabels = $parent->getTable();
-        $relatedLabels = $related->getTable();
+        $parentLabels = $parent->nodeLabel();
+        $relatedLabels = $related->nodeLabel();
         $parentNode = $this->modelAsNode($parentLabels);
 
         $this->matches[] = [
             'type'         => 'Relation',
+            'optional'     => $boolean,
             'property'     => $property,
             'direction'    => $direction,
             'relationship' => $relationship,
@@ -667,18 +660,19 @@ class Builder extends IlluminateQueryBuilder
             ],
         ];
 
-        $this->addBinding([$this->wrap($property) => $value], 'matches');
+        $this->addBinding(array($this->wrap($property) => $value), 'matches');
 
         return $this;
     }
 
     public function matchMorphRelation($parent, $relatedNode, $property, $value = null, $direction = 'out')
     {
-        $parentLabels = $parent->getTable();
+        $parentLabels = $parent->nodeLabel();
         $parentNode = $this->modelAsNode($parentLabels);
 
         $this->matches[] = [
             'type'      => 'MorphTo',
+            'optional' => 'and',
             'property'  => $property,
             'direction' => $direction,
             'related'   => ['node' => $relatedNode],
@@ -914,7 +908,7 @@ class Builder extends IlluminateQueryBuilder
      */
     public function newQuery()
     {
-        return new self($this->connection, $this->grammar, $this->getProcessor());
+        return new self($this->connection, $this->grammar);
     }
 
     /**
@@ -955,20 +949,10 @@ class Builder extends IlluminateQueryBuilder
      *
      * @param array $columns
      *
-     * @return \Illuminate\Support\Collection
+     * @return array|static[]
      */
     public function get($columns = ['*'])
     {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $results = $this->processor->processSelect($this, $this->runSelect());
-
-        $this->columns = $original;
-
-        return $results;
+        return $this->getFresh($columns);
     }
 }

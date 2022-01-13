@@ -124,14 +124,23 @@ abstract class Model extends IlluminateModel
         // pluck out backslashes to get a clean 'WordsUp' class name and use it as default
         return [str_replace('\\', '', get_class($this))];
     }
+//
+//    /**
+//     * @override
+//     * Get the table associated with the model.
+//     *
+//     * @return string
+//     */
+//    public function getTable()
+//    {
+//        return $this->getDefaultNodeLabel();
+//    }
 
     /**
      * @override
      * Get the table associated with the model.
-     *
-     * @return string
      */
-    public function getTable()
+    public function nodeLabel()
     {
         return $this->getDefaultNodeLabel();
     }
@@ -727,5 +736,35 @@ abstract class Model extends IlluminateModel
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get the current connection name for the model.
+     *
+     * @return string
+     */
+    public function getConnectionName()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Create a new instance of the given model.
+     *
+     * @param array $attributes
+     * @param bool  $exists
+     *
+     * @return static
+     */
+    public function newInstance($attributes = [], $exists = false)
+    {
+        // This method just provides a convenient way for us to generate fresh model
+        // instances of this current model. It is particularly useful during the
+        // hydration of new objects via the Eloquent query builder instances.
+        $model = new static((array) $attributes);
+
+        $model->exists = $exists;
+
+        return $model;
     }
 }

@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Query\Grammars;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
+use Vinelab\NeoEloquent\Query\Builder;
 
 class Grammar extends IlluminateGrammar
 {
@@ -26,7 +27,6 @@ class Grammar extends IlluminateGrammar
      */
     public function parameter($value)
     {
-
         // Validate whether the requested field is the
         // node id, in that case id(n) doesn't work as
         // a placeholder so we transform it to the id replacement instead.
@@ -47,7 +47,7 @@ class Grammar extends IlluminateGrammar
             $property = explode('.', $property)[1];
         }
 
-        return '{'.$property.'}';
+        return '$'.$property;
     }
 
     /**
@@ -58,10 +58,14 @@ class Grammar extends IlluminateGrammar
      *
      * @return string
      */
-    public function prepareLabels(array $labels)
+    public function prepareLabels($labels)
     {
-        // get the labels prepared and back to a string imploded by : they go.
-        return implode('', array_map([$this, 'wrapLabel'], $labels));
+        if (is_array($labels)) {
+            // get the labels prepared and back to a string imploded by : they go.
+            $labels = implode('', array_map(array($this, 'wrapLabel'), $labels));
+        }
+
+        return $labels;
     }
 
     /**
@@ -87,7 +91,20 @@ class Grammar extends IlluminateGrammar
      */
     public function prepareRelation($relation, $related)
     {
-        return '`rel_'.mb_strtolower($relation).'_'.$related."`:`{$relation}`";
+        return $this->getRelationIdentifier($relation, $related).":{$relation}";
+    }
+
+    /**
+     * Get the identifier for the given relationship.
+     *
+     * @param string $relation
+     * @param string $related
+     *
+     * @return string
+     */
+    public function getRelationIdentifier($relation, $related)
+    {
+        return 'rel_'.mb_strtolower($relation).'_'.$related;
     }
 
     /**
@@ -132,6 +149,34 @@ class Grammar extends IlluminateGrammar
     }
 
     /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function wrapValue($value)
+    {
+        if ($value === '*') {
+            return $value;
+        }
+
+        return '"'.str_replace('"', '""', $value).'"';
+    }
+
+    /**
+     * Wrap an array of values.
+     *
+     * @param array $values
+     *
+     * @return array
+     */
+    public function wrapArray(array $values)
+    {
+        return array_map([$this, 'wrap'], $values);
+    }
+
+    /**
      * Turn an array of values into a comma separated string of values
      * that are escaped and ready to be passed as values in a query.
      *
@@ -141,8 +186,11 @@ class Grammar extends IlluminateGrammar
      */
     public function valufy($values)
     {
+        $arrayValue = true;
+
         // we'll only deal with arrays so let's turn it into one if it isn't
         if (!is_array($values)) {
+            $arrayValue = false;
             $values = [$values];
         }
 
@@ -167,10 +215,11 @@ class Grammar extends IlluminateGrammar
             }
 
             return $value;
+
         }, $values);
 
         // stringify them.
-        return implode(', ', $values);
+        return $arrayValue ? '['.implode(',', $values).']' : implode(', ', $values);
     }
 
     /**
@@ -189,7 +238,7 @@ class Grammar extends IlluminateGrammar
         if (is_null($labels)) {
             return 'n';
         } elseif (is_array($labels)) {
-            $labels = reset($labels);
+            $labels = implode('_', $labels);   // Or just replace with this
         }
 
         // When this is a related node we'll just prepend it with 'with_' that way we avoid
@@ -199,22 +248,7 @@ class Grammar extends IlluminateGrammar
             $labels = 'with_'.$relation.'_'.$labels;
         }
 
-        // patch to fix bug 49.  this downcases only first letter of label which is
-        // compatible with how labels are recased in the rest of the library
-        // @see https://github.com/Vinelab/NeoEloquent/issues/49
-        if (is_array($labels)) {
-            foreach ($labels as $label) {
-                $firstChar = substr($label, 0, 1);
-                $suffix = substr($label, 1, strlen($label) - 1);
-                $label = mb_strtolower($firstChar).$suffix;
-            }
-        } else {
-            $firstChar = substr($labels, 0, 1);
-            $suffix = substr($labels, 1, strlen($labels) - 1);
-            $labels = mb_strtolower($firstChar).$suffix;
-        }
-
-        return $labels;
+        return mb_strtolower($labels);
     }
 
     /**
@@ -302,6 +336,20 @@ class Grammar extends IlluminateGrammar
         return "($label { ".implode(', ', $properties).'})';
     }
 
+
+    /**
+     * Concatenate an array of segments, removing empties.
+     *
+     * @param  array   $segments
+     * @return string
+     */
+    protected function concatenate($segments)
+    {
+        return implode(' ', array_filter($segments, function ($value) {
+            return (string) $value !== '';
+        }));
+    }
+
     /**
      * Turn a string into a valid property for a query.
      *
@@ -312,7 +360,7 @@ class Grammar extends IlluminateGrammar
     public function propertize($property)
     {
         // Sanitize the string from all characters except alpha numeric.
-        return preg_replace('/[^A-Za-z0-9_]+/i', '', $property);
+        return preg_replace('/[^A-Za-z0-9._,-:]+/i', '', $property);
     }
 
     /**
@@ -337,7 +385,7 @@ class Grammar extends IlluminateGrammar
      */
     public function getUniqueLabel($label)
     {
-        return $label.$this->labelPostfix.bin2hex(random_bytes(8));
+        return $label.$this->labelPostfix.uniqid();
     }
 
     /**
@@ -363,5 +411,63 @@ class Grammar extends IlluminateGrammar
     public function prepareBindingsForDelete(array $bindings)
     {
         return $bindings;
+    }
+
+
+    /**
+     * Convert an array of column names into a delimited string.
+     *
+     * @param array $columns
+     *
+     * @return string
+     */
+    public function columnize(array $columns)
+    {
+        return implode(', ', array_map([$this, 'wrap'], $columns));
+    }
+
+    /**
+     * Check whether the given query has relation matches.
+     *
+     * @param \Vinelab\NeoEloquent\Query\Builder $query
+     *
+     * @return bool
+     */
+    public function hasMatchRelations(Builder $query)
+    {
+        return (bool) count($this->getMatchRelations($query));
+    }
+
+    /**
+     * Get the relation-based matches from the given query.
+     *
+     * @param \Vinelab\NeoEloquent\Query\Builder $query
+     *
+     * @return array
+     */
+    public function getMatchRelations(Builder $query)
+    {
+        return array_filter($query->matches, function ($match) {
+            return $match['type'] == 'Relation';
+        });
+    }
+
+    /**
+     * Compile a create statement into Cypher.
+     *
+     * @param \Vinelab\NeoEloquent\Query\Builder $query
+     * @param array                              $values
+     *
+     * @return string
+     */
+    public function compileCreate(Builder $query, $values)
+    {
+        $labels = $this->prepareLabels($query->from);
+
+        $columns = $this->columnsFromValues($values);
+
+        $node = $query->modelAsNode();
+
+        return "CREATE ({$node}{$labels}) SET {$columns} RETURN {$node}";
     }
 }

@@ -130,8 +130,6 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
 
     /**
      * Get all the edges of the given type and direction.
-     *
-     * @return \Vinelab\NeoEloquent\Eloquent\Edges\Edge[In|Out]
      */
     public function edges()
     {
@@ -150,7 +148,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
     public function matchOneOrMany(array $models, Collection $results, $relation, $type)
     {
         // We will need the parent node placeholder so that we use it to extract related results.
-        $parent = $this->query->getQuery()->modelAsNode($this->parent->getTable());
+        $parent = $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
 
         /*
          * Looping into all the parents to match back onto their children using
@@ -159,13 +157,14 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
          * node placeholder.
          */
         foreach ($models as $model) {
-            $matched = $results->filter(function ($result) use ($parent, $model) {
+            $matched = $results->filter(function ($result) use ($parent, $model, $models) {
                 if ($result[$parent] instanceof Model) {
                     // In the case of fetching nested relations, we will get an array
                     // with the first key being the model we need, and the other being
                     // the related model so we'll just take the first model out of the array.
                     if (is_array($model)) {
-                        $model = reset($model);
+                        $identifier = $this->determineValueIdentifier($model);
+                        $model = $model[$identifier];
                     }
 
                     return $model->getKey() == $result[$parent]->getKey();
@@ -179,11 +178,17 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
                 // with the first key being the model we need, and the other being
                 // the related model so we'll just take the first model out of the array.
                 if (is_array($model)) {
-                    $model = reset($model);
+                    $identifier = $this->determineValueIdentifier($model);
+                    $model = $model[$identifier];
                 }
 
                 if ($type == 'many') {
-                    $collection = $model->getRelation($relation);
+                    $collection = $this->related->newCollection();
+
+                    if ($model->hasRelation($relation)) {
+                        $collection = $model->getRelation($relation);
+                    }
+
                     $collection->push($match[$relation]);
                     $model->setRelation($relation, $collection);
                 } else {
@@ -676,7 +681,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      */
     public function getParentNode()
     {
-        return $this->query->getQuery()->modelAsNode($this->parent->getTable());
+        return $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());
     }
 
     /**
@@ -686,7 +691,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      */
     public function getRelatedNode()
     {
-        return $this->query->getQuery()->modelAsNode($this->related->getTable());
+        return $this->query->getQuery()->modelAsNode($this->related->nodeLabel());
     }
 
     /**

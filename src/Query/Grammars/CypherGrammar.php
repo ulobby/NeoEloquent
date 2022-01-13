@@ -107,6 +107,37 @@ class CypherGrammar extends Grammar
         return $cypher;
     }
 
+    public function columnsFromValues(array $values, $updating = false)
+    {
+        $columns = [];
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+
+        foreach ($values as $key => $value) {
+            // Update bindings are differentiated with an _update postfix to make sure the don't clash
+            // with query bindings.
+            $postfix = $updating ? '_update' : '_create';
+
+            $columns[] = $this->wrap($key).' = '.$this->parameter(array('column' => $key.$postfix));
+        }
+
+        return implode(', ', $columns);
+    }
+
+    public function postfixValues(array $values, $updating = false)
+    {
+        $postfix = $updating ? '_update' : '_create';
+
+        $processed = [];
+
+        foreach ($values as $key => $value) {
+            $processed[$key.$postfix] = $value;
+        }
+
+        return $processed;
+    }
+
     /**
      * Compile the MATCH for a query with relationships.
      *
