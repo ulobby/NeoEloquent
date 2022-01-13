@@ -6,6 +6,7 @@ use Closure;
 use DateTime;
 use Carbon\Carbon;
 use BadMethodCallException;
+use Illuminate\Database\Concerns\BuildsQueries;
 use InvalidArgumentException;
 use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\Node;
@@ -24,6 +25,7 @@ use Vinelab\NeoEloquent\Traits\ResultTrait;
 class Builder
 {
     use ResultTrait;
+    use BuildsQueries;
 
     /**
      * The database connection instance.
@@ -1142,6 +1144,17 @@ class Builder
         $this->{$property}[] = compact('column', 'direction');
 
         return $this;
+    }
+
+    /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  Closure|Builder|string  $column
+     * @return Builder
+     */
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
     }
 
     /**
