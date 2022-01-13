@@ -36,7 +36,7 @@ trait QueriesRelationships
         $query = $relation->getRelated()->newQuery();
         // This will make sure that any query we add here will consider the related
         // model as our reference Node.
-        $this->getQuery()->from = $query->getModel()->modelAsNode();
+        $this->getQuery()->from = $query->getModel()->nodeLabel();
 
         /**
          * In graph we do not need to act on the count of the relationships when dealing
@@ -95,7 +95,7 @@ trait QueriesRelationships
          */
         $grammar = $this->getQuery()->getGrammar();
         $grammar->setQuery($this->getQuery());
-        $this->getQuery()->from = $this->getModel()->modelAsNode();
+        $this->getQuery()->from = $this->getModel()->nodeLabel();
 
         return $this;
     }
