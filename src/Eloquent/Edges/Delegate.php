@@ -7,9 +7,9 @@ use Laudis\Neo4j\Types\CypherMap;
 use Laudis\Neo4j\Types\Node;
 use Laudis\Neo4j\Types\Relationship;
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Exceptions\QueryException;
-use Vinelab\NeoEloquent\Eloquent\Builder;
 
 abstract class Delegate
 {
@@ -68,15 +68,15 @@ abstract class Delegate
         $direction = null
     ) {
         $attributes = [
-            'label' => isset($this->type) ? $this->type : $type,
-            'direction' => isset($this->direction) ? $this->direction : $direction,
+            'label'      => isset($this->type) ? $this->type : $type,
+            'direction'  => isset($this->direction) ? $this->direction : $direction,
             'properties' => $properties,
-            'start' => [
+            'start'      => [
                 'id' => [
-                    'key' => $startModel->getKeyName(),
+                    'key'   => $startModel->getKeyName(),
                     'value' => $startModel->getKey(),
                 ],
-                'label' => $startModel->getDefaultNodeLabel(),
+                'label'      => $startModel->getDefaultNodeLabel(),
                 'properties' => $this->getModelProperties($startModel),
             ],
         ];
@@ -84,10 +84,10 @@ abstract class Delegate
         if ($endModel) {
             $attributes['end'] = [
                 'id' => [
-                    'key' => $endModel->getKeyName(),
+                    'key'   => $endModel->getKeyName(),
                     'value' => $endModel->getKey(),
                 ],
-                'label' => $endModel->getDefaultNodeLabel(),
+                'label'      => $endModel->getDefaultNodeLabel(),
                 'properties' => $this->getModelProperties($endModel),
             ];
         }
@@ -123,7 +123,7 @@ abstract class Delegate
      *
      * @return Relationship
      */
-    protected function makeRelationship($type, $startModel, $endModel, $properties = array())
+    protected function makeRelationship($type, $startModel, $endModel, $properties = [])
     {
         $grammar = $this->query->getQuery()->getGrammar();
         $attributes = $this->getRelationshipAttributes($startModel, $endModel, $properties);
@@ -163,6 +163,7 @@ abstract class Delegate
      * @param Model $relatedModel
      * @param $type
      * @param string $direction
+     *
      * @return CypherList
      */
     public function firstRelationWithNodes(Model $parentModel, Model $relatedModel, $type, $direction = 'any'): CypherList
@@ -202,16 +203,16 @@ abstract class Delegate
     /**
      * Commit the started batch operation.
      *
-     * @return bool
-     *
      * @throws \Vinelab\NeoEloquent\QueryException If no open batch to commit.
+     *
+     * @return bool
      */
     public function commitBatch()
     {
         try {
             return $this->client->commitBatch();
         } catch (\Exception $e) {
-            throw new QueryException('Error committing batch operation.', array(), $e);
+            throw new QueryException('Error committing batch operation.', [], $e);
         }
     }
 
@@ -222,12 +223,12 @@ abstract class Delegate
      *
      * @param string $direction
      *
+     * @throws \Vinelab\NeoEloquent\Exceptions\UnknownDirectionException If the specified $direction is not one of in, out or inout
+     *
      * @return string
      *
      * @deprecated 2.0 No longer using Everyman's Relationship to get the value
      *                   of the direction constant
-     *
-     * @throws \Vinelab\NeoEloquent\Exceptions\UnknownDirectionException If the specified $direction is not one of in, out or inout
      */
     public function getRealDirection($direction)
     {

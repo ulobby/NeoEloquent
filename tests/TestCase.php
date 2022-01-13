@@ -5,8 +5,8 @@ namespace Vinelab\NeoEloquent\Tests;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Mockery as M;
-use Vinelab\NeoEloquent\Connection;
 use PHPUnit\Framework\TestCase as PHPUnit;
+use Vinelab\NeoEloquent\Connection;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
 class Stub extends Model

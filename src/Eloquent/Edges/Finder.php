@@ -2,15 +2,14 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
+use GraphAware\Bolt\Result\Result as GraphawareResult;
+use GraphAware\Neo4j\Client\Formatter\Result;
 use Laudis\Neo4j\Types\CypherMap;
 use Laudis\Neo4j\Types\Relationship;
-use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Collection;
-use GraphAware\Neo4j\Client\Formatter\Result;
+use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Traits\ResultTrait;
-use GraphAware\Bolt\Result\Result as GraphawareResult;
-use GraphAware\Common\Result\RecordViewInterface;
 
 class Finder extends Delegate
 {
@@ -132,8 +131,8 @@ class Finder extends Delegate
      * Get the direction of a relationship out of a Relation instance.
      *
      * @param \GraphAware\Neo4j\Client\Formatter\Result $results
-     * @param \Vinelab\NeoEloquent\Eloquent\Model $parent
-     * @param \Vinelab\NeoEloquent\Eloquent\Model $related
+     * @param \Vinelab\NeoEloquent\Eloquent\Model       $parent
+     * @param \Vinelab\NeoEloquent\Eloquent\Model       $related
      *
      * @return string Either 'in' or 'out'
      */
@@ -164,9 +163,10 @@ class Finder extends Delegate
      * Get the Edge instance out of a Relationship based on a direction.
      *
      * @param CypherMap $record
-     * @param Model $parent
-     * @param Model $related
-     * @param string $direction can be 'in' or 'out'
+     * @param Model     $parent
+     * @param Model     $related
+     * @param string    $direction can be 'in' or 'out'
+     *
      * @return \Vinelab\NeoEloquent\Eloquent\Edges\Edge[In|Out]
      */
     public function edgeFromRelationWithDirection(CypherMap $record, Model $parent, Model $related, $direction)
