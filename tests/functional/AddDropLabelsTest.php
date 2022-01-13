@@ -3,8 +3,8 @@
 namespace Vinelab\NeoEloquent\Tests\Functional\AddDropLabels;
 
 use Mockery as M;
-use Vinelab\NeoEloquent\Tests\TestCase;
 use Vinelab\NeoEloquent\Eloquent\Model;
+use Vinelab\NeoEloquent\Tests\TestCase;
 
 class Labelwiz extends Model
 {
@@ -23,6 +23,7 @@ class Foo extends Model
 {
     protected $label = ':Foo';
     protected $fillable = ['prop'];
+
     public function bar()
     {
         return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\AddDropLabels\Bar', 'OWNS');
@@ -56,7 +57,7 @@ class AddDropLabelsTest extends TestCase
             'triz' => 'troo',
         ]);
         $this->assertTrue($w->save());
-        die;
+        exit;
         //add the label
         $w->addLabels(['Superuniqelabel1']);
 
@@ -101,7 +102,7 @@ class AddDropLabelsTest extends TestCase
         $this->assertTrue(in_array('Superuniqelabel4', $nLabels));
 
         //now drop remaining labels
-        $w->dropLabels(array('Superuniqelabel3', 'Superuniqelabel4'));
+        $w->dropLabels(['Superuniqelabel3', 'Superuniqelabel4']);
         // get all the node's labels
         $nLabels = $this->getNodeLabels($w->id);
         $this->assertFalse(in_array('a1', $nLabels));

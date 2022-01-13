@@ -77,7 +77,7 @@ class BelongsToTest extends TestCase
     protected function getEagerRelation($models)
     {
         $query = M::mock('Vinelab\NeoEloquent\Query\Builder');
-        $query->shouldReceive('modelAsNode')->with(array('Stub'))->andReturn('parent');
+        $query->shouldReceive('modelAsNode')->with(['Stub'])->andReturn('parent');
 
         $builder = M::mock('Vinelab\NeoEloquent\Eloquent\Builder');
         $builder->shouldReceive('getQuery')->times(4)->andReturn($query);

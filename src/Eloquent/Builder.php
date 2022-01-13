@@ -3,7 +3,6 @@
 namespace Vinelab\NeoEloquent\Eloquent;
 
 use Everyman\Neo4j\Node;
-use Everyman\Neo4j\Query\ResultSet;
 use Everyman\Neo4j\Query\Row;
 use Illuminate\Database\Eloquent\Builder as IlluminateBuilder;
 use Illuminate\Database\Eloquent\Collection;
@@ -114,7 +113,7 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model.
      *
-     * @param string $connection
+     * @param string      $connection
      * @param ?CypherList $results
      *
      * @return array
@@ -144,7 +143,7 @@ class Builder extends IlluminateBuilder
                         $endNode = (is_array($resultsByIdentifier[$endIdentifier])) ? $resultsByIdentifier[$endIdentifier][$index] : reset($resultsByIdentifier[$endIdentifier]);
                         $models[] = [
                             $startIdentifier => $this->newModelFromNode($startNode, $startModelClass, $connection),
-                            $endIdentifier => $this->newModelFromNode($endNode, $endModelClass, $connection),
+                            $endIdentifier   => $this->newModelFromNode($endNode, $endModelClass, $connection),
                         ];
                     }
                 }
@@ -170,8 +169,8 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model with its relations.
      *
-     * @param string                          $connection
-     * @param CypherList    $results
+     * @param string     $connection
+     * @param CypherList $results
      *
      * @return array
      */
@@ -534,7 +533,7 @@ class Builder extends IlluminateBuilder
         $this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return new Paginator($this->get($columns), $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+            'path'     => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -869,7 +868,7 @@ class Builder extends IlluminateBuilder
         return array_map(function ($where) use ($prefix) {
             if ($where['type'] == 'Nested') {
                 $where['query']->wheres = $this->prefixWheres($where['query']->wheres, $prefix);
-            } else if ($where['type'] != 'Carried' && strpos($where['column'], '.') == false) {
+            } elseif ($where['type'] != 'Carried' && strpos($where['column'], '.') == false) {
                 $column = $where['column'];
                 $where['column'] = ($this->isId($column)) ? $column : $prefix.'.'.$column;
             }

@@ -6,18 +6,17 @@ use Closure;
 use DateTime;
 //use Everyman\Neo4j\Client as NeoClient;
 use Everyman\Neo4j\Cypher\Query as CypherQuery;
-use Everyman\Neo4j\Query\ResultSet;
 use Exception;
 use Illuminate\Database\Connection as IlluminateConnection;
 use Illuminate\Database\Schema\Grammars\Grammar as IlluminateSchemaGrammar;
 use Illuminate\Support\Arr;
+use Laudis\Neo4j\Authentication\Authenticate;
+use Laudis\Neo4j\Client as NeoClient;
+use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\TransactionInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Throwable;
 use Vinelab\NeoEloquent\Query\Builder;
-use Laudis\Neo4j\Authentication\Authenticate;
-use Laudis\Neo4j\ClientBuilder;
-use Laudis\Neo4j\Client as NeoClient;
 
 class Connection extends IlluminateConnection
 {
@@ -97,10 +96,9 @@ class Connection extends IlluminateConnection
             ->build();
 
         return $client;
-        die;
+        exit;
 
         return $client;
-
 
         $client = new NeoClient($this->getHost(), $this->getPort());
         $client->getTransport()->useHttps($this->getSsl())->setAuth($this->getUsername(), $this->getPassword());
@@ -404,9 +402,9 @@ class Connection extends IlluminateConnection
      *
      * @param Closure $callback
      *
-     * @return mixed
-     *
      * @throws Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -605,7 +603,7 @@ class Connection extends IlluminateConnection
      *
      * @return mixed
      */
-    public function insert($query, $bindings = array())
+    public function insert($query, $bindings = [])
     {
         return $this->statement($query, $bindings, true);
     }
