@@ -1480,7 +1480,20 @@ class Builder
             return count($results);
         }
 
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
+        if (!isset($results[0])) {
+            return 0;
+        }
+
+        $unifyKeys = array_change_key_case((array) $results[0]);
+        if (isset($unifyKeys['aggregate'])) {
+            return $unifyKeys['aggregate'];
+        }
+
+        if (get_class($results) === 'Laudis\Neo4j\Databags\SummarizedResult') {
+            return $results->first()->values()[0];
+        }
+
+        return 0;
     }
 
     /**
