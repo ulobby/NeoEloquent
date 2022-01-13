@@ -1590,6 +1590,21 @@ class Builder
     }
 
     /**
+     * Prevent the specified relations from being eager loaded.
+     *
+     * @param  mixed  $relations
+     * @return Builder
+     */
+    public function without($relations)
+    {
+        $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
+            is_string($relations) ? func_get_args() : $relations
+        ));
+
+        return $this;
+    }
+
+    /**
      * Parse a list of relations into individuals.
      *
      * @param array $relations
