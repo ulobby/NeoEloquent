@@ -14,13 +14,13 @@ class MigrationModel extends NeoEloquent
     /**
      * {@inheritDoc}
      */
-    protected $fillable = array(
+    protected $fillable = [
         'migration',
         'batch',
-    );
+    ];
 
     /**
      * {@inheritDoc}
      */
-    protected $guarded = array();
+    protected $guarded = [];
 }

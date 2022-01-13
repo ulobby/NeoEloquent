@@ -5,12 +5,13 @@ namespace Vinelab\NeoEloquent;
 use Closure;
 use DateTime;
 use Exception;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Laudis\Neo4j\Authentication\Authenticate;
 use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\AuthenticateInterface;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Contracts\TransactionInterface;
-use Laudis\Neo4j\Databags\ResultSummary;
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Formatter\OGMFormatter;
 use Laudis\Neo4j\Formatter\SummarizedResultFormatter;
@@ -23,14 +24,10 @@ use Vinelab\NeoEloquent\Exceptions\QueryException;
 use Vinelab\NeoEloquent\Query\Builder as QueryBuilder;
 use Vinelab\NeoEloquent\Query\Expression;
 use Vinelab\NeoEloquent\Query\Grammars\CypherGrammar;
-use Vinelab\NeoEloquent\Schema\Builder;
-use Vinelab\NeoEloquent\Schema\Grammars\CypherGrammar as SchemaGrammar;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 use Vinelab\NeoEloquent\Query\Processors\Processor;
-
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Arr;
-use function sprintf;
+use Vinelab\NeoEloquent\Schema\Builder;
+use Vinelab\NeoEloquent\Schema\Grammars\CypherGrammar as SchemaGrammar;
 
 class Connection implements ConnectionInterface
 {
@@ -134,13 +131,13 @@ class Connection implements ConnectionInterface
      *
      * @var array
      */
-    protected $defaults = array(
-        'scheme' => 'bolt',
-        'host' => 'localhost',
-        'port' => 7687,
+    protected $defaults = [
+        'scheme'   => 'bolt',
+        'host'     => 'localhost',
+        'port'     => 7687,
         'username' => null,
         'password' => null,
-    );
+    ];
 
     /**
      * The neo4j driver name.
@@ -379,9 +376,9 @@ class Connection implements ConnectionInterface
     private function initBuilder(): ClientBuilder
     {
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
+
         return ClientBuilder::create()->withFormatter($formatter);
     }
-
 
     public function createMultipleConnectionsClient()
     {
@@ -526,11 +523,11 @@ class Connection implements ConnectionInterface
      *
      * @return SummarizedResult
      */
-    public function select($query, $bindings = array())
+    public function select($query, $bindings = [])
     {
         return $this->run($query, $bindings, function (self $me, $query, array $bindings) {
             if ($me->pretending()) {
-                return array();
+                return [];
             }
 
             // For select statements, we'll simply execute the query and return an array
@@ -551,7 +548,7 @@ class Connection implements ConnectionInterface
      *
      * @return mixed
      */
-    public function insert($query, $bindings = array())
+    public function insert($query, $bindings = [])
     {
         return $this->statement($query, $bindings, true);
     }
@@ -590,7 +587,7 @@ class Connection implements ConnectionInterface
      *
      * @return SummarizedResult
      */
-    public function affectingStatement($query, $bindings = array())
+    public function affectingStatement($query, $bindings = [])
     {
         return $this->run($query, $bindings, function (self $me, $query, array $bindings) {
             if ($me->pretending()) {
@@ -617,7 +614,7 @@ class Connection implements ConnectionInterface
      *
      * @return CypherList|bool
      */
-    public function statement($query, $bindings = array(), $rawResults = false)
+    public function statement($query, $bindings = [], $rawResults = false)
     {
         return $this->run($query, $bindings, function (self $me, $query, array $bindings) use ($rawResults) {
             if ($me->pretending()) {
@@ -676,7 +673,7 @@ class Connection implements ConnectionInterface
     {
         $grammar = $this->getQueryGrammar();
 
-        $prepared = array();
+        $prepared = [];
 
         foreach ($bindings as $key => $binding) {
             // The bindings are collected in a little bit different way than
@@ -786,9 +783,9 @@ class Connection implements ConnectionInterface
      *
      * @param Closure $callback
      *
-     * @return mixed
-     *
      * @throws Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -824,7 +821,7 @@ class Connection implements ConnectionInterface
      */
     public function beginTransaction()
     {
-        ++$this->transactions;
+        $this->transactions++;
 
         if ($this->transactions == 1) {
             $client = $this->getClient();
@@ -843,7 +840,7 @@ class Connection implements ConnectionInterface
             $this->transaction->commit();
         }
 
-        --$this->transactions;
+        $this->transactions--;
 
         $this->fireConnectionEvent('committed');
     }
@@ -868,7 +865,7 @@ class Connection implements ConnectionInterface
 
             $this->transaction->rollback();
         } else {
-            --$this->transactions;
+            $this->transactions--;
         }
 
         $this->fireConnectionEvent('rollingBack');
@@ -925,7 +922,9 @@ class Connection implements ConnectionInterface
     public function query()
     {
         return new QueryBuilder(
-            $this, $this->getQueryGrammar(), $this->getPostProcessor()
+            $this,
+            $this->getQueryGrammar(),
+            $this->getPostProcessor()
         );
     }
 
@@ -936,9 +935,9 @@ class Connection implements ConnectionInterface
      * @param array   $bindings
      * @param Closure $callback
      *
-     * @return mixed
-     *
      * @throws QueryException
+     *
+     * @return mixed
      */
     protected function run($query, $bindings, Closure $callback)
     {
@@ -951,9 +950,9 @@ class Connection implements ConnectionInterface
             $result = $callback($this, $query, $bindings);
         }
 
-            // If an exception occurs when attempting to run a query, we'll format the error
-            // message to include the bindings with Cypher, which will make this exception a
-            // lot more helpful to the developer instead of just the database's errors.
+        // If an exception occurs when attempting to run a query, we'll format the error
+        // message to include the bindings with Cypher, which will make this exception a
+        // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             $this->handleExceptions($query, $bindings, $e);
         }
@@ -971,13 +970,13 @@ class Connection implements ConnectionInterface
     /**
      * Run a Cypher statement.
      *
-     * @param string   $query
-     * @param array    $bindings
+     * @param string  $query
+     * @param array   $bindings
      * @param Closure $callback
      *
-     * @return mixed
-     *
      * @throws InvalidCypherException
+     *
+     * @return mixed
      */
     protected function runQueryCallback($query, $bindings, Closure $callback)
     {
@@ -993,7 +992,9 @@ class Connection implements ConnectionInterface
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
             throw new QueryException(
-                $query, $this->prepareBindings($bindings), $e
+                $query,
+                $this->prepareBindings($bindings),
+                $e
             );
         }
 
@@ -1004,13 +1005,13 @@ class Connection implements ConnectionInterface
      * Handle a query exception that occurred during query execution.
      *
      * @param Exceptions\Exception $e
-     * @param string                                    $query
-     * @param array                                     $bindings
-     * @param Closure $callback
-     *
-     * @return mixed
+     * @param string               $query
+     * @param array                $bindings
+     * @param Closure              $callback
      *
      * @throws Exceptions\Exception
+     *
+     * @return mixed
      */
     protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
     {
@@ -1027,13 +1028,13 @@ class Connection implements ConnectionInterface
      * Determine if the given exception was caused by a lost connection.
      *
      * @param  \Illuminate\Database\QueryException
+     *
      * @return bool
      */
     protected function causedByLostConnection(QueryException $e)
     {
         return str_contains($e->getPrevious()->getMessage(), 'server has gone away');
     }
-
 
     /**
      * Disconnect from the underlying PDO connection.
@@ -1180,7 +1181,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Handle exceptions thrown in $this::run()
+     * Handle exceptions thrown in $this::run().
      *
      * @throws mixed
      */
@@ -1197,17 +1198,17 @@ class Connection implements ConnectionInterface
         $uri = '';
         $scheme = $this->getScheme($config);
         if ($scheme) {
-            $uri .= $scheme . '://';
+            $uri .= $scheme.'://';
         }
 
         $host = $this->getHost($config);
         if ($host) {
-            $uri .= '@' . $host;
+            $uri .= '@'.$host;
         }
 
         $port = $this->getPort($config);
         if ($port) {
-            $uri .= ':' . $port;
+            $uri .= ':'.$port;
         }
 
         return $uri;

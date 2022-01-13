@@ -2,16 +2,13 @@
 
 namespace Vinelab\NeoEloquent;
 
-
+use Faker\Generator as FakerGenerator;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
+use Vinelab\NeoEloquent\Connection as NeoEloquentConnection;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\NeoEloquentFactory;
 use Vinelab\NeoEloquent\Schema\Grammars\CypherGrammar;
-use Vinelab\NeoEloquent\Connection as NeoEloquentConnection;
-
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\ServiceProvider;
-
-use Faker\Generator as FakerGenerator;
 
 class NeoEloquentServiceProvider extends ServiceProvider
 {
@@ -27,9 +24,9 @@ class NeoEloquentServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $components = array(
+    protected $components = [
         'Migration',
-    );
+    ];
 
     /**
      * Bootstrap the application events.
@@ -54,7 +51,7 @@ class NeoEloquentServiceProvider extends ServiceProvider
             return $conn;
         });
 
-        $this->app->bind('neoeloquent.connection', function() {
+        $this->app->bind('neoeloquent.connection', function () {
             // $config is set by the previous binding,
             // so that we get the correct configuration
             // set by the user.
@@ -70,10 +67,11 @@ class NeoEloquentServiceProvider extends ServiceProvider
             $loader->alias('Neo4jSchema', 'Vinelab\NeoEloquent\Facade\Neo4jSchema');
             $loader->alias('Illuminate\Database\Eloquent\Factory', 'Vinelab\NeoEloquent\Eloquent\NeoEloquentFactory');
         });
-    
+
         $this->app->singleton(NeoEloquentFactory::class, function ($app) {
             return NeoEloquentFactory::construct(
-                $app->make(FakerGenerator::class), $this->app->databasePath('factories')
+                $app->make(FakerGenerator::class),
+                $this->app->databasePath('factories')
             );
         });
 
@@ -107,7 +105,7 @@ class NeoEloquentServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
-        );
+        return [
+        ];
     }
 }
