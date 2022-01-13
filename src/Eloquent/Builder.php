@@ -1428,7 +1428,7 @@ class Builder
         // In order to nest "has", we need to add count relation constraints on the
         // callback Closure. We'll do this by simply passing the Closure its own
         // reference to itself so it calls itself recursively on each segment.
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count , $callback) {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             if (count($relations) > 1) {
                 $q->whereHas(array_shift($relations), $closure);
             } else {
@@ -1592,7 +1592,8 @@ class Builder
     /**
      * Prevent the specified relations from being eager loaded.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return Builder
      */
     public function without($relations)
