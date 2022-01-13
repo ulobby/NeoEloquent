@@ -8,7 +8,6 @@ use DateTime;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
 use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\Node;
 use Vinelab\NeoEloquent\Connection;
@@ -81,8 +80,8 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Create a new query builder instance.
      *
-     * @param Vinelab\NeoEloquent\Connection                  $connection
-     * @param \Illuminate\Database\Query\Grammars\Grammar     $grammar
+     * @param Vinelab\NeoEloquent\Connection              $connection
+     * @param \Illuminate\Database\Query\Grammars\Grammar $grammar
      *
      * @return void
      */
