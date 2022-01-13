@@ -1149,7 +1149,8 @@ class Builder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  Closure|Builder|string  $column
+     * @param Closure|Builder|string $column
+     *
      * @return Builder
      */
     public function orderByDesc($column)
