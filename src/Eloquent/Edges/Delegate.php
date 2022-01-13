@@ -26,8 +26,6 @@ abstract class Delegate
 
     /**
      * The database client.
-     *
-     * @var \Everyman\Neo4j\Client
      */
     protected $client;
 

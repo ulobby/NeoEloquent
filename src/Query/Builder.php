@@ -23,8 +23,6 @@ class Builder extends IlluminateQueryBuilder
 
     /**
      * The database active client handler.
-     *
-     * @var Everyman\Neo4j\Client
      */
     protected $client;
 
@@ -83,15 +81,13 @@ class Builder extends IlluminateQueryBuilder
      *
      * @param Vinelab\NeoEloquent\Connection                  $connection
      * @param \Illuminate\Database\Query\Grammars\Grammar     $grammar
-     * @param \Illuminate\Database\Query\Processors\Processor $processor
      *
      * @return void
      */
-    public function __construct(Connection $connection, Grammar $grammar, IlluminateProcessor $processor)
+    public function __construct(Connection $connection, Grammar $grammar)
     {
         $this->grammar = $grammar;
         $this->grammar->setQuery($this);
-        $this->processor = $processor;
 
         $this->connection = $connection;
 
