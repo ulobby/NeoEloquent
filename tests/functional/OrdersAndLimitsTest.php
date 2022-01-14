@@ -45,6 +45,21 @@ class OrdersAndLimitsTest extends TestCase
         $this->assertEquals($c3->toArray(), $asc[2]->toArray());
     }
 
+    public function testFetchingOrderedDescRecords()
+    {
+        $c1 = Click::create(['num' => 1]);
+        $c2 = Click::create(['num' => 2]);
+        $c3 = Click::create(['num' => 3]);
+
+        $clicks = Click::orderByDesc('num')->get();
+
+        $this->assertEquals(3, count($clicks));
+
+        $this->assertEquals($c3->toArray(), $clicks[0]->toArray());
+        $this->assertEquals($c2->toArray(), $clicks[1]->toArray());
+        $this->assertEquals($c1->toArray(), $clicks[2]->toArray());
+    }
+
     public function testFetchingLimitedOrderedRecords()
     {
         $c1 = Click::create(['num' => 1]);
