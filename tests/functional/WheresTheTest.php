@@ -151,7 +151,7 @@ class WheresTheTest extends TestCase
         $cocoa = new Collection([$this->ab,
             $this->cd,
             $this->ef, ]);
-        $this->assertEquals($cocoa->toArray(), $three->toArray());
+        $this->assertEmpty($cocoa->diff($three));
 
         $below = User::where('calls', '<', -100)->get();
         $this->assertCount(0, $below);
@@ -171,7 +171,7 @@ class WheresTheTest extends TestCase
             $this->ij, ]);
 
         $this->assertCount(4, $notab);
-        $this->assertEquals($notab->toArray(), $dudes->toArray());
+        $this->assertEmpty($notab->diff($dudes));
     }
 
     public function testWhereIn()
@@ -184,7 +184,7 @@ class WheresTheTest extends TestCase
             $this->gh,
             $this->ij, ]);
 
-        $this->assertEquals($alpha->toArray(), $crocodile->toArray());
+        $this->assertEmpty($alpha->diff($crocodile));
     }
 
     public function testWhereNotNull()
@@ -197,7 +197,7 @@ class WheresTheTest extends TestCase
             $this->gh,
             $this->ij, ]);
 
-        $this->assertEquals($alpha->toArray(), $crocodile->toArray());
+        $this->assertEmpty($alpha->diff($crocodile));
     }
 
     public function testWhereNull()
@@ -259,7 +259,7 @@ class WheresTheTest extends TestCase
             $this->gh,
             $this->ij, ]);
 
-        $this->assertEquals($buddies->toArray(), $bigBrothers->toArray());
+        $this->assertEmpty($buddies->diff($bigBrothers));
     }
 
     public function testOrWhereIn()
@@ -297,8 +297,9 @@ class WheresTheTest extends TestCase
     {
         $u = User::where('alias', '=', 'ab')->orWhere('alias', '=', 'cd')->get();
         $this->assertCount(2, $u);
-        $this->assertEquals('ab', $u[0]->alias);
-        $this->assertEquals('cd', $u[1]->alias);
+        // Avoid random orders
+        $this->assertTrue(in_array('ab', [$u[0]->alias, $u[1]->alias]));
+        $this->assertTrue(in_array('cd', [$u[0]->alias, $u[1]->alias]));
     }
 
     /**
