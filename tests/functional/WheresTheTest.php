@@ -320,4 +320,11 @@ class WheresTheTest extends TestCase
         $this->assertEquals($this->cd->toArray(), $users[0]->toArray());
         $this->assertEquals($this->ef->toArray(), $users[1]->toArray());
     }
+
+    public function testWhereRaw()
+    {
+        $ab = User::whereRaw('individual.alias IN ["ab"]')->first();
+
+        $this->assertEquals($this->ab->id, $ab->id);
+    }
 }
