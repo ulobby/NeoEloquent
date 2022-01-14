@@ -81,7 +81,7 @@ class WheresTheTest extends TestCase
 
     public function testWhereIdSelectingProperties()
     {
-        $this->markTestIncomplete();
+        $this->markTestIncomplete('first() with columns is not correctly implemented');
         $u = User::where('id', $this->ab->id)->first(['id', 'name', 'email']);
 
         $this->assertEquals($this->ab->id, $u->id);
