@@ -542,6 +542,18 @@ class CypherGrammar extends Grammar
     }
 
     /**
+     * Compile a raw where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array                               $where
+     * @return string
+     */
+    protected function whereRaw(Builder $query, $where)
+    {
+        return $where['sql'];
+    }
+
+    /**
      * Compile a "where in" clause.
      *
      * @param \Illuminate\Database\Query\Builder $query
