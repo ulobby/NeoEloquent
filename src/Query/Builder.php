@@ -2312,26 +2312,29 @@ class Builder
      */
     public function addBinding($value, $type = 'where')
     {
-        if (is_array($value)) {
-            $key = array_keys($value)[0];
-
-            if (strpos($key, '.') !== false) {
-                $binding = $value[$key];
-                unset($value[$key]);
-                $key = explode('.', $key)[1];
-                $value[$key] = $binding;
-            }
-        }
-
         if (!array_key_exists($type, $this->bindings)) {
             throw new \InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value)) {
-            $this->bindings[$type] = array_merge($this->bindings[$type], $value);
-        } else {
-            $this->bindings[$type][] = $value;
+        if (empty($value)) {
+            return $this;
         }
+
+        if (!is_array($value)) {
+            $this->bindings[$type][] = $value;
+            return $this;
+        }
+
+        $key = array_keys($value)[0];
+
+        if (strpos($key, '.') !== false) {
+            $binding = $value[$key];
+            unset($value[$key]);
+            $key = explode('.', $key)[1];
+            $value[$key] = $binding;
+        }
+
+        $this->bindings[$type] = array_merge($this->bindings[$type], $value);
 
         return $this;
     }
