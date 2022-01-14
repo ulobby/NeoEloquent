@@ -2322,6 +2322,7 @@ class Builder
 
         if (!is_array($value)) {
             $this->bindings[$type][] = $value;
+
             return $this;
         }
 
