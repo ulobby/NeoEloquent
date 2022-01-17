@@ -290,7 +290,7 @@ abstract class Grammar
             return 'n';
         } elseif (is_array($labels)) {
             // Allow camelCase, example: fancyShoe.
-            array_walk($labels, function(&$value) {
+            array_walk($labels, function (&$value) {
                 $value = lcfirst($value);
             });
             $labels = implode('_', $labels);   // Or just replace with this
