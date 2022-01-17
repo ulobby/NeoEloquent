@@ -18,24 +18,24 @@ use Vinelab\NeoEloquent\Query\Builder as QueryBuilder;
 use Vinelab\NeoEloquent\Query\Expression;
 use Vinelab\NeoEloquent\Traits\ResultTrait;
 
-class Builder
+class Builder extends \Illuminate\Database\Eloquent\Builder
 {
     use ResultTrait;
 
     /**
      * The base query builder instance.
      */
-    protected QueryBuilder $query;
+    protected $query;
 
     /**
      * The model being queried.
      */
-    protected Model $model;
+    protected $model;
 
     /**
      * The relationships that should be eager loaded.
      */
-    protected array $eagerLoad = [];
+    protected $eagerLoad = [];
 
     /**
      * A replacement for the typical delete function.
@@ -47,7 +47,7 @@ class Builder
     /**
      * All of the registered builder macros.
      */
-    protected array $macros = [];
+//    protected $macros = [];
 
     /**
      * The loaded models that should be transformed back
@@ -64,7 +64,7 @@ class Builder
     /**
      * The methods that should be returned from query builder.
      */
-    protected array $passthru = [
+    protected $passthru = [
         'insert', 'insertGetId', 'getBindings', 'toSql',
         'exists', 'count', 'min', 'max', 'avg', 'sum',
     ];
@@ -228,10 +228,10 @@ class Builder
      *
      * @deprecated since version 5.1.
      */
-    public function pluck($column)
-    {
-        return $this->value($column);
-    }
+//    public function pluck($column)
+//    {
+//        return $this->value($column);
+//    }
 
     /**
      * Chunk the results of the query.
@@ -1123,18 +1123,18 @@ class Builder
      *
      * @internal param \Illuminate\Pagination\Factory $paginator
      */
-    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
-    {
-        $paginator = $this->query->getConnection()->getPaginator();
-        $page = $paginator->getCurrentPage();
-        $perPage = $perPage ?: $this->model->getPerPage();
-        $this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
-
-        return new Paginator($this->get($columns), $perPage, $page, [
-            'path'     => Paginator::resolveCurrentPath(),
-            'pageName' => $pageName,
-        ]);
-    }
+//    public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')
+//    {
+//        $paginator = $this->query->getConnection()->getPaginator();
+//        $page = $paginator->getCurrentPage();
+//        $perPage = $perPage ?: $this->model->getPerPage();
+//        $this->query->skip(($page - 1) * $perPage)->take($perPage + 1);
+//
+//        return new Paginator($this->get($columns), $perPage, $page, [
+//            'path'     => Paginator::resolveCurrentPath(),
+//            'pageName' => $pageName,
+//        ]);
+//    }
 
     /**
      * Add a mutation to the query.
@@ -1463,10 +1463,10 @@ class Builder
      *
      * @return Builder|static
      */
-    public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'and', $callback);
-    }
+//    public function whereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+//    {
+//        return $this->has($relation, $operator, $count, 'and', $callback);
+//    }
 
     /**
      * Add a relationship count condition to the query with an "or".
@@ -1490,10 +1490,10 @@ class Builder
      *
      * @return Builder|static
      */
-    public function whereDoesntHave($relation, Closure $callback = null)
-    {
-        return $this->doesntHave($relation, 'and', $callback);
-    }
+//    public function whereDoesntHave($relation, Closure $callback = null)
+//    {
+//        return $this->doesntHave($relation, 'and', $callback);
+//    }
 
     /**
      * Add a relationship count condition to the query with where clauses and an "or".
@@ -1505,10 +1505,10 @@ class Builder
      *
      * @return Builder|static
      */
-    public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'or', $callback);
-    }
+//    public function orWhereHas($relation, Closure $callback, $operator = '>=', $count = 1)
+//    {
+//        return $this->has($relation, $operator, $count, 'or', $callback);
+//    }
 
     /**
      * Add the "has" condition where clause to the query.
@@ -1521,16 +1521,16 @@ class Builder
      *
      * @return Builder
      */
-    protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
-    {
-        $this->mergeWheresToHas($hasQuery, $relation);
-
-        if (is_numeric($count)) {
-            $count = new Expression($count);
-        }
-
-        return $this->where(new Expression('('.$hasQuery->toCypher().')'), $operator, $count, $boolean);
-    }
+//    protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
+//    {
+//        $this->mergeWheresToHas($hasQuery, $relation);
+//
+//        if (is_numeric($count)) {
+//            $count = new Expression($count);
+//        }
+//
+//        return $this->where(new Expression('('.$hasQuery->toCypher().')'), $operator, $count, $boolean);
+//    }
 
     /**
      * Merge the "wheres" from a relation query to a has query.
@@ -1576,18 +1576,18 @@ class Builder
      *
      * @return $this
      */
-    public function with($relations)
-    {
-        if (is_string($relations)) {
-            $relations = func_get_args();
-        }
-
-        $eagers = $this->parseRelations($relations);
-
-        $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
-
-        return $this;
-    }
+//    public function with($relations)
+//    {
+//        if (is_string($relations)) {
+//            $relations = func_get_args();
+//        }
+//
+//        $eagers = $this->parseRelations($relations);
+//
+//        $this->eagerLoad = array_merge($this->eagerLoad, $eagers);
+//
+//        return $this;
+//    }
 
     /**
      * Parse a list of relations into individuals.
@@ -1655,12 +1655,12 @@ class Builder
      *
      * @return QueryBuilder
      */
-    protected function callScope($scope, $parameters)
-    {
-        array_unshift($parameters, $this);
-
-        return call_user_func_array([$this->model, $scope], $parameters) ?: $this;
-    }
+//    protected function callScope($scope, $parameters)
+//    {
+//        array_unshift($parameters, $this);
+//
+//        return call_user_func_array([$this->model, $scope], $parameters) ?: $this;
+//    }
 
     /**
      * Get the underlying query builder instance.
@@ -1727,7 +1727,7 @@ class Builder
      *
      * @return $this
      */
-    public function setModel(Model $model)
+    public function setModel($model, $ids = [])
     {
         $this->model = $model;
 
@@ -1742,10 +1742,10 @@ class Builder
      * @param string  $name
      * @param Closure $callback
      */
-    public function macro($name, Closure $callback)
-    {
-        $this->macros[$name] = $callback;
-    }
+//    public function macro($name, Closure $callback)
+//    {
+//        $this->macros[$name] = $callback;
+//    }
 
     /**
      * Get the given macro by name.
@@ -1754,10 +1754,10 @@ class Builder
      *
      * @return Closure
      */
-    public function getMacro($name)
-    {
-        return Arr::get($this->macros, $name);
-    }
+//    public function getMacro($name)
+//    {
+//        return Arr::get($this->macros, $name);
+//    }
 
     /**
      * Create a new record from the parent Model and new related records with it.
@@ -1963,20 +1963,20 @@ class Builder
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
-    {
-        if (isset($this->macros[$method])) {
-            array_unshift($parameters, $this);
-
-            return call_user_func_array($this->macros[$method], $parameters);
-        } elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
-            return $this->callScope($scope, $parameters);
-        }
-
-        $result = call_user_func_array([$this->query, $method], $parameters);
-
-        return in_array($method, $this->passthru) ? $result : $this;
-    }
+//    public function __call($method, $parameters)
+//    {
+//        if (isset($this->macros[$method])) {
+//            array_unshift($parameters, $this);
+//
+//            return call_user_func_array($this->macros[$method], $parameters);
+//        } elseif (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
+//            return $this->callScope($scope, $parameters);
+//        }
+//
+//        $result = call_user_func_array([$this->query, $method], $parameters);
+//
+//        return in_array($method, $this->passthru) ? $result : $this;
+//    }
 
     /**
      * Force a clone of the underlying query builder when cloning.

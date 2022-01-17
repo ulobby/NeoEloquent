@@ -2,8 +2,10 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
+use Illuminate\Support\Collection as IlluminateCollection;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Collection;
+use Vinelab\NeoEloquent\Eloquent\Collection as NeoCollection;
 use Vinelab\NeoEloquent\Eloquent\Edges\Finder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
@@ -280,12 +282,12 @@ abstract class OneRelation extends Relation implements RelationInterface
      * Match the eagerly loaded results to their parents.
      *
      * @param array                                    $models
-     * @param \Vinelab\NeoEloquent\Eloquent\Collection $results
+     * @param NeoCollection $results
      * @param string                                   $relation
      *
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, IlluminateCollection|NeoCollection $results, $relation)
     {
         // We will need the parent node placeholder so that we use it to extract related results.
         $parent = $this->query->getQuery()->modelAsNode($this->parent->nodeLabel());

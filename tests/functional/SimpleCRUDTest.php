@@ -373,17 +373,15 @@ class SimpleCRUDTest extends TestCase
         $this->assertGreaterThan(0, $updated);
     }
 
-    public function testSavningDateTimeAndCarbonInstances()
+    public function testSavingDateTimeAndCarbonInstances()
     {
         $now = Carbon::now();
         $dt = new DateTime();
         $w = Wiz::create(['fiz' => $now, 'biz' => $dt]);
 
-        $format = Wiz::getDateFormat();
-
         $fetched = Wiz::first();
-        $this->assertEquals($now->format(Wiz::getDateFormat()), $fetched->fiz);
-        $this->assertEquals($now->format(Wiz::getDateFormat()), $fetched->biz);
+        $this->assertEquals($now->format($fetched->getDateFormat()), $fetched->fiz);
+        $this->assertEquals($now->format($fetched->getDateFormat()), $fetched->biz);
 
         $tomorrow = Carbon::now()->addDay();
         $after = Carbon::now()->addDays(2);
@@ -393,7 +391,7 @@ class SimpleCRUDTest extends TestCase
         $fetched->save();
 
         $updated = Wiz::first();
-        $this->assertEquals($tomorrow->format(Wiz::getDateFormat()), $updated->fiz);
-        $this->assertEquals($after->format(Wiz::getDateFormat()), $updated->biz);
+        $this->assertEquals($tomorrow->format($updated->getDateFormat()), $updated->fiz);
+        $this->assertEquals($after->format($updated->getDateFormat()), $updated->biz);
     }
 }

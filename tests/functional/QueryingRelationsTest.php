@@ -417,9 +417,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $this->assertEquals($tags[$key]->toArray(), $tag->toArray());
-        }
+        $this->assertEmpty($related->diff($tags));
     }
 
     /**
@@ -707,11 +705,11 @@ class QueryingRelationsTest extends TestCase
             ]
         );
 
-        $houwe = User::first();
+        $houwe = User::where('name', 'Some Name')->first();
         $colleague = $houwe->colleagues()->first();
 
-        $this->assertEquals($yesterday->format(User::getDateFormat()), $houwe->dob);
-        $this->assertEquals($dt->format(User::getDateFormat()), $colleague->dob);
+        $this->assertEquals($yesterday->format($houwe->getDateFormat()), $houwe->dob);
+        $this->assertEquals($dt->format($houwe->getDateFormat()), $colleague->dob);
     }
 
     public function testSavingRelationWithDateTimeAndCarbonInstances()
@@ -726,11 +724,11 @@ class QueryingRelationsTest extends TestCase
         $user->colleagues()->save($someone);
         $user->colleagues()->save($brother);
 
-        $andrew = User::first();
+        $andrew = User::where('name', 'Andrew Hale')->first();
 
         $colleagues = $andrew->colleagues()->get();
-        $this->assertEquals($dt->format(User::getDateFormat()), $colleagues[0]->dob);
-        $this->assertEquals($yesterday->format(User::getDateFormat()), $colleagues[1]->dob);
+        $this->assertEquals($dt->format($andrew->getDateFormat()), $colleagues[0]->dob);
+        $this->assertEquals($yesterday->format($andrew->getDateFormat()), $colleagues[1]->dob);
     }
 
     public function testCreateWithReturnsRelatedModelsAsRelations()

@@ -2,7 +2,8 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
-use Vinelab\NeoEloquent\Eloquent\Collection;
+use Illuminate\Support\Collection as IlluminateCollection;
+use Vinelab\NeoEloquent\Eloquent\Collection as NeoCollection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
@@ -146,13 +147,13 @@ class HasOne extends HasOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
+     * @param array $models
+     * @param IlluminateCollection|NeoCollection $results
+     * @param string $relation
      *
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models,  IlluminateCollection|NeoCollection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }

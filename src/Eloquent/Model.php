@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Eloquent;
 use ArrayAccess;
 use BadMethodCallException;
 use Carbon\Carbon;
+use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -30,7 +31,7 @@ use Vinelab\NeoEloquent\Eloquent\Relations\Relation;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\Query\Builder as QueryBuilder;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model  extends \Illuminate\Database\Eloquent\Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     /**
      * The connection name for the model.
@@ -328,7 +329,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param \Vinelab\NeoEloquent\Eloquent\ScopeInterface $scope
      */
-    public static function addGlobalScope(ScopeInterface $scope)
+    public static function addGlobalScope($scope, Closure $implementation = null)
     {
         static::$globalScopes[get_called_class()][get_class($scope)] = $scope;
     }
@@ -683,16 +684,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return $this
      */
-    public function fresh(array $with = [])
-    {
-        if (!$this->exists) {
-            return;
-        }
-
-        $key = $this->getKeyName();
-
-        return static::with($with)->where($key, $this->getKey())->first();
-    }
+//    public function fresh(array $with = [])
+//    {
+//        if (!$this->exists) {
+//            return;
+//        }
+//
+//        $key = $this->getKeyName();
+//
+//        return static::with($with)->where($key, $this->getKey())->first();
+//    }
 
     /**
      * Eager load relations on the model.
@@ -1185,7 +1186,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null)
+    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
     {
 
         // When the name and the type are specified we'll return a MorphedByOne
@@ -1248,10 +1249,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return string
      */
-    public function getActualClassNameForMorph($class)
-    {
-        return array_get(Relation::morphMap(), $class, $class);
-    }
+//    public function getActualClassNameForMorph($class)
+//    {
+//        return array_get(Relation::morphMap(), $class, $class);
+//    }
 
     /**
      * Destroy the models for the given IDs.
@@ -1518,10 +1519,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return int
      */
-    protected function increment($column, $amount = 1)
-    {
-        return $this->incrementOrDecrement($column, $amount, 'increment');
-    }
+//    protected function increment($column, $amount = 1, $extra = [])
+//    {
+//        return $this->incrementOrDecrement($column, $amount, 'increment');
+//    }
 
     /**
      * Decrement a column's value by a given amount.
@@ -1531,10 +1532,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return int
      */
-    protected function decrement($column, $amount = 1)
-    {
-        return $this->incrementOrDecrement($column, $amount, 'decrement');
-    }
+//    protected function decrement($column, $amount = 1)
+//    {
+//        return $this->incrementOrDecrement($column, $amount, 'decrement');
+//    }
 
     /**
      * Run the increment or decrement method on the model.
@@ -1545,18 +1546,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return int
      */
-    protected function incrementOrDecrement($column, $amount, $method)
-    {
-        $query = $this->newQuery();
-
-        if (!$this->exists) {
-            return $query->{$method}($column, $amount);
-        }
-
-        $this->incrementOrDecrementAttributeValue($column, $amount, $method);
-
-        return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
-    }
+//    protected function incrementOrDecrement($column, $amount, $method)
+//    {
+//        $query = $this->newQuery();
+//
+//        if (!$this->exists) {
+//            return $query->{$method}($column, $amount);
+//        }
+//
+//        $this->incrementOrDecrementAttributeValue($column, $amount, $method);
+//
+//        return $query->where($this->getKeyName(), $this->getKey())->{$method}($column, $amount);
+//    }
 
     /**
      * Increment the underlying attribute value and sync with original.
@@ -1579,14 +1580,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool|int
      */
-    public function update(array $attributes = [])
-    {
-        if (!$this->exists) {
-            return $this->newQuery()->update($attributes);
-        }
-
-        return $this->fill($attributes)->save();
-    }
+//    public function update(array $attributes = [])
+//    {
+//        if (!$this->exists) {
+//            return $this->newQuery()->update($attributes);
+//        }
+//
+//        return $this->fill($attributes)->save();
+//    }
 
     /**
      * Save the model and all of its relationships.
@@ -1604,7 +1605,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // us to recurse into all of these nested relations for the model instance.
         foreach ($this->relations as $models) {
             $models = $models instanceof Collection
-                        ? $models->all() : [$models];
+                ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
                 if (!$model->push()) {
@@ -1679,39 +1680,39 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool|null
      */
-    protected function performUpdate(EloquentBuilder $query, array $options = [])
-    {
-        $dirty = $this->getDirty();
-
-        if (count($dirty) > 0) {
-            // If the updating event returns false, we will cancel the update operation so
-            // developers can hook Validation systems into their models and cancel this
-            // operation if the model does not pass validation. Otherwise, we update.
-            if ($this->fireModelEvent('updating') === false) {
-                return false;
-            }
-
-            // First we need to create a fresh query instance and touch the creation and
-            // update timestamp on the model which are maintained by us for developer
-            // convenience. Then we will just continue saving the model instances.
-            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
-                $this->updateTimestamps();
-            }
-
-            // Once we have run the update operation, we will fire the "updated" event for
-            // this model instance. This will allow developers to hook into these after
-            // models are updated, giving them a chance to do any special processing.
-            $dirty = $this->getDirty();
-
-            if (count($dirty) > 0) {
-                $this->setKeysForSaveQuery($query)->update($dirty);
-
-                $this->fireModelEvent('updated', false);
-            }
-        }
-
-        return true;
-    }
+//    protected function performUpdate(\Illuminate\Database\Eloquent\Builder $builder, array $options = [])
+//    {
+//        $dirty = $this->getDirty();
+//
+//        if (count($dirty) > 0) {
+//            // If the updating event returns false, we will cancel the update operation so
+//            // developers can hook Validation systems into their models and cancel this
+//            // operation if the model does not pass validation. Otherwise, we update.
+//            if ($this->fireModelEvent('updating') === false) {
+//                return false;
+//            }
+//
+//            // First we need to create a fresh query instance and touch the creation and
+//            // update timestamp on the model which are maintained by us for developer
+//            // convenience. Then we will just continue saving the model instances.
+//            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
+//                $this->updateTimestamps();
+//            }
+//
+//            // Once we have run the update operation, we will fire the "updated" event for
+//            // this model instance. This will allow developers to hook into these after
+//            // models are updated, giving them a chance to do any special processing.
+//            $dirty = $this->getDirty();
+//
+//            if (count($dirty) > 0) {
+//                $this->setKeysForSaveQuery($query)->update($dirty);
+//
+//                $this->fireModelEvent('updated', false);
+//            }
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Perform a model insert operation.
@@ -1721,7 +1722,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool
      */
-    protected function performInsert(EloquentBuilder $query, array $options = [])
+    protected function performInsert(\Illuminate\Database\Eloquent\Builder $query, array $options = [])
     {
         if ($this->fireModelEvent('creating') === false) {
             return false;
@@ -1768,7 +1769,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param array                                 $attributes
      */
-    protected function insertAndSetId(Builder $query, $attributes)
+    protected function insertAndSetId(\Illuminate\Database\Eloquent\Builder $query, $attributes)
     {
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
@@ -1836,12 +1837,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery(Builder $query)
-    {
-        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
-
-        return $query;
-    }
+//    protected function setKeysForSaveQuery(Builder $query)
+//    {
+//        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+//
+//        return $query;
+//    }
 
     /**
      * Get the primary key value for a save query.
@@ -1876,7 +1877,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Update the creation and update timestamps.
      */
-    protected function updateTimestamps()
+    public function updateTimestamps()
     {
         $time = $this->freshTimestamp();
 
@@ -1904,40 +1905,40 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param mixed $value
      */
-    public function setUpdatedAt($value)
-    {
-        $this->{static::UPDATED_AT} = $value;
-    }
+//    public function setUpdatedAt($value)
+//    {
+//        $this->{static::UPDATED_AT} = $value;
+//    }
 
     /**
      * Get the name of the "created at" column.
      *
      * @return string
      */
-    public function getCreatedAtColumn()
-    {
-        return static::CREATED_AT;
-    }
+//    public function getCreatedAtColumn()
+//    {
+//        return static::CREATED_AT;
+//    }
 
     /**
      * Get the name of the "updated at" column.
      *
      * @return string
      */
-    public function getUpdatedAtColumn()
-    {
-        return static::UPDATED_AT;
-    }
+//    public function getUpdatedAtColumn()
+//    {
+//        return static::UPDATED_AT;
+//    }
 
     /**
      * Get a fresh timestamp for the model.
      *
      * @return \Carbon\Carbon
      */
-    public function freshTimestamp()
-    {
-        return new Carbon();
-    }
+//    public function freshTimestamp()
+//    {
+//        return new Carbon();
+//    }
 
     /**
      * Get a fresh timestamp for the model.
@@ -2792,6 +2793,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getAttribute($key)
     {
+//        dump($key);
         if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
             return $this->getAttributeValue($key);
         }
@@ -2905,7 +2907,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool
      */
-    protected function hasCast($key)
+    public function hasCast($key, $types = null)
     {
         return array_key_exists($key, $this->casts);
     }
@@ -3029,12 +3031,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return array
      */
-    public function getDates()
-    {
-        $defaults = [static::CREATED_AT, static::UPDATED_AT];
-
-        return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
-    }
+//    public function getDates()
+//    {
+//        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+//
+//        return $this->timestamps ? array_merge($this->dates, $defaults) : $this->dates;
+//    }
 
     /**
      * Convert a DateTime to a storable string.
@@ -3043,14 +3045,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return string
      */
-    public function fromDateTime($value)
-    {
-        $format = $this->getDateFormat();
-
-        $value = $this->asDateTime($value);
-
-        return $value->format($format);
-    }
+//    public function fromDateTime($value)
+//    {
+//        $format = $this->getDateFormat();
+//
+//        $value = $this->asDateTime($value);
+//
+//        return $value->format($format);
+//    }
 
     /**
      * Return a timestamp as DateTime object.
@@ -3059,41 +3061,44 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return \Carbon\Carbon
      */
-    protected function asDateTime($value)
-    {
-        // If this value is already a Carbon instance, we shall just return it as is.
-        // This prevents us having to reinstantiate a Carbon instance when we know
-        // it already is one, which wouldn't be fulfilled by the DateTime check.
-        if ($value instanceof Carbon) {
-            return $value;
-        }
-
-        // If the value is already a DateTime instance, we will just skip the rest of
-        // these checks since they will be a waste of time, and hinder performance
-        // when checking the field. We will just return the DateTime right away.
-        if ($value instanceof DateTime) {
-            return Carbon::instance($value);
-        }
-
-        // If this value is an integer, we will assume it is a UNIX timestamp's value
-        // and format a Carbon object from this timestamp. This allows flexibility
-        // when defining your date fields as they might be UNIX timestamps here.
-        if (is_numeric($value)) {
-            return Carbon::createFromTimestamp($value);
-        }
-
-        // If the value is in simply year, month, day format, we will instantiate the
-        // Carbon instances from that format. Again, this provides for simple date
-        // fields on the database, while still supporting Carbonized conversion.
-        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
-            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
-        }
-
-        // Finally, we will just assume this date is in the format used by default on
-        // the database connection and use that format to create the Carbon object
-        // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat($this->getDateFormat(), $value);
-    }
+//    protected function asDateTime($value)
+//    {
+//        $e = new \Exception();
+//        dump ($e->getTraceAsString());
+//        // If this value is already a Carbon instance, we shall just return it as is.
+//        // This prevents us having to reinstantiate a Carbon instance when we know
+//        // it already is one, which wouldn't be fulfilled by the DateTime check.
+//        if ($value instanceof Carbon) {
+//            return $value;
+//        }
+//
+//        // If the value is already a DateTime instance, we will just skip the rest of
+//        // these checks since they will be a waste of time, and hinder performance
+//        // when checking the field. We will just return the DateTime right away.
+//        if ($value instanceof DateTime) {
+//            return Carbon::instance($value);
+//        }
+//
+//        // If this value is an integer, we will assume it is a UNIX timestamp's value
+//        // and format a Carbon object from this timestamp. This allows flexibility
+//        // when defining your date fields as they might be UNIX timestamps here.
+//        if (is_numeric($value)) {
+//            return Carbon::createFromTimestamp($value);
+//        }
+//
+//        // If the value is in simply year, month, day format, we will instantiate the
+//        // Carbon instances from that format. Again, this provides for simple date
+//        // fields on the database, while still supporting Carbonized conversion.
+//        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
+//            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
+//        }
+//        dump($value);
+//
+//        // Finally, we will just assume this date is in the format used by default on
+//        // the database connection and use that format to create the Carbon object
+//        // that is returned back out to the developers after we convert it here.
+//        return Carbon::createFromFormat($this->getDateFormat(), $value);
+//    }
 
     /**
      * Prepare a date for array / JSON serialization.
@@ -3102,20 +3107,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return string
      */
-    protected function serializeDate(DateTime $date)
-    {
-        return $date->format($this->getDateFormat());
-    }
+//    protected function serializeDate(DateTime $date)
+//    {
+//        return $date->format($this->getDateFormat());
+//    }
 
     /**
      * Get the format for database stored dates.
      *
      * @return string
      */
-    protected function getDateFormat()
-    {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
-    }
+//    public function getDateFormat()
+//    {
+//        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+//    }
 
     /**
      * Set the date format used by the model.
@@ -3124,12 +3129,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return $this
      */
-    public function setDateFormat($format)
-    {
-        $this->dateFormat = $format;
-
-        return $this;
-    }
+//    public function setDateFormat($format)
+//    {
+//        $this->dateFormat = $format;
+//
+//        return $this;
+//    }
 
     /**
      * Clone the model into a new, non-existing instance.
@@ -3591,10 +3596,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return mixed
      */
-    public function __get($key)
-    {
-        return $this->getAttribute($key);
-    }
+//    public function __get($key)
+//    {
+//        return $this->getAttribute($key);
+//    }
 
     /**
      * Dynamically set attributes on the model.
@@ -3602,10 +3607,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param string $key
      * @param mixed  $value
      */
-    public function __set($key, $value)
-    {
-        $this->setAttribute($key, $value);
-    }
+//    public function __set($key, $value)
+//    {
+//        $this->setAttribute($key, $value);
+//    }
 
     /**
      * Determine if the given attribute exists.
@@ -3662,7 +3667,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __isset($key)
     {
         return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-                ($this->hasGetMutator($key) && !is_null($this->getAttributeValue($key)));
+            ($this->hasGetMutator($key) && !is_null($this->getAttributeValue($key)));
     }
 
     /**
