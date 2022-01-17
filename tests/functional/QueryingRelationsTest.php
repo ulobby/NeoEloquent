@@ -817,6 +817,18 @@ class QueryingRelationsTest extends TestCase
 
         $this->assertEquals(0, count(Role::first()->users));
     }
+
+    public function testSearchInHasManyWithCamelCaseName()
+    {
+        $user = User::create(['name' => 'sefastak']);
+        $fancyCloset1 = FancyShoe::create(['name' =>'fancy1']);
+        $fancyCloset2 = FancyShoe::create(['name' => 'fancy2']);
+        $user->fancyShoes()->save($fancyCloset1);
+        $user->fancyShoes()->save($fancyCloset2);
+
+        $returnedFancyShoes = $user->fancyShoes()->where('name', 'fancy1')->first();
+        $this->assertEquals($fancyCloset1->toArray(), $returnedFancyShoes->toArray());
+    }
 }
 
 class User extends Model
@@ -844,6 +856,11 @@ class User extends Model
     {
         return $this->belongsTo('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\Organization', 'MEMBER_OF');
     }
+
+    public function fancyShoes()
+    {
+        return $this->hasMany('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\FancyShoe', 'HAS');
+    }
 }
 
 class Account extends Model
@@ -867,6 +884,18 @@ class Organization extends Model
     public function members()
     {
         return $this->hasMany('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\User', 'MEMBER_OF');
+    }
+}
+
+class FancyShoe extends Model
+{
+    protected $label = 'FancyShoe';
+
+    protected $fillable = ['name'];
+
+    public function user()
+    {
+        return $this->hasMany('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\User', 'HAS');
     }
 }
 
