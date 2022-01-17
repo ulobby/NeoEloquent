@@ -281,9 +281,9 @@ abstract class OneRelation extends Relation implements RelationInterface
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
+     * @param array         $models
      * @param NeoCollection $results
-     * @param string                                   $relation
+     * @param string        $relation
      *
      * @return array
      */

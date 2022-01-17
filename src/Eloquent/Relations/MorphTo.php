@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 use Vinelab\NeoEloquent\Eloquent\Builder;
-use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Collection as NeoCollection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Vinelab\NeoEloquent\Eloquent\Model;
@@ -84,9 +83,9 @@ class MorphTo extends OneRelation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array $models
+     * @param array                              $models
      * @param IlluminateCollection|NeoCollection $results
-     * @param string $relation
+     * @param string                             $relation
      *
      * @return array
      */
