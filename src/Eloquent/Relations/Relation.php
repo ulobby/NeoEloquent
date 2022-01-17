@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
 use Closure;
 use Vinelab\NeoEloquent\Eloquent\Builder;
-use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Query\Expression;
 

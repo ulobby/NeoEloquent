@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 use Vinelab\NeoEloquent\Eloquent\Builder;
-use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Collection as NeoCollection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeIn;
 use Vinelab\NeoEloquent\Eloquent\Model;
@@ -60,13 +59,13 @@ class BelongsToMany extends HasOneOrMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array $models
+     * @param array                              $models
      * @param IlluminateCollection|NeoCollection $results
-     * @param string $relation
+     * @param string                             $relation
      *
      * @return array
      */
-    public function match(array $models,  IlluminateCollection|NeoCollection $results, $relation)
+    public function match(array $models, IlluminateCollection|NeoCollection $results, $relation)
     {
         return $this->matchOneOrMany($models, $results, $relation, 'many');
     }
