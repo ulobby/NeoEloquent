@@ -1466,7 +1466,20 @@ class Builder extends \Illuminate\Database\Query\Builder
             return count($results);
         }
 
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
+        if (!isset($results[0])) {
+            return 0;
+        }
+
+        $unifyKeys = array_change_key_case((array) $results[0]);
+        if (isset($unifyKeys['aggregate'])) {
+            return $unifyKeys['aggregate'];
+        }
+
+        if (get_class($results) === 'Laudis\Neo4j\Databags\SummarizedResult') {
+            return $results->first()->values()[0];
+        }
+
+        return 0;
     }
 
     /**
@@ -2285,26 +2298,30 @@ class Builder extends \Illuminate\Database\Query\Builder
      */
     public function addBinding($value, $type = 'where')
     {
-        if (is_array($value)) {
-            $key = array_keys($value)[0];
-
-            if (strpos($key, '.') !== false) {
-                $binding = $value[$key];
-                unset($value[$key]);
-                $key = explode('.', $key)[1];
-                $value[$key] = $binding;
-            }
-        }
-
         if (!array_key_exists($type, $this->bindings)) {
             throw new \InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value)) {
-            $this->bindings[$type] = array_merge($this->bindings[$type], $value);
-        } else {
-            $this->bindings[$type][] = $value;
+        if (empty($value)) {
+            return $this;
         }
+
+        if (!is_array($value)) {
+            $this->bindings[$type][] = $value;
+
+            return $this;
+        }
+
+        $key = array_keys($value)[0];
+
+        if (strpos($key, '.') !== false) {
+            $binding = $value[$key];
+            unset($value[$key]);
+            $key = explode('.', $key)[1];
+            $value[$key] = $binding;
+        }
+
+        $this->bindings[$type] = array_merge($this->bindings[$type], $value);
 
         return $this;
     }
