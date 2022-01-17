@@ -2,22 +2,24 @@
 
 return [
 
-    'default' => 'bolt+routing',
+    'default' => 'http',
 
     'connections' => [
 
         'neo4j' => [
+            'scheme'   => 'http',
             'driver'   => 'neo4j',
-            'host'     => 'neo4j',
-            'port'     => 7687,
+            'host'     => 'localhost',
+            'port'     => 7474,
             'username' => 'neo4j',
             'password' => 'test',
         ],
 
         'default' => [
+            'scheme'   => 'http',
             'driver'   => 'neo4j',
-            'host'     => 'neo4j',
-            'port'     => 7687,
+            'host'     => 'localhost',
+            'port'     => 7474,
             'username' => 'neo4j',
             'password' => 'test',
         ],

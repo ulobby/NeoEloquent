@@ -311,6 +311,7 @@ class EloquentBuilderTest extends TestCase
         $model = \Vinelab\NeoEloquent\Eloquent\Model::class;
         $model = M::mock($model);
         $model->shouldReceive('nodeLabel')->once()->andReturn('Model');
+        $model->shouldReceive('nodeLabel')->once()->andReturn('Model');
         $builder->setModel($model);
         $builder->getQuery()->shouldReceive('foobar')->once()->andReturn('foo');
 

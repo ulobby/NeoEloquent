@@ -6,8 +6,9 @@ use Carbon\Carbon;
 use DateTime;
 use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Expression;
+use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
 
-abstract class Grammar
+abstract class Grammar extends IlluminateGrammar
 {
     /**
      * The Query builder instance.

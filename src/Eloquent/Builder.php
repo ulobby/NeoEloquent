@@ -64,10 +64,10 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
     /**
      * The methods that should be returned from query builder.
      */
-    protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum',
-    ];
+//    protected $passthru = [
+//        'insert', 'insertGetId', 'getBindings', 'toSql',
+//        'exists', 'count', 'min', 'max', 'avg', 'sum',
+//    ];
 
     /**
      * Create a new Eloquent query builder instance.

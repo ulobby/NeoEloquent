@@ -1895,10 +1895,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @param mixed $value
      */
-    public function setCreatedAt($value)
-    {
-        $this->{static::CREATED_AT} = $value;
-    }
+//    public function setCreatedAt($value)
+//    {
+//        $this->{static::CREATED_AT} = $value;
+//    }
 
     /**
      * Set the value of the "updated at" attribute.
@@ -1945,10 +1945,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return string
      */
-    public function freshTimestampString()
-    {
-        return $this->fromDateTime($this->freshTimestamp());
-    }
+//    public function freshTimestampString()
+//    {
+//        return $this->fromDateTime($this->freshTimestamp());
+//    }
 
     /**
      * Get a new query builder for the model's table.
@@ -2102,10 +2102,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return bool
      */
-    public function usesTimestamps()
-    {
-        return $this->timestamps;
-    }
+//    public function usesTimestamps()
+//    {
+//        return $this->timestamps;
+//    }
 
     /**
      * Create a model with its relations.
@@ -3688,16 +3688,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return mixed
      */
-    public function __call($method, $parameters)
-    {
-        if (in_array($method, ['increment', 'decrement'])) {
-            return call_user_func_array([$this, $method], $parameters);
-        }
-
-        $query = $this->newQuery();
-
-        return call_user_func_array([$query, $method], $parameters);
-    }
+//    public function __call($method, $parameters)
+//    {
+//        if (in_array($method, ['increment', 'decrement'])) {
+//            return call_user_func_array([$this, $method], $parameters);
+//        }
+//
+//        $query = $this->newQuery();
+//
+//        return call_user_func_array([$query, $method], $parameters);
+//    }
 
     /**
      * Handle dynamic static method calls into the method.
@@ -3707,22 +3707,22 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return mixed
      */
-    public static function __callStatic($method, $parameters)
-    {
-        $instance = new static();
-
-        return call_user_func_array([$instance, $method], $parameters);
-    }
+//    public static function __callStatic($method, $parameters)
+//    {
+//        $instance = new static();
+//
+//        return call_user_func_array([$instance, $method], $parameters);
+//    }
 
     /**
      * Convert the model to its string representation.
      *
      * @return string
      */
-    public function __toString()
-    {
-        return $this->toJson();
-    }
+//    public function __toString()
+//    {
+//        return $this->toJson();
+//    }
 
     /**
      * When a model is being unserialized, check if it needs to be booted.

@@ -91,11 +91,11 @@ class SimpleCRUDTest extends TestCase
         $expected = [
             $w->getKeyName() => $w->getKey(),
             'fiz'            => new CypherList(['not', '123', 'helping']),
-            'created_at'     => $w->created_at->toDateTimeString(),
+            'created_at'     => dump($w->created_at->toDateTimeString()),
             'updated_at'     => $w->updated_at->toDateTimeString(),
         ];
 
-        $fetched = Wiz::first();
+        $fetched = Wiz::first()->toArray();
         $this->assertEquals($expected, $fetched->toArray());
     }
 
