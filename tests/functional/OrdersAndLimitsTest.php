@@ -60,6 +60,34 @@ class OrdersAndLimitsTest extends TestCase
         $this->assertEquals($c1->toArray(), $another[0]->toArray());
         $this->assertEquals($c2->toArray(), $another[1]->toArray());
     }
+
+    public function testOrderByByRaw()
+    {
+        $c1 = Click::create(['num' => 1]);
+        $c2 = Click::create(['num' => 2]);
+
+        $clicks = Click::orderByRaw('click.num desc')->get();
+
+        $this->assertCount(2, $clicks);
+        $this->assertEquals($c2->toArray(), $clicks[0]->toArray());
+        $this->assertEquals($c1->toArray(), $clicks[1]->toArray());
+    }
+
+    public function testOrderByRawUsingARelation()
+    {
+        $clock1 = Clock::create(['num' => 1]);
+        $relation = $clock1->clicks()->save(Click::create(['num' => 2]));
+        $relation->position = 2;
+        $relation->save();
+        $relation = $clock1->clicks()->save(Click::create(['num' => 1]));
+        $relation->position = 1;
+        $relation->save();
+
+        $clicks = $clock1->clicks()->orderByRaw('rel_has_clicks.position')->get();
+
+        $this->assertEquals(1, $clicks[0]->num);
+        $this->assertEquals(2, $clicks[1]->num);
+    }
 }
 
 class Click extends Model
@@ -67,4 +95,16 @@ class Click extends Model
     protected $label = 'Click';
 
     protected $fillable = ['num'];
+}
+
+class Clock extends Model
+{
+    protected $label = 'Clock';
+
+    protected $fillable = ['num'];
+
+    public function clicks()
+    {
+        return $this->belongsToMany(Click::class, 'HAS');
+    }
 }
