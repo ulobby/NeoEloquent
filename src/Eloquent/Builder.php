@@ -1371,7 +1371,14 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
              * Which is the result of Post::has('comments', '>=', 10)->get();
              */
             $countPart = $prefix.'_count';
-            $this->carry([$relation->getParentNode(), "count($prefix)" => $countPart]);
+            $carry = [$relation->getParentNode(), "count($prefix)" => $countPart];
+
+            // Don't forget to carry the related model in case can be soft-deleted.
+            if (in_array(SoftDeletes::class, class_uses($relation->getModel()))) {
+                $carry[] = $relation->getRelatedNode();
+            }
+
+            $this->carry($carry);
             $this->whereCarried($countPart, $operator, $count);
         }
 
@@ -1477,10 +1484,10 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
      *
      * @return Builder|static
      */
-    public function orHas($relation, $operator = '>=', $count = 1)
-    {
-        return $this->has($relation, $operator, $count, 'or');
-    }
+//    public function orHas($relation, $operator = '>=', $count = 1)
+//    {
+//        return $this->has($relation, $operator, $count, 'or');
+//    }
 
     /**
      * Add a relationship count condition to the query with where clauses.

@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Tests\Functional;
 
 use Mockery as M;
+use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
 use function usort;
 use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model;
@@ -13,6 +14,20 @@ class User extends Model
     protected $label = 'Individual';
 
     protected $fillable = ['name', 'email', 'alias', 'calls'];
+
+    public function pets()
+    {
+        return $this->hasMany(Pet::class, 'HAS');
+    }
+}
+
+class Pet extends Model
+{
+    use SoftDeletes;
+
+    protected $label = 'Pet';
+
+    protected $fillable = ['name'];
 }
 
 class WheresTheTest extends TestCase
@@ -326,5 +341,28 @@ class WheresTheTest extends TestCase
         $ab = User::whereRaw('individual.alias IN ["ab"]')->first();
 
         $this->assertEquals($this->ab->id, $ab->id);
+    }
+
+    public function testWhereRawWithBindings()
+    {
+        $ab = User::whereRaw('individual.alias IN [{name}]', ['name' => 'ab'])->first();
+
+        $this->assertEquals($this->ab->id, $ab->id);
+    }
+
+    public function testWhereHasWithSoftDeletesInRelatedNode()
+    {
+        // Given a user with pets and another user without pets.
+        $userWithPets = User::create(['name' => 'Bertel']);
+        $pet = Pet::create(['name' => 'Pumba']);
+        $userWithPets->pets()->save($pet);
+        User::create(['name' => 'Bertel']);
+
+        // When we search for user with pets.
+        $users = User::where('name', 'Bertel')->whereHas('pets')->get();
+
+        // Then only the user with pets is returned.
+        $this->assertCount(1, $users);
+        $this->assertEquals($userWithPets->id, $users[0]->id);
     }
 }
