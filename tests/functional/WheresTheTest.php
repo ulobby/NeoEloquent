@@ -3,10 +3,10 @@
 namespace Vinelab\NeoEloquent\Tests\Functional;
 
 use Mockery as M;
-use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
 use function usort;
 use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model;
+use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
 use Vinelab\NeoEloquent\Tests\TestCase;
 
 class User extends Model
