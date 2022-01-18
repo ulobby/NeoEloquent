@@ -461,6 +461,7 @@ class CypherGrammar extends Grammar
             if (isset($order['type']) && $order['type'] === 'raw') {
                 return $order['sql'];
             }
+
             return $this->wrap($order['column']).' '.mb_strtoupper($order['direction']);
         }, $orders));
     }
