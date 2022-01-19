@@ -441,11 +441,8 @@ class QueryingRelationsTest extends TestCase
         $related = $post->tags;
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
-
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertEquals($tag1->toArray(), $related->where('id', $tag1->id)->first()->toArray());
+        $this->assertEquals($tag2->toArray(), $related->where('id', $tag2->id)->first()->toArray());
     }
 
     public function testCreatWithPassesThroughFillables()
@@ -466,11 +463,8 @@ class QueryingRelationsTest extends TestCase
         $related = $post->tags;
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
-
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertEquals($tag1->toArray(), $related->where('id', $tag1->id)->first()->toArray());
+        $this->assertEquals($tag2->toArray(), $related->where('id', $tag2->id)->first()->toArray());
     }
 
     public function testCreatingModelWithNullAndBooleanValues()
@@ -492,11 +486,8 @@ class QueryingRelationsTest extends TestCase
         $related = $post->tags;
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
-
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertEquals($tag1->toArray(), $related->where('id', $tag1->id)->first()->toArray());
+        $this->assertEquals($tag2->toArray(), $related->where('id', $tag2->id)->first()->toArray());
     }
 
     public function testCreatingModeWithAttachedModelIds()
@@ -512,11 +503,8 @@ class QueryingRelationsTest extends TestCase
         $related = $post->tags;
         $this->assertInstanceOf('Vinelab\NeoEloquent\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
-
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertEquals($tag1->toArray(), $related->where('id', $tag1->id)->first()->toArray());
+        $this->assertEquals($tag2->toArray(), $related->where('id', $tag2->id)->first()->toArray());
     }
 
     public function testCreatingModelWithAttachedSingleId()

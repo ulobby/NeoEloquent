@@ -2,21 +2,12 @@
 
 namespace Vinelab\NeoEloquent\Eloquent;
 
-use ArrayAccess;
-use BadMethodCallException;
-use Carbon\Carbon;
 use Closure;
-use DateTime;
 use Exception;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use JsonSerializable;
 use LogicException;
 use Vinelab\NeoEloquent\Eloquent\Builder as EloquentBuilder;
 use Vinelab\NeoEloquent\Eloquent\Relations\BelongsTo;
@@ -2880,10 +2871,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return mixed
      */
-    protected function mutateAttribute($key, $value)
-    {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
-    }
+//    protected function mutateAttribute($key, $value)
+//    {
+//        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+//    }
 
     /**
      * Get the value of an attribute using its mutator for array conversion.
@@ -2893,12 +2884,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return mixed
      */
-    protected function mutateAttributeForArray($key, $value)
-    {
-        $value = $this->mutateAttribute($key, $value);
-
-        return $value instanceof Arrayable ? $value->toArray() : $value;
-    }
+//    protected function mutateAttributeForArray($key, $value)
+//    {
+//        $value = $this->mutateAttribute($key, $value);
+//
+//        return $value instanceof Arrayable ? $value->toArray() : $value;
+//    }
 
     /**
      * Determine whether an attribute should be casted to a native type.
@@ -3738,10 +3729,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return mixed
      */
-    public function getQueueableConnection()
-    {
-        return $this->getConnectionName();
-    }
+//    public function getQueueableConnection()
+//    {
+//        return $this->getConnectionName();
+//    }
 
     /**
      * Retrieve the model for a bound value.

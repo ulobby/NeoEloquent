@@ -368,14 +368,15 @@ class WheresTheTest extends TestCase
 
     public function testWhereHasWithLogicalGroups()
     {
+        $this->markTestIncomplete('TODO');
         // Given a user with pets and another user without pets.
-//        $userWithPets = User::create(['name' => 'Bertel']);
-//        $pet = Pet::create(['name' => 'Pumba']);
-//        $userWithPets->pets()->save($pet);
-//        User::create(['name' => 'Bertel']);
+        $userWithPets = User::create(['name' => 'Bertel']);
+        $pet = Pet::create(['name' => 'Pumba']);
+        $userWithPets->pets()->save($pet);
+        User::create(['name' => 'Bertel']);
 
         $users = User::whereHas('pets')->where('name', 'Bertel')->get();
-        dump('popo');
+
         // When we search for user with pets.
         $users = User::whereHas('pets')->where(function ($query) {
             $query->where('name', 'Bertel');
