@@ -2,21 +2,16 @@
 
 namespace Vinelab\NeoEloquent\Eloquent;
 
-use ArrayAccess;
 use BadMethodCallException;
 use Carbon\Carbon;
 use Closure;
 use DateTime;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use JsonSerializable;
 use LogicException;
 use Vinelab\NeoEloquent\Eloquent\Builder as EloquentBuilder;
 use Vinelab\NeoEloquent\Eloquent\Relations\BelongsTo;
