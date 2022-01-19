@@ -2647,26 +2647,26 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return array
      */
-    protected function getArrayableAttributes()
-    {
-        return $this->getArrayableItems($this->attributes);
-    }
+//    protected function getArrayableAttributes()
+//    {
+//        return $this->getArrayableItems($this->attributes);
+//    }
 
     /**
      * Get all of the appendable values that are arrayable.
      *
      * @return array
      */
-    protected function getArrayableAppends()
-    {
-        if (!count($this->appends)) {
-            return [];
-        }
-
-        return $this->getArrayableItems(
-            array_combine($this->appends, $this->appends)
-        );
-    }
+//    protected function getArrayableAppends()
+//    {
+//        if (!count($this->appends)) {
+//            return [];
+//        }
+//
+//        return $this->getArrayableItems(
+//            array_combine($this->appends, $this->appends)
+//        );
+//    }
 
     /**
      * Get the model's relationships in array form.
