@@ -31,7 +31,7 @@ use Vinelab\NeoEloquent\Eloquent\Relations\Relation;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\Query\Builder as QueryBuilder;
 
-abstract class Model extends \Illuminate\Database\Eloquent\Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model extends \Illuminate\Database\Eloquent\Model
 {
     /**
      * The connection name for the model.
@@ -206,14 +206,14 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    protected static $dispatcher;
+//    protected static $dispatcher;
 
     /**
      * The array of booted models.
      *
      * @var array
      */
-    protected static $booted = [];
+//    protected static $booted = [];
 
     /**
      * The array of global scopes on the model.
@@ -269,60 +269,60 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @param array $attributes
      */
-    public function __construct(array $attributes = [])
-    {
-        $this->bootIfNotBooted();
-
-        $this->syncOriginal();
-
-        $this->fill($attributes);
-    }
+//    public function __construct(array $attributes = [])
+//    {
+//        $this->bootIfNotBooted();
+//
+//        $this->syncOriginal();
+//
+//        $this->fill($attributes);
+//    }
 
     /**
      * Check if the model needs to be booted and if so, do it.
      */
-    protected function bootIfNotBooted()
-    {
-        $class = get_class($this);
-
-        if (!isset(static::$booted[$class])) {
-            static::$booted[$class] = true;
-
-            $this->fireModelEvent('booting', false);
-
-            static::boot();
-
-            $this->fireModelEvent('booted', false);
-        }
-    }
+//    protected function bootIfNotBooted()
+//    {
+//        $class = get_class($this);
+//
+//        if (!isset(static::$booted[$class])) {
+//            static::$booted[$class] = true;
+//
+//            $this->fireModelEvent('booting', false);
+//
+//            static::boot();
+//
+//            $this->fireModelEvent('booted', false);
+//        }
+//    }
 
     /**
      * The "booting" method of the model.
      */
-    protected static function boot()
-    {
-        static::bootTraits();
-    }
+//    protected static function boot()
+//    {
+//        static::bootTraits();
+//    }
 
     /**
      * Boot all of the bootable traits on the model.
      */
-    protected static function bootTraits()
-    {
-        foreach (class_uses_recursive(get_called_class()) as $trait) {
-            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait))) {
-                forward_static_call([get_called_class(), $method]);
-            }
-        }
-    }
+//    protected static function bootTraits()
+//    {
+//        foreach (class_uses_recursive(get_called_class()) as $trait) {
+//            if (method_exists(get_called_class(), $method = 'boot'.class_basename($trait))) {
+//                forward_static_call([get_called_class(), $method]);
+//            }
+//        }
+//    }
 
     /**
      * Clear the list of booted models so they will be re-booted.
      */
-    public static function clearBootedModels()
-    {
-        static::$booted = [];
-    }
+//    public static function clearBootedModels()
+//    {
+//        static::$booted = [];
+//    }
 
     /**
      * Register a new global scope on the model.
@@ -1346,10 +1346,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function saving($callback, $priority = 0)
-    {
-        static::registerModelEvent('saving', $callback, $priority);
-    }
+//    public static function saving($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('saving', $callback, $priority);
+//    }
 
     /**
      * Register an updated model event with the dispatcher.
@@ -1357,10 +1357,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function updated($callback, $priority = 0)
-    {
-        static::registerModelEvent('updated', $callback, $priority);
-    }
+//    public static function updated($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('updated', $callback, $priority);
+//    }
 
     /**
      * Register a creating model event with the dispatcher.
@@ -1368,10 +1368,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function creating($callback, $priority = 0)
-    {
-        static::registerModelEvent('creating', $callback, $priority);
-    }
+//    public static function creating($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('creating', $callback, $priority);
+//    }
 
     /**
      * Register a created model event with the dispatcher.
@@ -1379,10 +1379,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function created($callback, $priority = 0)
-    {
-        static::registerModelEvent('created', $callback, $priority);
-    }
+//    public static function created($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('created', $callback, $priority);
+//    }
 
     /**
      * Register a deleting model event with the dispatcher.
@@ -1390,10 +1390,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function deleting($callback, $priority = 0)
-    {
-        static::registerModelEvent('deleting', $callback, $priority);
-    }
+//    public static function deleting($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('deleting', $callback, $priority);
+//    }
 
     /**
      * Register a deleted model event with the dispatcher.
@@ -1401,10 +1401,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function deleted($callback, $priority = 0)
-    {
-        static::registerModelEvent('deleted', $callback, $priority);
-    }
+//    public static function deleted($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('deleted', $callback, $priority);
+//    }
 
     /**
      * Register an updating model event with the dispatcher.
@@ -1412,10 +1412,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function updating($callback, $priority = 0)
-    {
-        static::registerModelEvent('updating', $callback, $priority);
-    }
+//    public static function updating($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('updating', $callback, $priority);
+//    }
 
     /**
      * Register a saved model event with the dispatcher.
@@ -1423,26 +1423,26 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    public static function saved($callback, $priority = 0)
-    {
-        static::registerModelEvent('saved', $callback, $priority);
-    }
+//    public static function saved($callback, $priority = 0)
+//    {
+//        static::registerModelEvent('saved', $callback, $priority);
+//    }
 
     /**
      * Remove all of the event listeners for the model.
      */
-    public static function flushEventListeners()
-    {
-        if (!isset(static::$dispatcher)) {
-            return;
-        }
-
-        $instance = new static();
-
-        foreach ($instance->getObservableEvents() as $event) {
-            static::$dispatcher->forget("eloquent.{$event}: ".get_called_class());
-        }
-    }
+//    public static function flushEventListeners()
+//    {
+//        if (!isset(static::$dispatcher)) {
+//            return;
+//        }
+//
+//        $instance = new static();
+//
+//        foreach ($instance->getObservableEvents() as $event) {
+//            static::$dispatcher->forget("eloquent.{$event}: ".get_called_class());
+//        }
+//    }
 
     /**
      * Register a model event with the dispatcher.
@@ -1451,65 +1451,65 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param \Closure|string $callback
      * @param int             $priority
      */
-    protected static function registerModelEvent($event, $callback, $priority = 0)
-    {
-        if (isset(static::$dispatcher)) {
-            $name = get_called_class();
-
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback, $priority);
-        }
-    }
+//    protected static function registerModelEvent($event, $callback, $priority = 0)
+//    {
+//        if (isset(static::$dispatcher)) {
+//            $name = get_called_class();
+//
+//            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback, $priority);
+//        }
+//    }
 
     /**
      * Get the observable event names.
      *
      * @return array
      */
-    public function getObservableEvents()
-    {
-        return array_merge(
-            [
-                'creating', 'created', 'updating', 'updated',
-                'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
-            ],
-            $this->observables
-        );
-    }
+//    public function getObservableEvents()
+//    {
+//        return array_merge(
+//            [
+//                'creating', 'created', 'updating', 'updated',
+//                'deleting', 'deleted', 'saving', 'saved',
+//                'restoring', 'restored',
+//            ],
+//            $this->observables
+//        );
+//    }
 
     /**
      * Set the observable event names.
      *
      * @param array $observables
      */
-    public function setObservableEvents(array $observables)
-    {
-        $this->observables = $observables;
-    }
+//    public function setObservableEvents(array $observables)
+//    {
+//        $this->observables = $observables;
+//    }
 
     /**
      * Add an observable event name.
      *
      * @param mixed $observables
      */
-    public function addObservableEvents($observables)
-    {
-        $observables = is_array($observables) ? $observables : func_get_args();
-
-        $this->observables = array_unique(array_merge($this->observables, $observables));
-    }
+//    public function addObservableEvents($observables)
+//    {
+//        $observables = is_array($observables) ? $observables : func_get_args();
+//
+//        $this->observables = array_unique(array_merge($this->observables, $observables));
+//    }
 
     /**
      * Remove an observable event name.
      *
      * @param mixed $observables
      */
-    public function removeObservableEvents($observables)
-    {
-        $observables = is_array($observables) ? $observables : func_get_args();
-
-        $this->observables = array_diff($this->observables, $observables);
-    }
+//    public function removeObservableEvents($observables)
+//    {
+//        $observables = is_array($observables) ? $observables : func_get_args();
+//
+//        $this->observables = array_diff($this->observables, $observables);
+//    }
 
     /**
      * Increment a column's value by a given amount.
@@ -3163,10 +3163,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return array
      */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
+//    public function getAttributes()
+//    {
+//        return $this->attributes;
+//    }
 
     /**
      * Set the array of model attributes. No checking is done.
@@ -3201,12 +3201,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return $this
      */
-    public function syncOriginal()
-    {
-        $this->original = $this->attributes;
-
-        return $this;
-    }
+//    public function syncOriginal()
+//    {
+//        $this->original = $this->attributes;
+//
+//        return $this;
+//    }
 
     /**
      * Sync a single original attribute with its current value.
@@ -3263,7 +3263,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
             if (!array_key_exists($key, $this->original)) {
                 $dirty[$key] = $value;
             } elseif ($value !== $this->original[$key] &&
-                                 !$this->originalIsNumericallyEquivalent($key)) {
+                !$this->originalIsNumericallyEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -3447,18 +3447,18 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return \Illuminate\Contracts\Events\Dispatcher
      */
-    public static function getEventDispatcher()
-    {
-        return static::$dispatcher;
-    }
+//    public static function getEventDispatcher()
+//    {
+//        return static::$dispatcher;
+//    }
 
     /**
      * Unset the event dispatcher for models.
      */
-    public static function unsetEventDispatcher()
-    {
-        static::$dispatcher = null;
-    }
+//    public static function unsetEventDispatcher()
+//    {
+//        static::$dispatcher = null;
+//    }
 
     /**
      * Get the mutated attributes for a given instance.
@@ -3490,7 +3490,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
         // need to be fast. This'll let us know the attributes that can mutate.
         foreach (get_class_methods($class) as $method) {
             if (strpos($method, 'Attribute') !== false &&
-                        preg_match('/^get(.+)Attribute$/', $method, $matches)) {
+                preg_match('/^get(.+)Attribute$/', $method, $matches)) {
                 if (static::$snakeAttributes) {
                     $matches[1] = Str::snake($matches[1]);
                 }
@@ -3507,10 +3507,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
      */
-    public static function setEventDispatcher(Dispatcher $dispatcher)
-    {
-        static::$dispatcher = $dispatcher;
-    }
+//    public static function setEventDispatcher(Dispatcher $dispatcher)
+//    {
+//        static::$dispatcher = $dispatcher;
+//    }
 
     /**
      * @override
@@ -3728,10 +3728,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
     /**
      * When a model is being unserialized, check if it needs to be booted.
      */
-    public function __wakeup()
-    {
-        $this->bootIfNotBooted();
-    }
+//    public function __wakeup()
+//    {
+//        $this->bootIfNotBooted();
+//    }
 
     /**
      * Get the queueable connection for the entity.
@@ -3755,13 +3755,13 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
         return $this->where($this->getRouteKeyName(), $value)->first();
     }
 
-    public function getQueueableRelations()
-    {
-        throw new BadMethodCallException('NeoEloquent does not support queueable relations yet');
-    }
-
-    public function resolveChildRouteBinding($childType, $value, $field)
-    {
-        throw new BadMethodCallException('NeoEloquent does not support queueable relations yet');
-    }
+//    public function getQueueableRelations()
+//    {
+//        throw new BadMethodCallException('NeoEloquent does not support queueable relations yet');
+//    }
+//
+//    public function resolveChildRouteBinding($childType, $value, $field)
+//    {
+//        throw new BadMethodCallException('NeoEloquent does not support queueable relations yet');
+//    }
 }
