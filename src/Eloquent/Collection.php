@@ -80,7 +80,7 @@ class Collection extends BaseCollection
 
             $key = $key instanceof Model ? $key->getKey() : $key;
 
-            return parent::contains(function ($k, $m) use ($key) {
+            return parent::contains(function ($m) use ($key) {
                 return $m->getKey() == $key;
             });
         }

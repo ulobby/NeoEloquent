@@ -1671,39 +1671,39 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return bool|null
      */
-//    protected function performUpdate(\Illuminate\Database\Eloquent\Builder $builder, array $options = [])
-//    {
-//        $dirty = $this->getDirty();
-//
-//        if (count($dirty) > 0) {
-//            // If the updating event returns false, we will cancel the update operation so
-//            // developers can hook Validation systems into their models and cancel this
-//            // operation if the model does not pass validation. Otherwise, we update.
-//            if ($this->fireModelEvent('updating') === false) {
-//                return false;
-//            }
-//
-//            // First we need to create a fresh query instance and touch the creation and
-//            // update timestamp on the model which are maintained by us for developer
-//            // convenience. Then we will just continue saving the model instances.
-//            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
-//                $this->updateTimestamps();
-//            }
-//
-//            // Once we have run the update operation, we will fire the "updated" event for
-//            // this model instance. This will allow developers to hook into these after
-//            // models are updated, giving them a chance to do any special processing.
-//            $dirty = $this->getDirty();
-//
-//            if (count($dirty) > 0) {
-//                $this->setKeysForSaveQuery($query)->update($dirty);
-//
-//                $this->fireModelEvent('updated', false);
-//            }
-//        }
-//
-//        return true;
-//    }
+    protected function performUpdate(\Illuminate\Database\Eloquent\Builder $query, array $options = [])
+    {
+        $dirty = $this->getDirty();
+
+        if (count($dirty) > 0) {
+            // If the updating event returns false, we will cancel the update operation so
+            // developers can hook Validation systems into their models and cancel this
+            // operation if the model does not pass validation. Otherwise, we update.
+            if ($this->fireModelEvent('updating') === false) {
+                return false;
+            }
+
+            // First we need to create a fresh query instance and touch the creation and
+            // update timestamp on the model which are maintained by us for developer
+            // convenience. Then we will just continue saving the model instances.
+            if ($this->timestamps && Arr::get($options, 'timestamps', true)) {
+                $this->updateTimestamps();
+            }
+
+            // Once we have run the update operation, we will fire the "updated" event for
+            // this model instance. This will allow developers to hook into these after
+            // models are updated, giving them a chance to do any special processing.
+            $dirty = $this->getDirty();
+
+            if (count($dirty) > 0) {
+                $this->setKeysForSaveQuery($query)->update($dirty);
+
+                $this->fireModelEvent('updated', false);
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Perform a model insert operation.
@@ -2572,12 +2572,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return array
      */
-    public function toArray()
-    {
-        $attributes = $this->attributesToArray();
-
-        return array_merge($attributes, $this->relationsToArray());
-    }
+//    public function toArray()
+//    {
+//        $attributes = $this->attributesToArray();
+//
+//        return array_merge($attributes, $this->relationsToArray());
+//    }
 
     /**
      * Convert the model's attributes to an array.
@@ -3456,16 +3456,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return array
      */
-    public function getMutatedAttributes()
-    {
-        $class = get_class($this);
-
-        if (!isset(static::$mutatorCache[$class])) {
-            static::cacheMutatedAttributes($class);
-        }
-
-        return static::$mutatorCache[$class];
-    }
+//    public function getMutatedAttributes()
+//    {
+//        $class = get_class($this);
+//
+//        if (!isset(static::$mutatorCache[$class])) {
+//            static::cacheMutatedAttributes($class);
+//        }
+//
+//        return static::$mutatorCache[$class];
+//    }
 
     /**
      * Extract and cache all the mutated attributes of a class.
