@@ -580,20 +580,20 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
      *
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
-        if ($column instanceof Closure) {
-            $query = $this->model->newQueryWithoutScopes();
-
-            call_user_func($column, $query);
-
-            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
-        } else {
-            call_user_func_array([$this->query, 'where'], func_get_args());
-        }
-
-        return $this;
-    }
+//    public function where($column, $operator = null, $value = null, $boolean = 'and')
+//    {
+//        if ($column instanceof Closure) {
+//            $query = $this->model->newQueryWithoutScopes();
+//
+//            call_user_func($column, $query);
+//
+//            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+//        } else {
+//            call_user_func_array([$this->query, 'where'], func_get_args());
+//        }
+//
+//        return $this;
+//    }
 
     /**
      * Add an "or where" clause to the query.
@@ -604,10 +604,10 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
      *
      * @return Builder|static
      */
-    public function orWhere($column, $operator = null, $value = null)
-    {
-        return $this->where($column, $operator, $value, 'or');
-    }
+//    public function orWhere($column, $operator = null, $value = null)
+//    {
+//        return $this->where($column, $operator, $value, 'or');
+//    }
 
     /**
      * Turn Neo4j result set into the corresponding model.
@@ -1988,8 +1988,8 @@ class Builder extends \Illuminate\Database\Eloquent\Builder
     /**
      * Force a clone of the underlying query builder when cloning.
      */
-    public function __clone()
-    {
-        $this->query = clone $this->query;
-    }
+//    public function __clone()
+//    {
+//        $this->query = clone $this->query;
+//    }
 }

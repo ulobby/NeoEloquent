@@ -365,4 +365,24 @@ class WheresTheTest extends TestCase
         $this->assertCount(1, $users);
         $this->assertEquals($userWithPets->id, $users[0]->id);
     }
+
+    public function testWhereHasWithLogicalGroups()
+    {
+        // Given a user with pets and another user without pets.
+//        $userWithPets = User::create(['name' => 'Bertel']);
+//        $pet = Pet::create(['name' => 'Pumba']);
+//        $userWithPets->pets()->save($pet);
+//        User::create(['name' => 'Bertel']);
+
+        $users = User::whereHas('pets')->where('name', 'Bertel')->get();
+dump('popo');
+        // When we search for user with pets.
+        $users = User::whereHas('pets')->where(function($query) {
+            $query->where('name', 'Bertel');
+        })->get();
+
+        // Then only the user with pets is returned.
+//        $this->assertCount(1, $users);
+//        $this->assertEquals($userWithPets->id, $users[0]->id);
+    }
 }

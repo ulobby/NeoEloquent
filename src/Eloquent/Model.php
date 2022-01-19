@@ -2791,15 +2791,15 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return mixed
      */
-    public function getAttribute($key)
-    {
-//        dump($key);
-        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
-            return $this->getAttributeValue($key);
-        }
-
-        return $this->getRelationValue($key);
-    }
+//    public function getAttribute($key)
+//    {
+////        dump($key);
+//        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
+//            return $this->getAttributeValue($key);
+//        }
+//
+//        return $this->getRelationValue($key);
+//    }
 
     /**
      * Get a relationship.
@@ -3619,10 +3619,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return bool
      */
-    public function offsetExists($offset)
-    {
-        return isset($this->$offset);
-    }
+//    public function offsetExists($offset)
+//    {
+//        return isset($this->$offset);
+//    }
 
     /**
      * Get the value for a given offset.
@@ -3631,10 +3631,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return mixed
      */
-    public function offsetGet($offset)
-    {
-        return $this->$offset;
-    }
+//    public function offsetGet($offset)
+//    {
+//        return $this->$offset;
+//    }
 
     /**
      * Set the value for a given offset.
@@ -3642,20 +3642,20 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      * @param mixed $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
-    {
-        $this->$offset = $value;
-    }
+//    public function offsetSet($offset, $value)
+//    {
+//        $this->$offset = $value;
+//    }
 
     /**
      * Unset the value for a given offset.
      *
      * @param mixed $offset
      */
-    public function offsetUnset($offset)
-    {
-        unset($this->$offset);
-    }
+//    public function offsetUnset($offset)
+//    {
+//        unset($this->$offset);
+//    }
 
     /**
      * Determine if an attribute exists on the model.
@@ -3664,21 +3664,22 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model implements Arra
      *
      * @return bool
      */
-    public function __isset($key)
-    {
-        return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
-            ($this->hasGetMutator($key) && !is_null($this->getAttributeValue($key)));
-    }
+//    public function __isset($key)
+//    {
+//        dump($key);
+//        return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
+//            ($this->hasGetMutator($key) && !is_null($this->getAttributeValue($key)));
+//    }
 
     /**
      * Unset an attribute on the model.
      *
      * @param string $key
      */
-    public function __unset($key)
-    {
-        unset($this->attributes[$key], $this->relations[$key]);
-    }
+//    public function __unset($key)
+//    {
+//        unset($this->attributes[$key], $this->relations[$key]);
+//    }
 
     /**
      * Handle dynamic method calls into the model.
