@@ -375,9 +375,9 @@ class WheresTheTest extends TestCase
 //        User::create(['name' => 'Bertel']);
 
         $users = User::whereHas('pets')->where('name', 'Bertel')->get();
-dump('popo');
+        dump('popo');
         // When we search for user with pets.
-        $users = User::whereHas('pets')->where(function($query) {
+        $users = User::whereHas('pets')->where(function ($query) {
             $query->where('name', 'Bertel');
         })->get();
 
