@@ -28,7 +28,7 @@ class CypherGrammar extends Grammar
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
-//dump($this->compileComponents($query));
+        //dump($this->compileComponents($query));
         return trim($this->concatenate($this->compileComponents($query)));
     }
 
@@ -98,7 +98,7 @@ class CypherGrammar extends Grammar
         // function for the component which is responsible for making the Cypher.
         if (!is_null($query->$component)) {
             $method = 'compile'.ucfirst($component);
-//dump('METHOD::::::::::::::::: ' . $method);
+            //dump('METHOD::::::::::::::::: ' . $method);
             $cypher = $this->$method($query, $query->$component);
 //            dump($cypher);
         }
@@ -142,7 +142,7 @@ class CypherGrammar extends Grammar
 
             $cypher = $cypher.' '.$this->compileOptionalMatchesCypher($optionalMatches);
         }
-//dump($cypher);
+        //dump($cypher);
         return $cypher;
     }
 

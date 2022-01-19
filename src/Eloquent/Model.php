@@ -2793,7 +2793,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      */
 //    public function getAttribute($key)
 //    {
-////        dump($key);
+    ////        dump($key);
 //        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
 //            return $this->getAttributeValue($key);
 //        }
