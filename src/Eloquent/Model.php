@@ -1644,6 +1644,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
             $this->finishSave($options);
         }
 
+        // Can we do this in a different way?
+        $this->refresh();
+
         return $saved;
     }
 
@@ -3287,10 +3290,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return array
      */
-    public function getRelations()
-    {
-        return $this->relations;
-    }
+//    public function getRelations()
+//    {
+//        return $this->relations;
+//    }
 
     /**
      * Get a specified relationship.
@@ -3299,10 +3302,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return mixed
      */
-    public function getRelation($relation)
-    {
-        return $this->relations[$relation];
-    }
+//    public function getRelation($relation)
+//    {
+//        return $this->relations[$relation];
+//    }
 
     /**
      * Determine if the given relation is loaded.
@@ -3311,10 +3314,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return bool
      */
-    public function relationLoaded($key)
-    {
-        return array_key_exists($key, $this->relations);
-    }
+//    public function relationLoaded($key)
+//    {
+//        return array_key_exists($key, $this->relations);
+//    }
 
     /**
      * Set the specific relationship in the model.
@@ -3324,12 +3327,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return $this
      */
-    public function setRelation($relation, $value)
-    {
-        $this->relations[$relation] = $value;
-
-        return $this;
-    }
+//    public function setRelation($relation, $value)
+//    {
+//        $this->relations[$relation] = $value;
+//
+//        return $this;
+//    }
 
     /**
      * Determine whether a relationship exists on this model.
@@ -3350,12 +3353,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      *
      * @return $this
      */
-    public function setRelations(array $relations)
-    {
-        $this->relations = $relations;
-
-        return $this;
-    }
+//    public function setRelations(array $relations)
+//    {
+//        $this->relations = $relations;
+//
+//        return $this;
+//    }
 
     /**
      * Get the database connection for the model.
