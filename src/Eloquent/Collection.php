@@ -84,6 +84,7 @@ class Collection extends BaseCollection
                 if ($m instanceof Model) {
                     return $m->getKey() === $key;
                 }
+
                 return $m === $key;
             });
         }
