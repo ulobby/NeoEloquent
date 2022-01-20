@@ -2784,7 +2784,6 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      */
 //    public function getAttribute($key)
 //    {
-    ////        dump($key);
 //        if (array_key_exists($key, $this->attributes) || $this->hasGetMutator($key)) {
 //            return $this->getAttributeValue($key);
 //        }
@@ -3083,7 +3082,6 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 //        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
 //            return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
 //        }
-//        dump($value);
 //
 //        // Finally, we will just assume this date is in the format used by default on
 //        // the database connection and use that format to create the Carbon object
@@ -3657,7 +3655,6 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
      */
 //    public function __isset($key)
 //    {
-//        dump($key);
 //        return (isset($this->attributes[$key]) || isset($this->relations[$key])) ||
 //            ($this->hasGetMutator($key) && !is_null($this->getAttributeValue($key)));
 //    }

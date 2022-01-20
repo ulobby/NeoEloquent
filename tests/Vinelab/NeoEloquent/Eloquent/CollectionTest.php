@@ -32,8 +32,18 @@ class CollectionTest extends TestCase
 //        parent::tearDown();
 //    }
 
-    public function testContains()
+    public function testContainsWithModels()
     {
+        $person = Person::create(['name' => 'Johannes']);
+        $office = Office::create(['name' => 'Denmark']);
+        $office->members()->save($person);
+
+        $this->assertTrue($office->members->contains($person));
+    }
+
+    public function testContainsWithVariables()
+    {
+        $this->markTestSkipped('TODO');
         $person = Person::create(['name' => 'Johannes']);
         $office = Office::create(['name' => 'Denmark']);
         $office->members()->save($person);
