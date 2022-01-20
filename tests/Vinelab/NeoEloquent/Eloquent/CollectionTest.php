@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\Tests\Eloquent;
 
+use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model as NeoEloquent;
 use Vinelab\NeoEloquent\Tests\TestCase;
 
@@ -24,14 +25,6 @@ class Person extends NeoEloquent
 
 class CollectionTest extends TestCase
 {
-//    public function tearDown(): void
-//    {
-//        $all = Person::all();
-//        $all->each(function ($u) { $u->delete(); });
-//
-//        parent::tearDown();
-//    }
-
     public function testContainsWithModels()
     {
         $person = Person::create(['name' => 'Johannes']);
@@ -43,11 +36,14 @@ class CollectionTest extends TestCase
 
     public function testContainsWithVariables()
     {
-        $this->markTestSkipped('TODO');
-        $person = Person::create(['name' => 'Johannes']);
-        $office = Office::create(['name' => 'Denmark']);
-        $office->members()->save($person);
+        $collection = new Collection(['a', 'b']);
 
-        $this->assertTrue($office->members->contains($person));
+        $this->assertTrue($collection->contains('a'));
+        $this->assertFalse($collection->contains('z'));
+
+        $collection = new Collection([1, 2]);
+
+        $this->assertTrue($collection->contains(1));
+        $this->assertFalse($collection->contains(9));
     }
 }
