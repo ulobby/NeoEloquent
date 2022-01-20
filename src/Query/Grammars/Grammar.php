@@ -4,10 +4,11 @@ namespace Vinelab\NeoEloquent\Query\Grammars;
 
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
 use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Expression;
 
-abstract class Grammar
+abstract class Grammar extends IlluminateGrammar
 {
     /**
      * The Query builder instance.
@@ -289,6 +290,10 @@ abstract class Grammar
         if (is_null($labels)) {
             return 'n';
         } elseif (is_array($labels)) {
+            // Allow camelCase, example: fancyShoe.
+            array_walk($labels, function (&$value) {
+                $value = lcfirst($value);
+            });
             $labels = implode('_', $labels);   // Or just replace with this
         }
 
@@ -299,7 +304,8 @@ abstract class Grammar
             $labels = 'with_'.$relation.'_'.$labels;
         }
 
-        return mb_strtolower($labels);
+        // Allow camelCase, example: fancyShoe.
+        return lcfirst($labels);
     }
 
     /**

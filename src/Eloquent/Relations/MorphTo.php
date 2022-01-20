@@ -2,8 +2,9 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
+use Illuminate\Support\Collection as IlluminateCollection;
 use Vinelab\NeoEloquent\Eloquent\Builder;
-use Vinelab\NeoEloquent\Eloquent\Collection;
+use Vinelab\NeoEloquent\Eloquent\Collection as NeoCollection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
@@ -82,13 +83,13 @@ class MorphTo extends OneRelation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
+     * @param array                              $models
+     * @param IlluminateCollection|NeoCollection $results
+     * @param string                             $relation
      *
      * @return array
      */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, IlluminateCollection|NeoCollection $results, $relation)
     {
         // This relationship deals with a One-To-One morph type so we'll just extract
         // the first model out of the results and return it.

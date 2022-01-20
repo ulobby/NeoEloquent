@@ -80,8 +80,12 @@ class Collection extends BaseCollection
 
             $key = $key instanceof Model ? $key->getKey() : $key;
 
-            return parent::contains(function ($k, $m) use ($key) {
-                return $m->getKey() == $key;
+            return parent::contains(function ($m) use ($key) {
+                if ($m instanceof Model) {
+                    return $m->getKey() === $key;
+                }
+
+                return $m === $key;
             });
         }
 
@@ -186,14 +190,14 @@ class Collection extends BaseCollection
      *
      * @return static
      */
-    public function unique($key = null, $strict = false)
-    {
-        if (!is_null($key)) {
-            return parent::unique($key, $strict);
-        }
-
-        return new static(array_values($this->getDictionary()));
-    }
+//    public function unique($key = null, $strict = false)
+//    {
+//        if (!is_null($key)) {
+//            return parent::unique($key, $strict);
+//        }
+//
+//        return new static(array_values($this->getDictionary()));
+//    }
 
     /**
      * Returns only the models from the collection with the specified keys.

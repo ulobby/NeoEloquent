@@ -366,4 +366,28 @@ class HasManyRelationTest extends TestCase
             $edge->delete();
         }
     }
+
+    public function testHasManyLazyLoading()
+    {
+        $author = Author::create(['name' => 'George R.R. Martin']);
+        $got = Book::create(['title' => 'A Game of Thrones']);
+        $cok = Book::create(['title' => 'A Clash of Kings']);
+
+        $author->books()->save($got);
+        $author->books()->save($cok);
+
+        $this->assertCount(2, $author->books);
+    }
+
+    public function testHasManyLazyLoadingIsNotConsideredNullByNullCoalescingOperator()
+    {
+        $author = Author::create(['name' => 'George R.R. Martin']);
+        $got = Book::create(['title' => 'A Game of Thrones']);
+        $cok = Book::create(['title' => 'A Clash of Kings']);
+
+        $author->books()->save($got);
+        $author->books()->save($cok);
+
+        $this->assertNotNull($author->books ?? null);
+    }
 }

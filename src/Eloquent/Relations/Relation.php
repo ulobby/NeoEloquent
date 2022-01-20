@@ -4,11 +4,10 @@ namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
 use Closure;
 use Vinelab\NeoEloquent\Eloquent\Builder;
-use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Query\Expression;
 
-abstract class Relation
+abstract class Relation extends \Illuminate\Database\Eloquent\Relations\Relation
 {
     /**
      * The Eloquent query builder instance.
@@ -43,7 +42,7 @@ abstract class Relation
      *
      * @var array
      */
-    protected static $morphMap = [];
+//    protected static $morphMap = [];
 
     /**
      * Create a new relation instance.
@@ -91,7 +90,7 @@ abstract class Relation
      *
      * @return array
      */
-    abstract public function match(array $models, Collection $results, $relation);
+//    abstract public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation);
 
     /**
      * Get the results of the relationship.

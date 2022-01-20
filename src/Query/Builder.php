@@ -20,7 +20,7 @@ use Vinelab\NeoEloquent\Eloquent\Collection;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 use Vinelab\NeoEloquent\Traits\ResultTrait;
 
-class Builder
+class Builder extends \Illuminate\Database\Query\Builder
 {
     use ResultTrait;
 
@@ -29,28 +29,28 @@ class Builder
      *
      * @var Vinelab\NeoEloquent\Connection
      */
-    protected $connection;
+//    protected $connection;
 
     /**
      * The database active client handler.
      *
      * @var Neoxygen\NeoClient\Client
      */
-    protected $client;
+//    protected $client;
 
     /**
      * The database query grammar instance.
      *
      * @var \Vinelab\NeoEloquent\Query\Grammars\Grammar
      */
-    protected $grammar;
+//    protected $grammar;
 
     /**
      * The database query post processor instance.
      *
      * @var \Vinelab\NeoEloquent\Query\Processors\Processor
      */
-    protected $processor;
+//    protected $processor;
 
     /**
      * The matches constraints for the query.
@@ -71,7 +71,7 @@ class Builder
      *
      * @var array
      */
-    protected $bindings = [
+    public $bindings = [
         'matches' => [],
         'select'  => [],
         'join'    => [],
@@ -85,7 +85,7 @@ class Builder
      *
      * @var array
      */
-    protected $operators = [
+    public $operators = [
         '+', '-', '*', '/', '%', '^',    // Mathematical
         '=', '<>', '<', '>', '<=', '>=', // Comparison
         'is null', 'is not null',
@@ -325,7 +325,7 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function from($label)
+    public function from($label, $as = null)
     {
         $this->from = $label;
 
@@ -562,16 +562,16 @@ class Builder
      *
      * @return $this
      */
-    public function whereRaw($sql, array $bindings = [], $boolean = 'and')
-    {
-        $type = 'raw';
-
-        $this->wheres[] = compact('type', 'sql', 'boolean');
-
-        $this->addBinding($bindings, 'where');
-
-        return $this;
-    }
+//    public function whereRaw($sql, array $bindings = [], $boolean = 'and')
+//    {
+//        $type = 'raw';
+//
+//        $this->wheres[] = compact('type', 'sql', 'boolean');
+//
+//        $this->addBinding($bindings, 'where');
+//
+//        return $this;
+//    }
 
     /**
      * Add a raw or where clause to the query.
@@ -581,10 +581,10 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function orWhereRaw($sql, array $bindings = [])
-    {
-        return $this->whereRaw($sql, $bindings, 'or');
-    }
+//    public function orWhereRaw($sql, array $bindings = [])
+//    {
+//        return $this->whereRaw($sql, $bindings, 'or');
+//    }
 
     /**
      * Add a where not between statement to the query.
@@ -910,10 +910,10 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function whereDate($column, $operator, $value, $boolean = 'and')
-    {
-        return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
-    }
+//    public function whereDate($column, $operator, $value, $boolean = 'and')
+//    {
+//        return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
+//    }
 
     /**
      * Add a "where day" statement to the query.
@@ -925,10 +925,10 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function whereDay($column, $operator, $value, $boolean = 'and')
-    {
-        return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
-    }
+//    public function whereDay($column, $operator, $value, $boolean = 'and')
+//    {
+//        return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
+//    }
 
     /**
      * Add a "where month" statement to the query.
@@ -940,10 +940,10 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function whereMonth($column, $operator, $value, $boolean = 'and')
-    {
-        return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
-    }
+//    public function whereMonth($column, $operator, $value, $boolean = 'and')
+//    {
+//        return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
+//    }
 
     /**
      * Add a "where year" statement to the query.
@@ -955,10 +955,10 @@ class Builder
      *
      * @return \Vinelab\NeoEloquent\Query\Builder|static
      */
-    public function whereYear($column, $operator, $value, $boolean = 'and')
-    {
-        return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
-    }
+//    public function whereYear($column, $operator, $value, $boolean = 'and')
+//    {
+//        return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
+//    }
 
     /**
      * Add a date based (year, month, day) statement to the query.
@@ -1047,14 +1047,14 @@ class Builder
      *
      * @return $this
      */
-    public function groupBy()
-    {
-        foreach (func_get_args() as $arg) {
-            $this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
-        }
-
-        return $this;
-    }
+//    public function groupBy()
+//    {
+//        foreach (func_get_args() as $arg) {
+//            $this->groups = array_merge((array) $this->groups, is_array($arg) ? $arg : [$arg]);
+//        }
+//
+//        return $this;
+//    }
 
     /**
      * Add a "having" clause to the query.
@@ -1365,10 +1365,10 @@ class Builder
      *
      * @deprecated since version 5.1.
      */
-    public function pluck($column)
-    {
-        return $this->value($column);
-    }
+//    public function pluck($column, $key = null)
+//    {
+//        return $this->value($column);
+//    }
 
     /**
      * Execute the query and get the first result.
@@ -1431,17 +1431,17 @@ class Builder
      *
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
-    {
-        $page = Paginator::resolveCurrentPage($pageName);
-
-        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
-
-        return new Paginator($this->get($columns), $perPage, $page, [
-            'path'     => Paginator::resolveCurrentPath(),
-            'pageName' => $pageName,
-        ]);
-    }
+//    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page')
+//    {
+//        $page = Paginator::resolveCurrentPage($pageName);
+//
+//        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
+//
+//        return new Paginator($this->get($columns), $perPage, $page, [
+//            'path'     => Paginator::resolveCurrentPath(),
+//            'pageName' => $pageName,
+//        ]);
+//    }
 
     /**
      * Get the count of the total records for the paginator.
@@ -1466,7 +1466,20 @@ class Builder
             return count($results);
         }
 
-        return isset($results[0]) ? (int) array_change_key_case((array) $results[0])['aggregate'] : 0;
+        if (!isset($results[0])) {
+            return 0;
+        }
+
+        $unifyKeys = array_change_key_case((array) $results[0]);
+        if (isset($unifyKeys['aggregate'])) {
+            return $unifyKeys['aggregate'];
+        }
+
+        if (get_class($results) === 'Laudis\Neo4j\Databags\SummarizedResult') {
+            return $results->first()->values()[0];
+        }
+
+        return 0;
     }
 
     /**
@@ -1746,12 +1759,12 @@ class Builder
      *
      * @return array
      */
-    protected function cleanBindings(array $bindings)
-    {
-        return array_values(array_filter($bindings, function ($binding) {
-            return !$binding instanceof Expression;
-        }));
-    }
+//    protected function cleanBindings(array $bindings)
+//    {
+//        return array_values(array_filter($bindings, function ($binding) {
+//            return !$binding instanceof Expression;
+//        }));
+//    }
 
     /**
      * Create a raw database expression.
@@ -1803,12 +1816,12 @@ class Builder
      *
      * @return $this
      */
-    public function mergeBindings(Builder $query)
-    {
-        $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
-
-        return $this;
-    }
+//    public function mergeBindings(Builder $query)
+//    {
+//        $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
+//
+//        return $this;
+//    }
 
     /**
      * Get the database connection instance.
@@ -2285,26 +2298,30 @@ class Builder
      */
     public function addBinding($value, $type = 'where')
     {
-        if (is_array($value)) {
-            $key = array_keys($value)[0];
-
-            if (strpos($key, '.') !== false) {
-                $binding = $value[$key];
-                unset($value[$key]);
-                $key = explode('.', $key)[1];
-                $value[$key] = $binding;
-            }
-        }
-
         if (!array_key_exists($type, $this->bindings)) {
             throw new \InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value)) {
-            $this->bindings[$type] = array_merge($this->bindings[$type], $value);
-        } else {
-            $this->bindings[$type][] = $value;
+        if (empty($value)) {
+            return $this;
         }
+
+        if (!is_array($value)) {
+            $this->bindings[$type][] = $value;
+
+            return $this;
+        }
+
+        $key = array_keys($value)[0];
+
+        if (strpos($key, '.') !== false) {
+            $binding = $value[$key];
+            unset($value[$key]);
+            $key = explode('.', $key)[1];
+            $value[$key] = $binding;
+        }
+
+        $this->bindings[$type] = array_merge($this->bindings[$type], $value);
 
         return $this;
     }

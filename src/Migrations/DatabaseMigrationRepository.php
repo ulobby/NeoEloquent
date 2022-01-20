@@ -111,7 +111,6 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function createRepository()
     {
-
     }
 
     /**
