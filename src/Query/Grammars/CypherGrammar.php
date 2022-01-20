@@ -139,6 +139,7 @@ class CypherGrammar extends Grammar
 
             $cypher = $cypher.' '.$this->compileOptionalMatchesCypher($optionalMatches);
         }
+
         return $cypher;
     }
 
