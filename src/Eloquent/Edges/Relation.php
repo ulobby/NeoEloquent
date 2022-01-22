@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTime;
 use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\NoEdgeDirectionException;
@@ -300,9 +301,10 @@ abstract class Relation extends Delegate
     /**
      * Set a given relationship on this relation.
      *
-     * @param \Everyman\Neo4j\Relationship $relation
+     * @param RelationInterface $relation
+     * @param bool $debug
      */
-    public function setRelation(Relationship $relation, $debug = false)
+    public function setRelation(RelationInterface $relation, $debug = false)
     {
         // Set the relation object.
         $this->relation = $relation;

@@ -3,12 +3,12 @@
 namespace Vinelab\NeoEloquent\Eloquent;
 
 use Everyman\Neo4j\Node;
-use Everyman\Neo4j\Query\ResultSet;
 use Everyman\Neo4j\Query\Row;
 use Illuminate\Database\Eloquent\Builder as IlluminateBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis\ResultSet;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\QueryException;
 
@@ -104,24 +104,41 @@ class Builder extends IlluminateBuilder
         $models = [];
 
         if ($results->valid()) {
-            $resultColumns = $results->getColumns();
-
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($resultColumns, $result, $columns);
-
+             foreach ($results->getResults() as $attributes) {
+//                $attributes = $result->getAttributes();
+//dump($attributes);
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
                 if ($this->shouldMutate($attributes)) {
-                    $models[] = $this->mutateToOrigin($result, $attributes);
+                    $models[] = $this->mutateToOrigin($results, $attributes);
                 }
-                // This is a regular record that we should deal with the normal way, creating an instance
-                // of the model out of the fetched attributes.
+//                // This is a regular record that we should deal with the normal way, creating an instance
+//                // of the model out of the fetched attributes.
                 else {
                     $model = $this->model->newFromBuilder($attributes);
                     $model->setConnection($connection);
                     $models[] = $model;
                 }
             }
+
+//            $resultColumns = $results->getColumns();
+//
+//            foreach ($results as $result) {
+//                $attributes = $this->getProperties($resultColumns, $result, $columns);
+//
+//                // Now that we have the attributes, we first check for mutations
+//                // and if exists, we will need to mutate the attributes accordingly.
+//                if ($this->shouldMutate($attributes)) {
+//                    $models[] = $this->mutateToOrigin($result, $attributes);
+//                }
+//                // This is a regular record that we should deal with the normal way, creating an instance
+//                // of the model out of the fetched attributes.
+//                else {
+//                    $model = $this->model->newFromBuilder($attributes);
+//                    $model->setConnection($connection);
+//                    $models[] = $model;
+//                }
+//            }
         }
 
         return $models;
@@ -141,10 +158,10 @@ class Builder extends IlluminateBuilder
 
         if ($results->valid()) {
             $grammar = $this->getQuery()->getGrammar();
-            $columns = $results->getColumns();
+       //     $columns = $results->getColumns();
 
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($columns, $result);
+            foreach ($results->getResults() as $result) {
+                $attributes = $result;
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
                 if ($this->shouldMutate($attributes)) {

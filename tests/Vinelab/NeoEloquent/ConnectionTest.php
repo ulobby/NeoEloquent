@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Tests;
 
 use Mockery as M;
+use Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis\ResultSet;
 
 class ConnectionTest extends TestCase
 {
@@ -324,7 +325,7 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(ResultSet::class, $results);
 
         foreach ($results as $result) {
             $count = $result[0];
@@ -337,7 +338,7 @@ class ConnectionTest extends TestCase
 
         $results = $cypher->getResultSet();
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(ResultSet::class, $results);
 
         $user = null;
 
@@ -368,7 +369,7 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(ResultSet::class, $results);
 
         foreach ($results as $result) {
             $count = $result[0];
