@@ -25,11 +25,20 @@ class Node implements NodeInterface
         $this->properties[$key] = $value;
     }
 
-    protected function compileCreateQuery(): string
+    public function hasId(): bool
+    {
+        return ($this->id !== null);
+    }
+
+    protected function compileCreateNode(): string
     {
         $cypher = 'MERGE (n {';
 
         foreach ($this->properties as $property => $value) {
+            // Avoid null values
+            if ($value === null) {
+                continue;
+            }
             $cypher .= $property . ': $' . $property;
             $cypher .= ', ';
         }
@@ -39,15 +48,34 @@ class Node implements NodeInterface
         return $cypher;
     }
 
-    public function save()
+    protected function runUpdateNode()
     {
-        $statement = new Statement($this->compileCreateQuery(), $this->properties);
-        $result = $this->client->runStatement($statement);
-        $list = $result->first();
-        $pair = $list->first();
+        dump('runUpdateNode');
+        // Properties to update
 
-        $this->id = $pair->getValue();
+        // Properties to remove
+        //
+    }
 
+    protected function runCreateNode()
+    {
+        $cypher = $this->compileCreateNode();
+        $statement = new Statement($cypher, $this->properties);
+        $this->id = $this->client->runStatement($statement)
+            ->first()
+            ->first()
+            ->getValue();
+    }
+
+    public function save(): NodeInterface
+    {
+        if ($this->hasId()) {
+            $this->runUpdateNode();
+
+            return $this;
+        }
+
+        $this->runCreateNode();
         return $this;
     }
 
@@ -85,5 +113,10 @@ class Node implements NodeInterface
     public function getRelationships(): array
     {
         return [];
+    }
+
+    public function findPathsTo()
+    {
+        dump('findPathsTo');
     }
 }

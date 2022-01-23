@@ -13,4 +13,5 @@ interface NodeInterface
     public function addLabels($labels);
     public function getRelationships(): array;
     public function getProperties(): array;
+    public function findPathsTo();
 }

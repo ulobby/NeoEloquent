@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\QueryException;
@@ -35,7 +36,7 @@ abstract class Delegate
      * Create a new delegate instance.
      *
      * @param \Vinelab\NeoEloquent\Eloquent\Builder $query
-     * @param \Vinelab\NeoEloquent\Eloquent\Model   $parent
+     * @param Model $parent
      */
     public function __construct(Builder $query)
     {
@@ -61,8 +62,8 @@ abstract class Delegate
      * Make a new Relationship instance.
      *
      * @param string                              $type
-     * @param \Vinelab\NeoEloquent\Eloquent\Model $startModel
-     * @param \Vinelab\NeoEloquent\Eloquent\Model $endModel
+     * @param Model $startModel
+     * @param Model $endModel
      * @param array                               $properties
      *
      * @return \Everyman\Neo4j\Relationship
@@ -132,11 +133,11 @@ abstract class Delegate
     /**
      * Convert a model to a Node object.
      *
-     * @param \Vinelab\NeoEloquent\Eloquent\Model $model
-     *
-     * @return \Everyman\Neo4j\Node
+     * @param Model $model
+     * @return NodeInterface
+     * @throws \Everyman\Neo4j\Exception
      */
-    public function asNode(Model $model)
+    public function asNode(Model $model): NodeInterface
     {
         $node = $this->client->makeNode();
 

@@ -163,6 +163,7 @@ class Builder extends IlluminateQueryBuilder
         $bindings = $this->getBindingsMergedWithValues($values);
 
         $updated = $this->connection->update($cypher, $bindings);
+        $updated = $updated->getResults();
 
         return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
     }
@@ -818,7 +819,7 @@ class Builder extends IlluminateQueryBuilder
         $this->columns = $previousColumns;
 
         if ($results->valid()) {
-            return $results->current()[0];
+            return $results->getResults()[0][0];
         }
     }
 
@@ -946,6 +947,7 @@ class Builder extends IlluminateQueryBuilder
         $cypher = $this->grammar->compileUpdateLabels($this, $labels, $operation);
 
         $updated = $this->connection->update($cypher, $this->getBindings());
+        $updated = $updated->getResults();
 
         return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
     }

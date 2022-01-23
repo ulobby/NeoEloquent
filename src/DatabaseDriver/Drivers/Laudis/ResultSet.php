@@ -36,7 +36,7 @@ class ResultSet implements ResultSetInterface
         $rawResults = is_array($rawResults) ? $rawResults : [$rawResults];
         $properties = [];
         foreach ($rawResults as $rawKey => $value) {
-            $key = '';
+            $key = $rawKey;
 
             if (str_contains($rawKey, '(') && str_contains($rawKey, ')')) {
                 $key = 'id';
@@ -45,10 +45,6 @@ class ResultSet implements ResultSetInterface
             if (str_contains($rawKey, '.')){
                 $keyExploded = explode('.', $rawKey);
                 $key = $keyExploded[1];
-            }
-
-            if ($key === '') {
-                // Exception?
             }
 
             $properties[$key] = $value;
