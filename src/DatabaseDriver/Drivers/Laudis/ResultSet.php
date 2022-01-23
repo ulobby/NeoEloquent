@@ -47,7 +47,7 @@ class ResultSet implements ResultSetInterface
             }
 
             if ($key === '') {
-                //
+                // Exception?
             }
 
             $properties[$key] = $value;
@@ -56,20 +56,40 @@ class ResultSet implements ResultSetInterface
         return $properties;
     }
 
+    protected function parseItem($row): array
+    {
+        if ($row instanceof CypherMap) {
+            $row = $row->values()[0];
+        }
+
+        if ($row instanceof LaudisNode) {
+            return $this->parseNode($row);
+        }
+
+        return $this->parseRawResults($row);
+    }
+
+    protected function parseItems($row): array
+    {
+        $items = [];
+        foreach($row as $key => $value) {
+            $items[$key] = $this->parseItem($value);
+        }
+        return $items;
+    }
+
     public function parse()
     {
-        /** @var \Laudis\Neo4j\Types\CypherMap $list */
-        foreach ($this->rawResult->getResults() as $list) {
-            $nodes = [];
-            foreach ($list as $key => $item) {
-                if ($item instanceof LaudisNode) {
-                    $nodes[$key] = $this->parseNode($item);
-                } else {
-                    $this->parsedResults = $this->parseRawResults($item);
-                }
+        /** @var \Laudis\Neo4j\Types\CypherMap $results */
+        $results = $this->rawResult->getResults();
+        foreach ($results as $row) {
+            if (count($row) > 1) {
+                $this->parsedResults[] = $this->parseItems($row);
+            } else {
+                $this->parsedResults[] = $this->parseItem($row);
             }
-            $this->parsedResults[] = $nodes;
         }
+        return $this->parsedResults;
     }
 
     public function getResults()
