@@ -75,7 +75,7 @@ class ResultSet implements ResultSetInterface
         return $items;
     }
 
-    public function parse()
+    protected function parse()
     {
         /** @var \Laudis\Neo4j\Types\CypherMap $results */
         $results = $this->rawResult->getResults();

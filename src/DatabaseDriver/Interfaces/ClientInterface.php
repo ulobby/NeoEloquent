@@ -11,4 +11,6 @@ interface ClientInterface
     public function makeLabel($label);
     public function executeCypherQuery(CypherQuery $cypherQuery);
     public function makeRelationship();
+    public function getNode($id);
+    public function deleteNode(NodeInterface $node);
 }

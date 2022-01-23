@@ -12,6 +12,7 @@ use Laudis\Neo4j\Formatter\SummarizedResultFormatter;
 use Vinelab\NeoEloquent\DatabaseDriver\CypherQuery;
 use Vinelab\NeoEloquent\DatabaseDriver\Drivers\ClientAbstract;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 
 class Laudis extends ClientAbstract implements ClientInterface
 {
@@ -75,5 +76,29 @@ class Laudis extends ClientAbstract implements ClientInterface
         }
 
         return Authenticate::disabled();
+    }
+
+    public function getNode($id): Node
+    {
+        $node = $this->makeNode();
+        $node->setId($id);
+        $node->populateNode();
+
+        return $node;
+    }
+
+    public function deleteNode(NodeInterface $node)
+    {
+        $node->delete();
+    }
+
+    public function startBatch()
+    {
+        echo('startBatch');
+    }
+
+    public function commitBatch()
+    {
+        echo('commitBatch');
     }
 }

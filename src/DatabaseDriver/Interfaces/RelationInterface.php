@@ -19,4 +19,5 @@ interface RelationInterface
     public function setProperty($key, $value): Relation;
     public function hasId(): bool;
     public function delete();
+    public function setDirection($direction): Relation;
 }

@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
@@ -28,7 +29,7 @@ abstract class Delegate
     /**
      * The database client.
      *
-     * @var \Everyman\Neo4j\Client
+     * @var ClientInterface
      */
     protected $client;
 

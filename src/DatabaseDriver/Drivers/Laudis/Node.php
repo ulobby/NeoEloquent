@@ -14,6 +14,7 @@ class Node implements NodeInterface
     protected $client;
     protected $id;
     protected $properties = [];
+    protected $labels;
 
     public function __construct($client)
     {
@@ -48,13 +49,38 @@ class Node implements NodeInterface
         return $cypher;
     }
 
+    protected function compileGetNode(): string
+    {
+        return 'MATCH (n) WHERE id(n) = $id RETURN n';
+    }
+
+    protected function compileGetLabels(): string
+    {
+        return 'MATCH (n) WHERE id(n) = $id RETURN labels(n)';
+    }
+
+    protected function compileDeleteNode(): string
+    {
+        return 'MATCH (n) WHERE id(n) = $id DETACH DELETE n';
+    }
+
     protected function runUpdateNode()
     {
-        dump('runUpdateNode');
+        echo('runUpdateNode');
         // Properties to update
 
         // Properties to remove
         //
+    }
+
+    public function populateNode()
+    {
+        $cypher = $this->compileGetNode();
+        $statement = new Statement($cypher, ['id' => $this->id]);
+        $response = $this->client->runStatement($statement);
+        $resultSet = new ResultSet($response);
+        $this->properties = $resultSet->getResults()[0];
+        return $this;
     }
 
     protected function runCreateNode()
@@ -115,8 +141,45 @@ class Node implements NodeInterface
         return [];
     }
 
-    public function findPathsTo()
+    protected function compileGetRelations()
     {
-        dump('findPathsTo');
+
+    }
+
+    /**
+     * @param NodeInterface $to
+     * @param $type
+     * @param $direction "all", "in", "out"
+     * @return array
+     */
+    public function findPathsTo(NodeInterface $to, $type = null, $direction = null)
+    {
+        $relation = new Relation($this->client);
+        $relation->setStartNode($this);
+        $relation->setEndNode($to);
+        $relation->setType($type);
+        $relation->setDirection($direction);
+
+        return $relation->getAll();
+    }
+
+    public function getLabels()
+    {
+        if ($this->labels === null) {
+            $cypher = $this->compileGetLabels();
+            $statement = new Statement($cypher, ['id' => $this->id]);
+            $response = $this->client->runStatement($statement);
+            $resultSet = new ResultSet($response);
+            $this->labels = $resultSet->getResults()[0][0];
+        }
+
+        return $this->labels;
+    }
+
+    public function delete()
+    {
+        $cypher = $this->compileDeleteNode();
+        $statement = new Statement($cypher, ['id' => $this->id]);
+        $this->client->runStatement($statement);
     }
 }

@@ -3,6 +3,7 @@
 namespace Vinelab\NeoEloquent\Tests;
 
 use Mockery as M;
+use Vinelab\NeoEloquent\DatabaseDriver\CypherQuery;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 
@@ -211,7 +212,7 @@ class ConnectionTest extends TestCase
 
         $query = $c->getCypherQuery('MATCH (u:`User`) RETURN * LIMIT 10', []);
 
-        $this->assertInstanceOf('Everyman\Neo4j\Cypher\Query', $query);
+        $this->assertInstanceOf(CypherQuery::class, $query);
     }
 
     public function testCheckingIfBindingIsABinding()

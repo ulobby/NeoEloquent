@@ -18,6 +18,7 @@ class Relation implements RelationInterface
     protected $type;
     protected $start;
     protected $end;
+    protected $direction;
 
     public function __construct($client)
     {
@@ -31,16 +32,23 @@ class Relation implements RelationInterface
 
     protected function compileCreateRelationship(): string
     {
-        return "MATCH (a), (b)
+        $cypher = "MATCH (a), (b)
             WHERE id(a) = \$start
             AND id(b) = \$end
-            CREATE (a)-[r:{$this->type}]->(b)
-            RETURN id(r)";
+            CREATE (a)-[r:{$this->type} {";
+
+        foreach($this->properties as $property => $value) {
+            $cypher .= $property . ': $' . $property;
+            $cypher .= ', ';
+        }
+        $cypher = mb_substr($cypher, 0, -2);
+        $cypher .= '}]->(b) RETURN id(r)';
+        RETURN $cypher;
     }
 
     protected function compileUpdateRelationship(): string
     {
-        dump('compileUpdateRelationship');
+        echo('compileUpdateRelationship');
         return '';
     }
 
@@ -50,6 +58,28 @@ class Relation implements RelationInterface
             WHERE id(a) = \$start
             AND id(b) = \$end
             DELETE r";
+    }
+
+    protected function compileGetRelationships(): string
+    {
+        if ($this->direction === 'out') {
+            return "MATCH (a)-[r:{$this->type}]->(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            RETURN r";
+        }
+
+        if ($this->direction === 'in') {
+            return "MATCH (a)<-[r:{$this->type}]-(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            RETURN r";
+        }
+
+        return "MATCH (a)-[r:{$this->type}]-(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            RETURN r";
     }
 
     public function save()
@@ -65,10 +95,10 @@ class Relation implements RelationInterface
             'end' => $this->end->getId(),
         ];
 
-//        $properties = array_merge(
-//            $properties,
-//            $this->properties,
-//        );
+        $properties = array_merge(
+            $properties,
+            $this->properties,
+        );
 
         $statement = new Statement($cypher, $properties);
 
@@ -140,5 +170,49 @@ class Relation implements RelationInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function setDirection($direction): Relation
+    {
+        $this->direction = $direction;
+        return $this;
+    }
+
+    public function getAll()
+    {
+        $cypher = $this->compileGetRelationships();
+        $properties = [
+            'start' => $this->start->getId(),
+            'end' => $this->end->getId(),
+        ];
+        $statement = new Statement($cypher, $properties);
+        /** @var \Laudis\Neo4j\Databags\SummarizedResult $response */
+        $response = $this->client->runStatement($statement);
+
+        $relations = [];
+        foreach($response as $items) {
+            foreach ($items as $item) {
+                $relation = new Relation($this->client);
+                $relation->setProperties($item->getProperties()->toArray());
+                $relation->setId($item->getId());
+                $relation->setStartNode($this->start);
+                $relation->setEndNode($this->end);
+                $relation->setDirection($this->direction);
+                $relation->setType($this->type);
+                $relations[] = $relation;
+            }
+        }
+        return $relations;
     }
 }
