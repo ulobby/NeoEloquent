@@ -33,6 +33,7 @@ class ResultSet implements ResultSetInterface
 
     protected function parseRawResults($rawResults): array
     {
+        $rawResults = is_array($rawResults) ? $rawResults : [$rawResults];
         $properties = [];
         foreach ($rawResults as $rawKey => $value) {
             $key = '';

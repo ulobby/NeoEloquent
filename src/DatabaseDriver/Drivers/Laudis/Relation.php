@@ -34,13 +34,22 @@ class Relation implements RelationInterface
         return "MATCH (a), (b)
             WHERE id(a) = \$start
             AND id(b) = \$end
-            CREATE (a)-[r:{$this->type}]->(b)";
+            CREATE (a)-[r:{$this->type}]->(b)
+            RETURN id(r)";
     }
 
     protected function compileUpdateRelationship(): string
     {
         dump('compileUpdateRelationship');
         return '';
+    }
+
+    protected function compileDeleteRelationship(): string
+    {
+        return "MATCH (a)-[r:{$this->type}]->(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            DELETE r";
     }
 
     public function save()
@@ -61,6 +70,23 @@ class Relation implements RelationInterface
 //            $this->properties,
 //        );
 
+        $statement = new Statement($cypher, $properties);
+
+        $result = $this->client->runStatement($statement);
+        $list = $result->first();
+        $pair = $list->first();
+
+        $this->id = $pair->getValue();
+        return $this;
+    }
+
+    public function delete()
+    {
+        $cypher = $this->compileDeleteRelationship();
+        $properties = [
+            'start' => $this->start->getId(),
+            'end' => $this->end->getId(),
+        ];
         $statement = new Statement($cypher, $properties);
         $this->client->runStatement($statement);
         return $this;

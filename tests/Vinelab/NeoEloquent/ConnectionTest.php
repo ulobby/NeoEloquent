@@ -3,7 +3,8 @@
 namespace Vinelab\NeoEloquent\Tests;
 
 use Mockery as M;
-use Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis\ResultSet;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 
 class ConnectionTest extends TestCase
 {
@@ -45,7 +46,7 @@ class ConnectionTest extends TestCase
 
         $client = $c->getClient();
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $client);
+        $this->assertInstanceOf(ClientInterface::class, $client);
     }
 
     public function testGettingConfigParam()
@@ -67,7 +68,7 @@ class ConnectionTest extends TestCase
     {
         $c = $this->getConnectionWithConfig('neo4j');
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $c->getClient());
+        $this->assertInstanceOf(ClientInterface::class, $c->getClient());
     }
 
     public function testGettingDefaultHost()
@@ -234,7 +235,7 @@ class ConnectionTest extends TestCase
 
         $connection = $c->createConnection();
 
-        $this->assertInstanceOf('Everyman\Neo4j\Client', $connection);
+        $this->assertInstanceOf(ClientInterface::class, $connection);
     }
 
     public function testSelectWithBindings()
@@ -255,7 +256,7 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($log['query'], $query);
         $this->assertEquals($log['bindings'], $bindings);
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(ResultSetInterface::class, $results);
 
         // This is how we get the first row of the result (first [0])
         // and then we get the Node instance (the 2nd [0])
@@ -297,7 +298,7 @@ class ConnectionTest extends TestCase
 
         $this->assertEquals($log[1]['query'], $query);
         $this->assertEquals($log[1]['bindings'], $bindings);
-        $this->assertInstanceOf('Everyman\Neo4j\Query\ResultSet', $results);
+        $this->assertInstanceOf(ResultSetInterface::class, $results);
 
         $selected = $results[0][0]->getProperties();
 
@@ -325,7 +326,7 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf(ResultSet::class, $results);
+        $this->assertInstanceOf(ResultSetInterface::class, $results);
 
         foreach ($results as $result) {
             $count = $result[0];
@@ -338,7 +339,7 @@ class ConnectionTest extends TestCase
 
         $results = $cypher->getResultSet();
 
-        $this->assertInstanceOf(ResultSet::class, $results);
+        $this->assertInstanceOf(ResultSetInterface::class, $results);
 
         $user = null;
 
@@ -369,7 +370,7 @@ class ConnectionTest extends TestCase
 
         $results = $c->affectingStatement($query, $bindings);
 
-        $this->assertInstanceOf(ResultSet::class, $results);
+        $this->assertInstanceOf(ResultSetInterface::class, $results);
 
         foreach ($results as $result) {
             $count = $result[0];
@@ -457,7 +458,7 @@ class ConnectionTest extends TestCase
 
     public function testTransactionMethodRunsSuccessfully()
     {
-        $client = M::mock('Everyman\Neo4j\Client');
+        $client = M::mock(ClientInterface::class);
         $client->shouldReceive('beginTransaction')->once()
             ->andReturn(M::mock('Everyman\Neo4j\Transaction')->makePartial());
 
@@ -472,7 +473,7 @@ class ConnectionTest extends TestCase
 
     public function testTransactionMethodRollsbackAndThrows()
     {
-        $neo = M::mock('Everyman\Neo4j\Client');
+        $neo = M::mock(ClientInterface::class);
         $neo->shouldReceive('beginTransaction')->once()
             ->andReturn(M::mock('Everyman\Neo4j\Transaction')->makePartial());
 
