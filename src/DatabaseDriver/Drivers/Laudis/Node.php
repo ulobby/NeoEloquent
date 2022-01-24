@@ -39,7 +39,7 @@ class Node implements NodeInterface
 
     protected function compileCreateNode(): string
     {
-        $cypher = 'MERGE (n {';
+        $cypher = 'CREATE (n {';
 
         foreach ($this->properties as $property => $value) {
             // Avoid null values
@@ -92,6 +92,7 @@ class Node implements NodeInterface
     protected function runCreateNode()
     {
         $cypher = $this->compileCreateNode();
+        dump($cypher, $this->properties);
         $statement = new Statement($cypher, $this->properties);
         $this->id = $this->client->runStatement($statement)
             ->first()
@@ -111,7 +112,7 @@ class Node implements NodeInterface
         return $this;
     }
 
-    public function setId($id): Node
+    public function setId($id): NodeInterface
     {
         $this->id = $id;
         return $this;
