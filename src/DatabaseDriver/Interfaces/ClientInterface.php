@@ -13,4 +13,5 @@ interface ClientInterface
     public function makeRelationship();
     public function getNode($id);
     public function deleteNode(NodeInterface $node);
+    public function beginTransaction();
 }

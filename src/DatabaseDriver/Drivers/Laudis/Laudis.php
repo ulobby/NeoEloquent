@@ -102,4 +102,9 @@ class Laudis extends ClientAbstract implements ClientInterface
         // TODO
         return true;
     }
+
+    public function beginTransaction()
+    {
+        // TODO
+    }
 }
