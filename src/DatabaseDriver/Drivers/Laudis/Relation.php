@@ -238,14 +238,13 @@ class Relation implements RelationInterface
             }
         }
 
+        $relation->setStartNode($aNode)
+            ->setEndNode($bNode);
+
         if ($aNode->getId() === $startNodeId) {
-            $relation->setStartNode($aNode)
-                ->setEndNode($bNode)
-                ->setDirection('out');
+            $relation->setDirection('out');
         } else {
-            $relation->setStartNode($bNode)
-                ->setEndNode($aNode)
-                ->setDirection('in');
+            $relation->setDirection('in');
         }
 
         return $relation;
