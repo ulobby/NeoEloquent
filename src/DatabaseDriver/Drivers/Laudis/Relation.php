@@ -238,6 +238,24 @@ class Relation implements RelationInterface
             }
         }
 
+        /**
+         * If the developer explicitly chose a direction, then, we
+         * should keep that direction.
+         */
+        if (($this->direction === 'in') || ($this->direction === 'out')) {
+            if ($aNode->getId() === $startNodeId) {
+                $relation->setStartNode($aNode)->setEndNode($bNode);
+            } else {
+                $relation->setStartNode($bNode)->setEndNode($aNode);
+            }
+            $relation->setDirection($this->direction);
+            return $relation;
+        }
+
+        /**
+         * In case the developer didn't choose any specific direction. Then,
+         * it doesn't matter, just keep it coherent.
+         */
         $relation->setStartNode($aNode)
             ->setEndNode($bNode);
 
