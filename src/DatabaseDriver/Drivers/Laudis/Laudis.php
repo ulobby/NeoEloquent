@@ -94,11 +94,12 @@ class Laudis extends ClientAbstract implements ClientInterface
 
     public function startBatch()
     {
-        echo(' startBatch ');
+        // TODO
     }
 
     public function commitBatch()
     {
-        echo(' commitBatch ');
+        // TODO
+        return true;
     }
 }

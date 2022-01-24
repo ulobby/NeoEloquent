@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis;
 
 use Laudis\Neo4j\Client;
 use Laudis\Neo4j\Databags\Statement;
-use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 
 class Relation implements RelationInterface
@@ -65,6 +64,13 @@ class Relation implements RelationInterface
 
     protected function compileDeleteRelationship(): string
     {
+        if ($this->direction === 'all') {
+            return "MATCH (a)-[r:{$this->type}]-(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            DELETE r";
+        }
+
         return "MATCH (a)-[r:{$this->type}]->(b)
             WHERE id(a) = \$start
             AND id(b) = \$end
