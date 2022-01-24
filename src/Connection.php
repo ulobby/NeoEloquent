@@ -87,10 +87,9 @@ class Connection extends IlluminateConnection
      */
     public function createConnection()
     {
-
         $client = DatabaseDriver::create($this->getConfig());
-        return $client;
 
+        return $client;
 
         $client = new NeoClient($this->getHost(), $this->getPort());
         $client->getTransport()->useHttps($this->getSsl())->setAuth($this->getUsername(), $this->getPassword());

@@ -1,4 +1,5 @@
 <?php
+
 namespace Vinelab\NeoEloquent\DatabaseDriver;
 
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
@@ -19,7 +20,7 @@ class CypherQuery
 
     protected $result = null;
 
-    public function __construct(ClientInterface $client, $template, $vars=array())
+    public function __construct(ClientInterface $client, $template, $vars = [])
     {
         $this->client = $client;
         $this->template = $template;
@@ -27,7 +28,7 @@ class CypherQuery
     }
 
     /**
-     * Get the query script
+     * Get the query script.
      *
      * @return string
      */
@@ -37,7 +38,7 @@ class CypherQuery
     }
 
     /**
-     * Get the template parameters
+     * Get the template parameters.
      *
      * @return array
      */
@@ -47,7 +48,7 @@ class CypherQuery
     }
 
     /**
-     * Retrieve the query results
+     * Retrieve the query results.
      */
     public function getResultSet()
     {

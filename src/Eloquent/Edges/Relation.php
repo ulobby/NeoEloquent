@@ -302,7 +302,7 @@ abstract class Relation extends Delegate
      * Set a given relationship on this relation.
      *
      * @param RelationInterface $relation
-     * @param bool $debug
+     * @param bool              $debug
      */
     public function setRelation(RelationInterface $relation, $debug = false)
     {
