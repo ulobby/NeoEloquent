@@ -24,6 +24,7 @@ class Node implements NodeInterface
     public function setProperties($properties)
     {
         $this->properties = $properties;
+
         return $this;
     }
 
@@ -34,7 +35,7 @@ class Node implements NodeInterface
 
     public function hasId(): bool
     {
-        return ($this->id !== null);
+        return $this->id !== null;
     }
 
     protected function compileCreateNode(): string
@@ -46,7 +47,7 @@ class Node implements NodeInterface
             if ($value === null) {
                 continue;
             }
-            $cypher .= $property . ': $' . $property;
+            $cypher .= $property.': $'.$property;
             $cypher .= ', ';
         }
         $cypher = mb_substr($cypher, 0, -2);
@@ -72,7 +73,7 @@ class Node implements NodeInterface
 
     protected function runUpdateNode()
     {
-        echo(' runUpdateNode ');
+        echo ' runUpdateNode ';
         // Properties to update
 
         // Properties to remove
@@ -86,6 +87,7 @@ class Node implements NodeInterface
         $response = $this->client->runStatement($statement);
         $resultSet = new ResultSet($response);
         $this->properties = $resultSet->getResults()[0];
+
         return $this;
     }
 
@@ -109,12 +111,14 @@ class Node implements NodeInterface
         }
 
         $this->runCreateNode();
+
         return $this;
     }
 
     public function setId($id): NodeInterface
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -155,13 +159,13 @@ class Node implements NodeInterface
 
     protected function compileGetRelations()
     {
-
     }
 
     /**
      * @param NodeInterface $to
      * @param $type
      * @param $direction "all", "in", "out"
+     *
      * @return array
      */
     public function findPathsTo(NodeInterface $to, $type = null, $direction = null): array

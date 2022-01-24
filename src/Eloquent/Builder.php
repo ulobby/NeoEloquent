@@ -95,9 +95,10 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model.
      *
-     * @param string $connection
+     * @param string             $connection
      * @param ResultSetInterface $results
-     * @param array $columns
+     * @param array              $columns
+     *
      * @return array
      */
     protected function resultsToModels($connection, ResultSetInterface $results, array $columns = [])
@@ -105,7 +106,7 @@ class Builder extends IlluminateBuilder
         $models = [];
 
         if ($results->valid()) {
-             foreach ($results->getResults() as $attributes) {
+            foreach ($results->getResults() as $attributes) {
 
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
@@ -139,7 +140,7 @@ class Builder extends IlluminateBuilder
 
         if ($results->valid()) {
             $grammar = $this->getQuery()->getGrammar();
-       //     $columns = $results->getColumns();
+            //     $columns = $results->getColumns();
 
             foreach ($results->getResults() as $result) {
                 $attributes = $result;

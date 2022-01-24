@@ -37,7 +37,7 @@ abstract class Delegate
      * Create a new delegate instance.
      *
      * @param \Vinelab\NeoEloquent\Eloquent\Builder $query
-     * @param Model $parent
+     * @param Model                                 $parent
      */
     public function __construct(Builder $query)
     {
@@ -62,10 +62,10 @@ abstract class Delegate
     /**
      * Make a new Relationship instance.
      *
-     * @param string                              $type
-     * @param Model $startModel
-     * @param Model $endModel
-     * @param array                               $properties
+     * @param string $type
+     * @param Model  $startModel
+     * @param Model  $endModel
+     * @param array  $properties
      *
      * @return \Everyman\Neo4j\Relationship
      */
@@ -135,8 +135,10 @@ abstract class Delegate
      * Convert a model to a Node object.
      *
      * @param Model $model
-     * @return NodeInterface
+     *
      * @throws \Everyman\Neo4j\Exception
+     *
+     * @return NodeInterface
      */
     public function asNode(Model $model): NodeInterface
     {

@@ -2,10 +2,9 @@
 
 namespace Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis;
 
-use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Types\CypherMap;
-use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 use Laudis\Neo4j\Types\Node as LaudisNode;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 
 class ResultSet implements ResultSetInterface
 {
@@ -42,7 +41,7 @@ class ResultSet implements ResultSetInterface
                 $key = 'id';
             }
 
-            if (str_contains($rawKey, '.')){
+            if (str_contains($rawKey, '.')) {
                 $keyExploded = explode('.', $rawKey);
                 $key = $keyExploded[1];
             }
@@ -72,6 +71,7 @@ class ResultSet implements ResultSetInterface
         foreach ($row as $key => $value) {
             $items[$key] = $this->parseItem($value);
         }
+
         return $items;
     }
 
@@ -86,6 +86,7 @@ class ResultSet implements ResultSetInterface
                 $this->parsedResults[] = $this->parseItem($row);
             }
         }
+
         return $this->parsedResults;
     }
 
