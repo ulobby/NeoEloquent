@@ -92,7 +92,7 @@ class Node implements NodeInterface
     protected function runCreateNode()
     {
         $cypher = $this->compileCreateNode();
-        dump($cypher, $this->properties);
+
         $statement = new Statement($cypher, $this->properties);
         $this->id = $this->client->runStatement($statement)
             ->first()

@@ -32,31 +32,46 @@ class Relation implements RelationInterface
     protected function compileCreateRelationship(): string
     {
         $cypher = "MATCH (a), (b)
-            WHERE id(a) = \$start
-            AND id(b) = \$end
+            WHERE id(a) = {$this->start->getId()}
+            AND id(b) = {$this->end->getId()}
             CREATE (a)-[r:{$this->type} {";
 
         foreach($this->properties as $property => $value) {
             $cypher .= $property . ': $' . $property;
             $cypher .= ', ';
         }
+
         $cypher = mb_substr($cypher, 0, -2);
         $cypher .= '}]->(b) RETURN id(r)';
         RETURN $cypher;
     }
 
+    protected function compileNodeRelation(): string
+    {
+        if ($this->direction === 'out') {
+            return "(a)-[r:$this->type]->(b)";
+        }
+
+        if ($this->direction === 'in') {
+            return "(a)<-[r:$this->type]-(b)";
+        }
+
+        return "(a)-[r:$this->type]-(b)";
+    }
+
     protected function compileUpdateProperties(): string
     {
-        $cypher = "MATCH (a)-[r:$this->type]->(b)
-            WHERE id(a) = \$start
-            AND id(b) = \$end
-            AND id(r) = \$id
+        $cypher = "MATCH {$this->compileNodeRelation()}
+            WHERE id(a) = {$this->start->getId()}
+            AND id(b) = {$this->end->getId()}
+            AND id(r) = $this->id
             SET ";
 
         foreach($this->properties as $property => $value) {
             $cypher .= 'r.' . $property . ' = $' . $property;
             $cypher .= ', ';
         }
+
         $cypher = mb_substr($cypher, 0, -2);
         $cypher .= ' RETURN r';
         RETURN $cypher;
@@ -64,76 +79,44 @@ class Relation implements RelationInterface
 
     protected function compileDeleteRelationship(): string
     {
-        if ($this->direction === 'all') {
-            return "MATCH (a)-[r:{$this->type}]-(b)
-            WHERE id(a) = \$start
-            AND id(b) = \$end
-            DELETE r";
-        }
-
-        return "MATCH (a)-[r:{$this->type}]->(b)
-            WHERE id(a) = \$start
-            AND id(b) = \$end
+        return "MATCH {$this->compileNodeRelation()}
+            WHERE id(a) = {$this->start->getId()}
+            AND id(b) = {$this->end->getId()}
             DELETE r";
     }
 
     protected function compileGetRelationships(): string
     {
+        $startId = $this->start->getId();
         $withEnd = '';
 
         if ($this->end !== null) {
-            $withEnd = "AND id(b) = \$end";
+            $withEnd = "AND id(b) = {$this->end->getId()}";
         }
 
-        if ($this->direction === 'out') {
-            return "MATCH (a)-[r:{$this->type}]->(b)
-            WHERE id(a) = \$start
-            $withEnd
-            RETURN a, b, r";
-        }
 
-        if ($this->direction === 'in') {
-            return "MATCH (a)<-[r:{$this->type}]-(b)
-            WHERE id(a) = \$start
-            $withEnd
-            RETURN a, b, r";
-        }
-
-        return "MATCH (a)-[r:{$this->type}]-(b)
-            WHERE id(a) = \$start
+        return "MATCH {$this->compileNodeRelation()}
+            WHERE id(a) = $startId
             $withEnd
             RETURN a, b, r";
     }
 
     protected function runUpdateRelationship()
     {
-        $properties = array_merge([
-            'start' => $this->start->getId(),
-            'end' => $this->end->getId(),
-            'id' => $this->id],
-            $this->properties,
-        );
-
         // 1. Remove null properties (TODO).
 
         // 2. Update attributes.
         $cypher = $this->compileUpdateProperties();
-        $propertiesWithoutNull = array_filter($properties);
+        $propertiesWithoutNull = array_filter($this->properties);
         $statement = new Statement($cypher, $propertiesWithoutNull);
         $this->client->runStatement($statement);
     }
 
     protected function runCreateRelationship()
     {
-        $properties = array_merge([
-            'start' => $this->start->getId(),
-            'end' => $this->end->getId()],
-            $this->properties
-        );
-
         $cypher = $this->compileCreateRelationship();
 
-        $statement = new Statement($cypher, $properties);
+        $statement = new Statement($cypher, $this->properties);
 
         $result = $this->client->runStatement($statement);
         $list = $result->first();
@@ -158,11 +141,7 @@ class Relation implements RelationInterface
     public function delete()
     {
         $cypher = $this->compileDeleteRelationship();
-        $properties = [
-            'start' => $this->start->getId(),
-            'end' => $this->end->getId(),
-        ];
-        $statement = new Statement($cypher, $properties);
+        $statement = new Statement($cypher, []);
         $this->client->runStatement($statement);
         return $this;
     }
