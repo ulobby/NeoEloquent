@@ -212,38 +212,41 @@ class Relation implements RelationInterface
 
     protected function parseRelation($items): Relation
     {
-        $start = new Node($this->client);
-        $end = new Node($this->client);
+        $aNode = new Node($this->client);
+        $bNode = new Node($this->client);
         $relation = new Relation($this->client);
+        $startNodeId = null;
+
         foreach ($items as $key => $item) {
             // Start node
             if ($key === 'a') {
-                $start->setProperties($item->getProperties()->toArray())
+                $aNode->setProperties($item->getProperties()->toArray())
                     ->setId($item->getId());
             }
             // End node
             if ($key === 'b') {
-                $end->setProperties($item->getProperties()->toArray())
+                $bNode->setProperties($item->getProperties()->toArray())
                     ->setId($item->getId());
             }
             // Relation
             if ($key === 'r') {
-                $relation->setProperties($item->getProperties()->toArray())
+                $startNodeId = $item->getStartNodeId();
+                $relation
+                    ->setType($item->getType())
+                    ->setProperties($item->getProperties()->toArray())
                     ->setId($item->getId());
             }
         }
 
-        if ($this->direction === 'in') {
-            $relation->setStartNode($end)
-                ->setEndNode($start);
+        if ($aNode->getId() === $startNodeId) {
+            $relation->setStartNode($aNode)
+                ->setEndNode($bNode)
+                ->setDirection('out');
         } else {
-            $relation->setStartNode($start)
-                ->setEndNode($end);
+            $relation->setStartNode($bNode)
+                ->setEndNode($aNode)
+                ->setDirection('in');
         }
-
-        $relation
-            ->setDirection($this->direction)
-            ->setType($this->type);
 
         return $relation;
     }

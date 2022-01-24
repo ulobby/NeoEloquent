@@ -69,7 +69,7 @@ class ResultSet implements ResultSetInterface
     protected function parseItems($row): array
     {
         $items = [];
-        foreach($row as $key => $value) {
+        foreach ($row as $key => $value) {
             $items[$key] = $this->parseItem($value);
         }
         return $items;
