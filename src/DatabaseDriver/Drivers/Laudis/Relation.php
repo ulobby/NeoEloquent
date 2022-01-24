@@ -46,10 +46,21 @@ class Relation implements RelationInterface
         RETURN $cypher;
     }
 
-    protected function compileUpdateRelationship(): string
+    protected function compileUpdateProperties(): string
     {
-        echo('compileUpdateRelationship');
-        return '';
+        $cypher = "MATCH (a)-[r:$this->type]->(b)
+            WHERE id(a) = \$start
+            AND id(b) = \$end
+            AND id(r) = \$id
+            SET ";
+
+        foreach($this->properties as $property => $value) {
+            $cypher .= 'r.' . $property . ' = $' . $property;
+            $cypher .= ', ';
+        }
+        $cypher = mb_substr($cypher, 0, -2);
+        $cypher .= ' RETURN r';
+        RETURN $cypher;
     }
 
     protected function compileDeleteRelationship(): string
@@ -62,43 +73,59 @@ class Relation implements RelationInterface
 
     protected function compileGetRelationships(): string
     {
+        $withEnd = '';
+
+        if ($this->end !== null) {
+            $withEnd = "AND id(b) = \$end";
+        }
+
         if ($this->direction === 'out') {
             return "MATCH (a)-[r:{$this->type}]->(b)
             WHERE id(a) = \$start
-            AND id(b) = \$end
-            RETURN r";
+            $withEnd
+            RETURN a, b, r";
         }
 
         if ($this->direction === 'in') {
             return "MATCH (a)<-[r:{$this->type}]-(b)
             WHERE id(a) = \$start
-            AND id(b) = \$end
-            RETURN r";
+            $withEnd
+            RETURN a, b, r";
         }
 
         return "MATCH (a)-[r:{$this->type}]-(b)
             WHERE id(a) = \$start
-            AND id(b) = \$end
-            RETURN r";
+            $withEnd
+            RETURN a, b, r";
     }
 
-    public function save()
+    protected function runUpdateRelationship()
     {
-        if ($this->hasId()) {
-            $cypher = $this->compileUpdateRelationship();
-        } else {
-            $cypher = $this->compileCreateRelationship();
-        }
-
-        $properties = [
+        $properties = array_merge([
             'start' => $this->start->getId(),
             'end' => $this->end->getId(),
-        ];
-
-        $properties = array_merge(
-            $properties,
+            'id' => $this->id],
             $this->properties,
         );
+
+        // 1. Remove null properties (TODO).
+
+        // 2. Update attributes.
+        $cypher = $this->compileUpdateProperties();
+        $propertiesWithoutNull = array_filter($properties);
+        $statement = new Statement($cypher, $propertiesWithoutNull);
+        $this->client->runStatement($statement);
+    }
+
+    protected function runCreateRelationship()
+    {
+        $properties = array_merge([
+            'start' => $this->start->getId(),
+            'end' => $this->end->getId()],
+            $this->properties
+        );
+
+        $cypher = $this->compileCreateRelationship();
 
         $statement = new Statement($cypher, $properties);
 
@@ -107,6 +134,18 @@ class Relation implements RelationInterface
         $pair = $list->first();
 
         $this->id = $pair->getValue();
+    }
+
+    public function save()
+    {
+        if ($this->hasId()) {
+            $this->runUpdateRelationship();
+
+            return $this;
+        }
+
+        $this->runCreateRelationship();
+
         return $this;
     }
 
@@ -189,30 +228,56 @@ class Relation implements RelationInterface
         return $this;
     }
 
-    public function getAll()
+    protected function parseRelation($items): Relation
+    {
+        $start = new Node($this->client);
+        $end = new Node($this->client);
+        $relation = new Relation($this->client);
+
+        foreach ($items as $key => $item) {
+            // Start node
+            if ($key === 'a') {
+                $start->setProperties($item->getProperties()->toArray())
+                    ->setId($item->getId());
+            }
+            // End node
+            if ($key === 'b') {
+                $end->setProperties($item->getProperties()->toArray())
+                    ->setId($item->getId());
+            }
+            // Relation
+            if ($key === 'r') {
+                $relation->setProperties($item->getProperties()->toArray())
+                    ->setId($item->getId());
+            }
+        }
+
+        $relation
+            ->setStartNode($start)
+            ->setEndNode($end)
+            ->setDirection($this->direction)
+            ->setType($this->type);
+
+        return $relation;
+    }
+
+    public function getAll(): array
     {
         $cypher = $this->compileGetRelationships();
-        $properties = [
-            'start' => $this->start->getId(),
-            'end' => $this->end->getId(),
-        ];
+
+        $properties['start'] = $this->start->getId();
+        if ($this->end !== null) {
+            $properties['end'] = $this->end->getId();
+        }
+
         $statement = new Statement($cypher, $properties);
-        /** @var \Laudis\Neo4j\Databags\SummarizedResult $response */
         $response = $this->client->runStatement($statement);
 
         $relations = [];
         foreach($response as $items) {
-            foreach ($items as $item) {
-                $relation = new Relation($this->client);
-                $relation->setProperties($item->getProperties()->toArray());
-                $relation->setId($item->getId());
-                $relation->setStartNode($this->start);
-                $relation->setEndNode($this->end);
-                $relation->setDirection($this->direction);
-                $relation->setType($this->type);
-                $relations[] = $relation;
-            }
+            $relations[] = $this->parseRelation($items);
         }
+
         return $relations;
     }
 }

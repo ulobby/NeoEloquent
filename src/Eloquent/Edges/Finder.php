@@ -204,7 +204,7 @@ class Finder extends Delegate
         // Determine the direction, the real one!
         $direction = $this->getRealDirection($direction);
 
-        return $parent->getRelationships((array) $type, $direction);
+        return $parent->getRelationships($type, $direction);
     }
 
     /**

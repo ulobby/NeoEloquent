@@ -206,14 +206,14 @@ abstract class Relation extends Delegate
         if ($this->unique && !$this->exists()) {
             $parent = $this->asNode($this->parent);
             $realDirection = $this->getRealDirection($this->direction);
-            $relationships = $parent->getRelationships((array) $this->type, $realDirection);
+            $relationships = $parent->getRelationships($this->type, $realDirection);
 
             foreach ($relationships as $relationship) {
                 $relatedNode = $realDirection === 'in' ? $relationship->getStartNode() : $relationship->getEndNode();
                 $relationshipLabels = $relatedNode->getLabels();
 
                 foreach ($relationshipLabels as $relationshipLabel) {
-                    if (in_array($relationshipLabel->getName(), (array) $this->related->getLabel())) {
+                    if (in_array($relationshipLabel, (array) $this->related->getLabel())) {
                         $relationship->delete();
                     }
                 }
@@ -255,11 +255,11 @@ abstract class Relation extends Delegate
      * Create a new Relation of the current instance
      * from an existing database relation.
      *
-     * @param Everyman\Neo4j\Relationship $relation
+     * @param RelationInterface $relation
      *
      * @return static
      */
-    public function newFromRelation(Relationship $relation)
+    public function newFromRelation(RelationInterface $relation)
     {
         $instance = new static($this->query, $this->parent, $this->related, $this->type, $this->attributes, $this->unique);
 

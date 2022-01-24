@@ -21,6 +21,12 @@ class Node implements NodeInterface
         $this->client = $client;
     }
 
+    public function setProperties($properties)
+    {
+        $this->properties = $properties;
+        return $this;
+    }
+
     public function setProperty($key, $value)
     {
         $this->properties[$key] = $value;
@@ -66,7 +72,7 @@ class Node implements NodeInterface
 
     protected function runUpdateNode()
     {
-        echo('runUpdateNode');
+        echo(' runUpdateNode ');
         // Properties to update
 
         // Properties to remove
@@ -136,9 +142,14 @@ class Node implements NodeInterface
         return $this->properties;
     }
 
-    public function getRelationships(): array
+    public function getRelationships($type, $direction): array
     {
-        return [];
+        $relation = new Relation($this->client);
+        $relation->setStartNode($this);
+        $relation->setType($type);
+        $relation->setDirection($direction);
+
+        return $relation->getAll();
     }
 
     protected function compileGetRelations()
@@ -152,7 +163,7 @@ class Node implements NodeInterface
      * @param $direction "all", "in", "out"
      * @return array
      */
-    public function findPathsTo(NodeInterface $to, $type = null, $direction = null)
+    public function findPathsTo(NodeInterface $to, $type = null, $direction = null): array
     {
         $relation = new Relation($this->client);
         $relation->setStartNode($this);
