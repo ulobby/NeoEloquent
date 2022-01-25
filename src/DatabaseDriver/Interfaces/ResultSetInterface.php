@@ -7,4 +7,6 @@ interface ResultSetInterface
     public function valid();
 
     public function getResults();
+
+    public function offsetExists($key);
 }

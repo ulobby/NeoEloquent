@@ -94,4 +94,16 @@ class ResultSet implements ResultSetInterface
     {
         return $this->parsedResults;
     }
+
+    public function offsetExists($key)
+    {
+        $results = $this->getResults();
+        return isset($results[$key]);
+    }
+
+    public function offsetGet($key)
+    {
+        $results = $this->getResults();
+        return $results[$key];
+    }
 }
