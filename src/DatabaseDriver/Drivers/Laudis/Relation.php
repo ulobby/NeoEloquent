@@ -72,7 +72,7 @@ class Relation implements RelationInterface
         return "(a)-[r:$this->type]-(b)";
     }
 
-    protected function compileUpdateProperties(): string
+    protected function compileUpdateProperties(array $propertiesNotNull): string
     {
         $cypher = "MATCH {$this->compileNodeRelation()}
             WHERE id(a) = {$this->start->getId()}
@@ -80,7 +80,7 @@ class Relation implements RelationInterface
             AND id(r) = $this->id
             SET ";
 
-        foreach ($this->properties as $property => $value) {
+        foreach ($propertiesNotNull as $property => $value) {
             $cypher .= 'r.'.$property.' = $'.$property;
             $cypher .= ', ';
         }
@@ -112,14 +112,37 @@ class Relation implements RelationInterface
             RETURN a, b, r";
     }
 
+    protected function compileRemoveProperties(array $propertiesNull): string
+    {
+        $cypher = "MATCH {$this->compileNodeRelation()}
+            WHERE id(a) = {$this->start->getId()}
+            AND id(b) = {$this->end->getId()}
+            AND id(r) = $this->id 
+            REMOVE ";
+
+        foreach ($propertiesNull as $property) {
+            $cypher .= 'r.'.$property;
+            $cypher .= ', ';
+        }
+
+        return mb_substr($cypher, 0, -2);
+    }
+
     protected function runUpdateRelationship()
     {
-        // 1. Remove null properties (TODO).
+        // 1. Remove null properties.
+        $propertiesNull = array_keys($this->properties, null, true);
+        if (!empty($propertiesNull)) {
+            $cypher = $this->compileRemoveProperties($propertiesNull);
+            $this->runStatement($cypher, []);
+        }
 
-        // 2. Update attributes.
-        $cypher = $this->compileUpdateProperties();
-        $propertiesWithoutNull = array_filter($this->properties);
-        $this->runStatement($cypher, $propertiesWithoutNull);
+        // 2. Update properties.
+        $propertiesNotNull = array_filter($this->properties);
+        if (!empty($propertiesNotNull)) {
+            $cypher = $this->compileUpdateProperties($propertiesNotNull);
+            $this->runStatement($cypher, $propertiesNotNull);
+        }
     }
 
     protected function runCreateRelationship()

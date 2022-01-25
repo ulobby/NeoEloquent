@@ -28,6 +28,23 @@ class WizDel extends Model
     protected $fillable = ['fiz', 'biz', 'triz'];
 }
 
+class Person extends Model
+{
+    protected $label = 'Person';
+    protected $guarded = [];
+
+    public function dogs()
+    {
+        return $this->hasMany( Dog::class,'HAS');
+    }
+}
+
+class Dog extends Model
+{
+    protected $label = 'Dog';
+    protected $guard = [];
+}
+
 class SimpleCRUDTest extends TestCase
 {
     public function setUp(): void
@@ -360,7 +377,7 @@ class SimpleCRUDTest extends TestCase
         $this->assertGreaterThan(0, $updated);
     }
 
-    public function testSavningDateTimeAndCarbonInstances()
+    public function testSavingDateTimeAndCarbonInstances()
     {
         $now = Carbon::now();
         $dt = new DateTime();
@@ -382,5 +399,27 @@ class SimpleCRUDTest extends TestCase
         $updated = Wiz::first();
         $this->assertEquals($tomorrow->format($format), $updated->fiz);
         $this->assertEquals($after->format($format), $updated->biz);
+    }
+
+    public function testRemovingAPropertyFromARelation()
+    {
+        // Given a person who has a dog and a property in their relation.
+        $person = Person::create(['name' => 'Johannes']);
+        $dog = Dog::create();
+        $edge = $person->dogs()->save($dog);
+        $edge->date_adopted = '2022-01-01';
+        $edge->save();
+
+        // Then the information in the relation is stored.
+        $edge = $person->dogs()->edge($dog);
+        $this->assertEquals('2022-01-01', $edge->date_adopted);
+
+        // When we set the same property to null
+        $edge->date_adopted = null;
+        $edge->save();
+
+        // Then the information in the relation has been deleted.
+        $edge = $person->dogs()->edge($dog);
+        $this->assertNull($edge->date_adopted);
     }
 }
