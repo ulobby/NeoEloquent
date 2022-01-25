@@ -26,13 +26,8 @@ class Laudis extends ClientAbstract implements ClientInterface
     {
         $this->config = $config;
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
-
         $client = ClientBuilder::create()
             ->withDriver('default', $this->buildUriFromConfig($config), $this->getAuth())
-//            ->withDriver('bolt', 'bolt+s://user:password@localhost') // creates a bolt driver
-//            ->withDriver('http', 'http@' . $this->getHost() . ':' . $this->getPort(), Authenticate::basic($this->getUsername(), $this->getPassword())) // creates an http driver
-//            ->withDriver('neo4j', 'neo4j://neo4j.test.com?database=my-database', Authenticate::kerberos('token')) // creates an auto routed driver
-//            ->withDefaultDriver('http')
             ->withFormatter($formatter)
             ->build();
         $this->client = $client;
