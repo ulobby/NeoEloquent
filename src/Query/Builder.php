@@ -266,7 +266,7 @@ class Builder extends IlluminateQueryBuilder
         $row = null;
         if ($results->offsetExists(0)) {
             $row = $results->offsetGet(0);
-            $count = $row[0];
+            $count = reset($row);
 
             return $count;
         } else {
