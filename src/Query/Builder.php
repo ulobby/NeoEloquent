@@ -165,7 +165,11 @@ class Builder extends IlluminateQueryBuilder
         $updated = $this->connection->update($cypher, $bindings);
         $updated = $updated->getResults();
 
-        return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
+        if (!isset($updated[0])) {
+            return 0;
+        }
+
+        return reset($updated[0]);
     }
 
     /**
@@ -819,7 +823,7 @@ class Builder extends IlluminateQueryBuilder
         $this->columns = $previousColumns;
 
         if ($results->valid()) {
-            return $results->getResults()[0][0];
+            return reset($results->getResults()[0]);
         }
     }
 

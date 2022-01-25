@@ -157,10 +157,6 @@ class Node implements NodeInterface
         return $relation->getAll();
     }
 
-    protected function compileGetRelations()
-    {
-    }
-
     /**
      * @param NodeInterface $to
      * @param $type
@@ -179,14 +175,18 @@ class Node implements NodeInterface
         return $relation->getAll();
     }
 
+    protected function parseLabels($rawResponse)
+    {
+        return $rawResponse->first()->get('labels(n)');
+    }
+
     public function getLabels()
     {
         if ($this->labels === null) {
             $cypher = $this->compileGetLabels();
             $statement = new Statement($cypher, ['id' => $this->id]);
             $response = $this->client->runStatement($statement);
-            $resultSet = new ResultSet($response);
-            $this->labels = $resultSet->getResults()[0][0];
+            $this->labels = $this->parseLabels($response);
         }
 
         return $this->labels;

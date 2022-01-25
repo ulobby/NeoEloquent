@@ -30,14 +30,14 @@ class ResultSet implements ResultSetInterface
         );
     }
 
-    protected function parseRawResults($rawResults): array
+    protected function parseRawResults($rawResults, $arrayWrap = true): array
     {
-        $rawResults = is_array($rawResults) ? $rawResults : [$rawResults];
+        $rawResults = is_array($rawResults) || !$arrayWrap ? $rawResults : [$rawResults];
         $properties = [];
         foreach ($rawResults as $rawKey => $value) {
             $key = $rawKey;
 
-            if (str_contains($rawKey, '(') && str_contains($rawKey, ')')) {
+            if (str_contains($rawKey, 'id(') && str_contains($rawKey, ')')) {
                 $key = 'id';
             }
 
@@ -79,7 +79,13 @@ class ResultSet implements ResultSetInterface
     {
         /** @var \Laudis\Neo4j\Types\CypherMap $results */
         $results = $this->rawResult->getResults();
+
         foreach ($results as $row) {
+            if (!$row->first()->getValue() instanceof LaudisNode) {
+                $this->parsedResults[] = $this->parseRawResults($row, false);
+                continue;
+            }
+
             if (count($row) > 1) {
                 $this->parsedResults[] = $this->parseItems($row);
             } else {
