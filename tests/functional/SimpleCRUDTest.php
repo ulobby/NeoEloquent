@@ -35,7 +35,7 @@ class Person extends Model
 
     public function dogs()
     {
-        return $this->hasMany( Dog::class,'HAS');
+        return $this->hasMany(Dog::class, 'HAS');
     }
 }
 
