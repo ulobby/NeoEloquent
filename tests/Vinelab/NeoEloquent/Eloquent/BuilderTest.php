@@ -771,6 +771,11 @@ class ClientResultSetStub implements ResultSetInterface
     {
         //
     }
+
+    public function offsetExists($key)
+    {
+
+    }
 }
 
 class ClientNodeStub implements NodeInterface

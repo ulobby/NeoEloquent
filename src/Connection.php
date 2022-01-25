@@ -4,15 +4,13 @@ namespace Vinelab\NeoEloquent;
 
 use Closure;
 use DateTime;
-use Everyman\Neo4j\Client as NeoClient;
 use Exception;
 use Illuminate\Database\Connection as IlluminateConnection;
 use Illuminate\Database\Schema\Grammars\Grammar as IlluminateSchemaGrammar;
 use Illuminate\Support\Arr;
-use Laudis\Neo4j\Authentication\Authenticate;
-use Laudis\Neo4j\Contracts\AuthenticateInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\CypherQuery;
 use Vinelab\NeoEloquent\DatabaseDriver\DatabaseDriver;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 use Vinelab\NeoEloquent\Query\Builder;
 
@@ -21,7 +19,7 @@ class Connection extends IlluminateConnection
     /**
      * The Neo4j active client connection.
      *
-     * @var \Everyman\Neo4j\Client
+     * @var ClientInterface
      */
     protected $neo;
 
@@ -83,16 +81,11 @@ class Connection extends IlluminateConnection
     /**
      * Create a new Neo4j client.
      *
-     * @return \Everyman\Neo4j\Client
+     * @return ClientInterface
      */
     public function createConnection()
     {
         $client = DatabaseDriver::create($this->getConfig());
-
-        return $client;
-
-        $client = new NeoClient($this->getHost(), $this->getPort());
-        $client->getTransport()->useHttps($this->getSsl())->setAuth($this->getUsername(), $this->getPassword());
 
         return $client;
     }
@@ -105,7 +98,7 @@ class Connection extends IlluminateConnection
     /**
      * Get the currenty active database client.
      *
-     * @return \Everyman\Neo4j\Client
+     * @return ClientInterface
      */
     public function getClient()
     {
@@ -116,9 +109,9 @@ class Connection extends IlluminateConnection
      * Set the client responsible for the
      * database communication.
      *
-     * @param \Everyman\Neo4j\Client $client
+     * @param ClientInterface $client
      */
-    public function setClient(NeoClient $client)
+    public function setClient(ClientInterface $client)
     {
         $this->neo = $client;
     }
@@ -250,7 +243,7 @@ class Connection extends IlluminateConnection
      * @param string $query
      * @param array  $bindings
      *
-     * @return bool|\Everyman\Neo4j\Query\ResultSet When $result is set to true.
+     * @return bool|ResultSetInterface When $result is set to true.
      */
     public function statement($query, $bindings = [], $rawResults = false)
     {
@@ -555,16 +548,5 @@ class Connection extends IlluminateConnection
         $result = $statement->getResultSet();
 
         return $result[0][0];
-    }
-
-    private function getAuth(): AuthenticateInterface
-    {
-        $username = $this->getUsername();
-        $password = $this->getPassword();
-        if ($username && $password) {
-            return Authenticate::basic($username, $password);
-        }
-
-        return Authenticate::disabled();
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
-use Everyman\Neo4j\Path;
-use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;

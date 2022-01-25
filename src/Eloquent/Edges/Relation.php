@@ -4,7 +4,6 @@ namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
 use Carbon\Carbon;
 use DateTime;
-use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
