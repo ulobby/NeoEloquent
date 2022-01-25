@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis;
 
+use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\CypherMap;
 use Laudis\Neo4j\Types\Node as LaudisNode;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
@@ -24,9 +25,20 @@ class ResultSet implements ResultSetInterface
 
     protected function parseNode(LaudisNode $node): array
     {
+        $properties = $node->getProperties()->toArray();
+
+        // If there are any ArrayList in the properties.
+        // Covert it to an array.
+        $properties = array_map(function($element) {
+            if ($element instanceof CypherList) {
+                return $element->toArray();
+            }
+            return $element;
+        }, $properties);
+
         return array_merge(
             ['id' => $node->getId()],
-            $node->getProperties()->toArray(),
+            $properties,
         );
     }
 

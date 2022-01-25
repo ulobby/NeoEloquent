@@ -422,4 +422,13 @@ class SimpleCRUDTest extends TestCase
         $edge = $person->dogs()->edge($dog);
         $this->assertNull($edge->date_adopted);
     }
+
+    public function testWhenSavingAnArrayReturnsAnArrayType()
+    {
+        $person = Person::create([
+            'roles' => ['admin', 'user'],
+        ]);
+        $this->assertTrue(is_array($person->roles));
+        $this->assertEquals(['admin', 'user'], $person->roles);
+    }
 }
