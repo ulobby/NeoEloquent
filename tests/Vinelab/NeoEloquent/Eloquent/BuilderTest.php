@@ -774,7 +774,6 @@ class ClientResultSetStub implements ResultSetInterface
 
     public function offsetExists($key)
     {
-
     }
 }
 
