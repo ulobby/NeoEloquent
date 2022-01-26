@@ -40,7 +40,7 @@ class ResultSet implements ResultSetInterface
         }, $properties);
 
         return [
-            'labels' => $node->getLabels()->toArray(),
+            'labels'     => $node->getLabels()->toArray(),
             'properties' => array_merge(
                 ['id' => $node->getId()],
                 $properties,
