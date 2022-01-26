@@ -127,7 +127,7 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model with its relations.
      *
-     * @param string $connection
+     * @param string             $connection
      * @param ResultSetInterface $results
      *
      * @return array

@@ -7,9 +7,9 @@ use Vinelab\NeoEloquent\DatabaseDriver\Drivers\Laudis\Relation;
 
 interface RelationInterface
 {
-    const DIRECTION_ALL       = 'all';
-    const DIRECTION_IN        = 'in';
-    const DIRECTION_OUT       = 'out';
+    const DIRECTION_ALL = 'all';
+    const DIRECTION_IN = 'in';
+    const DIRECTION_OUT = 'out';
 
     public function save();
 
