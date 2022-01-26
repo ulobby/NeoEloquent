@@ -51,17 +51,6 @@ class Finder extends Delegate
         }
 
         return $relations[0];
-//        // Since we are sure that the relation between these two nodes is direct
-//        // with depth of 1 we will get the path and return the first relationship (if any).
-//        if (!is_null($path)) {
-//            // Tell the path that we need to work with the relationships now
-//            // so that it sets the nodes aside.
-//            $path->setContext(Path::ContextRelationship);
-//
-//            $relationships = $path->getRelationships();
-//            // Return the first found relationship or null if no relationships are found
-//            return reset($relationships) ? reset($relationships) : null;
-//        }
     }
 
     /**

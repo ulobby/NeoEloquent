@@ -141,7 +141,6 @@ class Builder extends IlluminateBuilder
 
         if ($results->valid()) {
             $grammar = $this->getQuery()->getGrammar();
-            //     $columns = $results->getColumns();
 
             foreach ($results->getResults() as $result) {
                 $attributes = $result;

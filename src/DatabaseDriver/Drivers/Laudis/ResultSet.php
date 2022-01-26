@@ -39,20 +39,13 @@ class ResultSet implements ResultSetInterface
             return $element;
         }, $properties);
 
-//        if ($this->addLabels) {
-            return [
-                'labels' => $node->getLabels()->toArray(),
-                'properties' => array_merge(
-                    ['id' => $node->getId()],
-                    $properties,
-                ),
-            ];
-//        }
-
-        return array_merge(
-            ['id' => $node->getId()],
-            $properties,
-        );
+        return [
+            'labels' => $node->getLabels()->toArray(),
+            'properties' => array_merge(
+                ['id' => $node->getId()],
+                $properties,
+            ),
+        ];
     }
 
     protected function parseRawResults($rawResults, $arrayWrap = true): array
