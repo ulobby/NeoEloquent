@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Eloquent\Edges;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Database\Eloquent\Collection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
@@ -22,13 +23,13 @@ abstract class Relation extends Delegate
     /**
      * The start node of the relationship.
      *
-     * @var \Everyman\Neo4j\Node
+     * @var NodeInterface
      */
     protected $start;
     /**
      * The end node of the relationship.
      *
-     * @var \Everyman\Neo4j\Node
+     * @var NodeInterface
      */
     protected $end;
 
@@ -87,7 +88,7 @@ abstract class Relation extends Delegate
     /**
      * The relationship instance.
      *
-     * @var \Everyman\Neo4j\Relationship
+     * @var RelationInterface
      */
     protected $relation;
 
@@ -270,7 +271,7 @@ abstract class Relation extends Delegate
     /**
      * Get the Neo4j relationship object.
      *
-     * @return \Everyman\Neo4j\Relationship
+     * @return RelationInterface
      */
     public function getReal()
     {
@@ -607,7 +608,7 @@ abstract class Relation extends Delegate
     /**
      * Get the left node of the relationship.
      *
-     * @return \Everyman\Neo4j\Node
+     * @return NodeInterface
      */
     public function getStartNode()
     {
@@ -617,7 +618,7 @@ abstract class Relation extends Delegate
     /**
      * Get the end Node of the relationship.
      *
-     * @return \Everyman\Neo4j\Node
+     * @return NodeInterface
      */
     public function getEndNode()
     {

@@ -10,6 +10,7 @@ use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 
 class Builder extends IlluminateQueryBuilder
@@ -24,7 +25,7 @@ class Builder extends IlluminateQueryBuilder
     /**
      * The database active client handler.
      *
-     * @var Everyman\Neo4j\Client
+     * @var ClientInterface
      */
     protected $client;
 
@@ -866,7 +867,7 @@ class Builder extends IlluminateQueryBuilder
      *
      * @param string $label
      *
-     * @return Everyman\Neo4j\Label
+     * @return string
      */
     public function makeLabel($label)
     {

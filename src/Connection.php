@@ -12,6 +12,7 @@ use Vinelab\NeoEloquent\DatabaseDriver\CypherQuery;
 use Vinelab\NeoEloquent\DatabaseDriver\DatabaseDriver;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\TransactionInterface;
 use Vinelab\NeoEloquent\Query\Builder;
 
 class Connection extends IlluminateConnection
@@ -26,7 +27,7 @@ class Connection extends IlluminateConnection
     /**
      * The Neo4j database transaction.
      *
-     * @var \Everyman\Neo4j\Transaction
+     * @var TransactionInterface
      */
     protected $transaction;
 

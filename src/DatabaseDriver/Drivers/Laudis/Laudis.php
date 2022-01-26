@@ -90,6 +90,7 @@ class Laudis extends ClientAbstract implements ClientInterface
     public function startBatch()
     {
         // TODO
+        return new Batch();
     }
 
     public function commitBatch()

@@ -3,8 +3,10 @@
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\BatchInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\QueryException;
@@ -63,13 +65,13 @@ abstract class Delegate
      * Make a new Relationship instance.
      *
      * @param string $type
-     * @param Model  $startModel
-     * @param Model  $endModel
-     * @param array  $properties
+     * @param Model $startModel
+     * @param Model $endModel
+     * @param array $properties
      *
-     * @return \Everyman\Neo4j\Relationship
+     * @return RelationInterface
      */
-    protected function makeRelationship($type, $startModel, $endModel, $properties = [])
+    protected function makeRelationship($type, $startModel, $endModel, $properties = []): RelationInterface
     {
         return $this->client
             ->makeRelationship()
@@ -82,7 +84,7 @@ abstract class Delegate
     /**
      * Start a batch operation with the database.
      *
-     * @return \Everyman\Neo4j\Batch
+     * @return BatchInterface
      */
     public function prepareBatch()
     {
@@ -126,17 +128,15 @@ abstract class Delegate
             throw new UnknownDirectionException($direction);
         }
 
-        $direction = 'Direction'.$direction;
+        $direction = 'DIRECTION_'.mb_strtoupper($direction);
 
-        return constant("Everyman\Neo4j\Relationship::".$direction);
+        return constant("\Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface::".$direction);
     }
 
     /**
      * Convert a model to a Node object.
      *
      * @param Model $model
-     *
-     * @throws \Everyman\Neo4j\Exception
      *
      * @return NodeInterface
      */

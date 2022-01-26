@@ -7,8 +7,20 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 
 class DatabaseDriver
 {
+    protected static function nameToClass($name)
+    {
+        $drivers = [
+            'laudis' => Laudis::class,
+        ];
+
+        return $drivers[$name];
+    }
+
     public static function create($config): ClientInterface
     {
-        return new Laudis($config);
+        $eloquentDriver = $config['eloquent_driver'] ?? 'laudis';
+        $className = self::nameToClass($eloquentDriver);
+
+        return new $className($config);
     }
 }

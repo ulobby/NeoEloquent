@@ -2,7 +2,6 @@
 
 namespace Vinelab\NeoEloquent\Tests\Eloquent;
 
-use Everyman\Neo4j\Query\Row;
 use Illuminate\Support\Collection;
 use Mockery as M;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
@@ -788,50 +787,55 @@ class ClientNodeStub implements NodeInterface
 
     public function setProperty($key, $value)
     {
-        // TODO: Implement setProperty() method.
+        //
     }
 
     public function save()
     {
-        // TODO: Implement save() method.
+        //
     }
 
     public function getId()
     {
-        // TODO: Implement getId() method.
+        //
     }
 
     public function setId($id): NodeInterface
     {
-        // TODO: Implement setId() method.
+        //
         return $this;
     }
 
     public function addLabels($labels)
     {
-        // TODO: Implement addLabels() method.
+        //
     }
 
     public function getRelationships($type, $direction): array
     {
-        // TODO: Implement getRelationships() method.
+        //
         return [];
     }
 
     public function getProperties(): array
     {
-        // TODO: Implement getProperties() method.
+        //
         return [];
     }
 
     public function findPathsTo(NodeInterface $to, $type = null, $direction = null): array
     {
-        // TODO: Implement findPathsTo() method.
+        //
         return [];
     }
 
     public function delete()
     {
-        // TODO: Implement delete() method.
+        //
+    }
+
+    public function offsetGet()
+    {
+        //
     }
 }

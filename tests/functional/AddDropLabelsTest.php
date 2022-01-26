@@ -61,14 +61,14 @@ class AddDropLabelsTest extends TestCase
         //add the label
         $w->addLabels(['Superuniqelabel1']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
         $this->assertTrue(in_array('Superuniqelabel1', $nLabels));
 
         //now drop the label
         $w->dropLabels(['Superuniqelabel1']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
         $this->assertFalse(in_array('Superuniqelabel1', $nLabels));
     }
@@ -86,7 +86,7 @@ class AddDropLabelsTest extends TestCase
         //add the label
         $w->addLabels(['Superuniqelabel3', 'Superuniqelabel4', 'a1']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
 
         $this->assertTrue(in_array('Superuniqelabel3', $nLabels));
@@ -96,7 +96,7 @@ class AddDropLabelsTest extends TestCase
         //now drop one of the labels
         $w->dropLabels(['a1']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
         $this->assertFalse(in_array('a1', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel3', $nLabels));
@@ -104,7 +104,7 @@ class AddDropLabelsTest extends TestCase
 
         //now drop remaining labels
         $w->dropLabels(['Superuniqelabel3', 'Superuniqelabel4']);
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
         $this->assertFalse(in_array('a1', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel3', $nLabels));
@@ -126,7 +126,7 @@ class AddDropLabelsTest extends TestCase
         $w->addLabels(['Superuniqelabel6']);
         $w->addLabels(['Superuniqelabel7']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
 
         $this->assertTrue(in_array('Superuniqelabel5', $nLabels));
@@ -138,7 +138,7 @@ class AddDropLabelsTest extends TestCase
         $w->dropLabels(['Superuniqelabel6']);
         $w->dropLabels(['Superuniqelabel7']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w->id);
 
         $this->assertFalse(in_array('Superuniqelabel5', $nLabels));
@@ -182,20 +182,20 @@ class AddDropLabelsTest extends TestCase
         $w2->addLabels(['Superuniqelabel9', 'Superuniqelabel10']);
         $w3->addLabels(['Superuniqelabel9', 'Superuniqelabel10']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w1->id);
 
         $this->assertTrue(in_array('Superuniqelabel8', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel9', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel10', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w2->id);
         $this->assertTrue(in_array('Superuniqelabel8', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel9', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel10', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w3->id);
         $this->assertTrue(in_array('Superuniqelabel8', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel9', $nLabels));
@@ -211,19 +211,19 @@ class AddDropLabelsTest extends TestCase
         $w2->dropLabels(['Superuniqelabel9', 'Superuniqelabel10']);
         $w3->dropLabels(['Superuniqelabel9', 'Superuniqelabel10']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w1->id);
         $this->assertFalse(in_array('Superuniqelabel8', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel9', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel10', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w2->id);
         $this->assertFalse(in_array('Superuniqelabel8', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel9', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel10', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($w3->id);
         $this->assertFalse(in_array('Superuniqelabel8', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel9', $nLabels));
@@ -270,20 +270,20 @@ class AddDropLabelsTest extends TestCase
         $f2->addLabels(['Superuniqelabel12', 'Superuniqelabel13']);
         $f3->addLabels(['Superuniqelabel12', 'Superuniqelabel13']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f1->id);
 
         $this->assertTrue(in_array('Superuniqelabel11', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel12', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel13', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f2->id);
         $this->assertTrue(in_array('Superuniqelabel11', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel12', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel13', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f3->id);
         $this->assertTrue(in_array('Superuniqelabel11', $nLabels));
         $this->assertTrue(in_array('Superuniqelabel12', $nLabels));
@@ -299,19 +299,19 @@ class AddDropLabelsTest extends TestCase
         $f2->dropLabels(['Superuniqelabel12', 'Superuniqelabel13']);
         $f3->dropLabels(['Superuniqelabel12', 'Superuniqelabel13']);
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f1->id);
         $this->assertFalse(in_array('Superuniqelabel11', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel12', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel13', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f2->id);
         $this->assertFalse(in_array('Superuniqelabel11', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel12', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel13', $nLabels));
 
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $nLabels = $this->getLabelsUsingClient($f3->id);
         $this->assertFalse(in_array('Superuniqelabel11', $nLabels));
         $this->assertFalse(in_array('Superuniqelabel12', $nLabels));
@@ -401,7 +401,7 @@ class AddDropLabelsTest extends TestCase
      */
     public function getLabelsUsingClient($nodeId)
     {
-        //get the labels using Everyman lib
+        //get the labels using the client lib
         $connection = $this->getConnectionWithConfig('neo4j');
         $client = $connection->getClient();
 
