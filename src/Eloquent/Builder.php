@@ -233,7 +233,7 @@ class Builder extends IlluminateBuilder
 
         foreach ($this->getMutations() as $label => $info) {
             $mutationModel = $this->getMutationModel($label);
-            $model = $mutationModel->newFromBuilder($attributes[$label]);
+            $model = $mutationModel->newFromBuilder($attributes[$label]['properties']);
             $model->setConnection($mutationModel->getConnectionName());
             $mutations[$label] = $model;
         }
