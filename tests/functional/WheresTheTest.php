@@ -111,8 +111,8 @@ class WheresTheTest extends TestCase
 
     public function testWhereGreaterThanOperator()
     {
-       $u = User::where('calls', '>', 10)->orderBy('calls')->first();
-       $this->assertEquals($this->cd->toArray(), $u->toArray());
+        $u = User::where('calls', '>', 10)->orderBy('calls')->first();
+        $this->assertEquals($this->cd->toArray(), $u->toArray());
 
         $others = User::where('calls', '>', 10)->get();
         $this->assertCount(4, $others);
