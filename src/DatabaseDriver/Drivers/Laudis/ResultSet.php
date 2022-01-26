@@ -40,13 +40,13 @@ class ResultSet implements ResultSetInterface
         }, $properties);
 
 //        if ($this->addLabels) {
-            return [
-                'labels' => $node->getLabels()->toArray(),
-                'properties' => array_merge(
-                    ['id' => $node->getId()],
-                    $properties,
-                ),
-            ];
+        return [
+            'labels'     => $node->getLabels()->toArray(),
+            'properties' => array_merge(
+                ['id' => $node->getId()],
+                $properties,
+            ),
+        ];
 //        }
 
         return array_merge(
