@@ -10,11 +10,13 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 class ResultSet implements ResultSetInterface
 {
     protected $rawResult;
+    protected $addLabels;
     protected $parsedResults = [];
 
-    public function __construct($rawResult)
+    public function __construct($rawResult, $addLabels = false)
     {
         $this->rawResult = $rawResult;
+        $this->addLabels = $addLabels;
         $this->parse();
     }
 
@@ -35,6 +37,16 @@ class ResultSet implements ResultSetInterface
             }
             return $element;
         }, $properties);
+
+//        if ($this->addLabels) {
+            return [
+                'labels' => $node->getLabels()->toArray(),
+                'properties' => array_merge(
+                    ['id' => $node->getId()],
+                    $properties,
+                ),
+            ];
+//        }
 
         return array_merge(
             ['id' => $node->getId()],

@@ -107,6 +107,7 @@ class Builder extends IlluminateBuilder
 
         if ($results->valid()) {
             foreach ($results->getResults() as $attributes) {
+                $attributes = $attributes['properties'] ?? $attributes;
 
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
@@ -148,6 +149,7 @@ class Builder extends IlluminateBuilder
                 // and if exists, we will need to mutate the attributes accordingly.
                 if ($this->shouldMutate($attributes)) {
                     foreach ($attributes as $identifier => $values) {
+                        $values = $values['properties'] ?? $values;
                         $cropped = $grammar->cropLabelIdentifier($identifier);
 
                         if (!isset($models[$cropped])) {
@@ -183,6 +185,7 @@ class Builder extends IlluminateBuilder
 
         // Transform mutations back to their origin
         foreach ($attributes as $mutation => $values) {
+            $values = $values['properties'] ?? $values;
             // First we should see whether this mutation can be resolved so that
             // we take it into consideration otherwise we skip to the next iteration.
             if (!$this->resolvableMutation($mutation)) {

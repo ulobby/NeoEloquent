@@ -262,7 +262,7 @@ class ConnectionTest extends TestCase
         // This is how we get the first row of the result (first [0])
         // and then we get the Node instance (the 2nd [0])
         // and then ask it to return its properties
-        $selected = $results->getResults()[0];
+        $selected = $results->getResults()[0]['properties'];
         unset($selected['id']);
 
         $this->assertEquals($this->user, $selected, 'The fetched User must be the same as the one we just created');
@@ -283,7 +283,7 @@ class ConnectionTest extends TestCase
 
         // Get the ID of the created record
         $results = $c->select($query, [['username' => $this->user['username']]]);
-        $node = $results->getResults()[0];
+        $node = $results->getResults()[0]['properties'];
 
         $id = $node['id'];
 
@@ -302,7 +302,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals($log[1]['bindings'], $bindings);
         $this->assertInstanceOf(ResultSetInterface::class, $results);
 
-        $selected = $results->getResults()[0];
+        $selected = $results->getResults()[0]['properties'];
         unset($selected['id']);
 
         $this->assertEquals($this->user, $selected);
@@ -346,7 +346,7 @@ class ConnectionTest extends TestCase
 
         $user = $results->getResults()[0];
 
-        $this->assertEquals($type, $user['type']);
+        $this->assertEquals($type, $user['properties']['type']);
     }
 
     public function testAffectingStatementOnNonExistingRecord()

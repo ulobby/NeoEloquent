@@ -73,11 +73,7 @@ class Node implements NodeInterface
 
     protected function runUpdateNode()
     {
-        echo ' runUpdateNode ';
-        // Properties to update
-
-        // Properties to remove
-        //
+        // TODO
     }
 
     public function populateNode()
@@ -86,7 +82,9 @@ class Node implements NodeInterface
         $statement = new Statement($cypher, ['id' => $this->id]);
         $response = $this->client->runStatement($statement);
         $resultSet = new ResultSet($response);
-        $this->properties = $resultSet->getResults()[0];
+        $nodeData = $resultSet->getResults()[0];
+        $this->properties = $nodeData['properties'];
+        $this->labels = $nodeData['labels'];
 
         return $this;
     }
