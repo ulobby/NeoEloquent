@@ -31,10 +31,11 @@ class ResultSet implements ResultSetInterface
 
         // If there are any ArrayList in the properties.
         // Covert it to an array.
-        $properties = array_map(function($element) {
+        $properties = array_map(function ($element) {
             if ($element instanceof CypherList) {
                 return $element->toArray();
             }
+
             return $element;
         }, $properties);
 
