@@ -161,7 +161,7 @@ class Finder extends Delegate
      * Get the Edge instance out of a Relationship based on a direction.
      *
      * @param RelationInterface $relation
-     * @param string                       $direction
+     * @param string            $direction
      *
      * @return \Vinelab\NeoEloquent\Eloquent\Edges\Edge[In|Out]
      */

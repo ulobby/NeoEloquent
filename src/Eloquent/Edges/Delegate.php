@@ -65,9 +65,9 @@ abstract class Delegate
      * Make a new Relationship instance.
      *
      * @param string $type
-     * @param Model $startModel
-     * @param Model $endModel
-     * @param array $properties
+     * @param Model  $startModel
+     * @param Model  $endModel
+     * @param array  $properties
      *
      * @return RelationInterface
      */
