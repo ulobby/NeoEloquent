@@ -2,9 +2,8 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
-use Everyman\Neo4j\Path;
-use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
@@ -30,7 +29,7 @@ class Finder extends Delegate
      * @param \Vinelab\NeoEloquent\Eloquent\Model $relatedModel
      * @param string                              $direction
      *
-     * @return \Everyman\Neo4j\Relationship
+     * @return RelationInterface
      */
     public function firstRelation(Model $parentModel, Model $relatedModel, $type, $direction = 'any')
     {
@@ -45,20 +44,14 @@ class Finder extends Delegate
 
         // Find the path between parent and related nodes in the previously
         // determined direction according to the type and we will get returned
-        // an instance of \Everyman\Neo4j\Path which will lead us to the relationship.
-        $path = $parent->findPathsTo($related, $type, $direction)->getSinglePath();
+        // an array of relations.
+        $relations = $parent->findPathsTo($related, $type, $direction);
 
-        // Since we are sure that the relation between these two nodes is direct
-        // with depth of 1 we will get the path and return the first relationship (if any).
-        if (!is_null($path)) {
-            // Tell the path that we need to work with the relationships now
-            // so that it sets the nodes aside.
-            $path->setContext(Path::ContextRelationship);
-
-            $relationships = $path->getRelationships();
-            // Return the first found relationship or null if no relationships are found
-            return reset($relationships) ? reset($relationships) : null;
+        if (empty($relations)) {
+            return null;
         }
+
+        return $relations[0];
     }
 
     /**
@@ -142,13 +135,12 @@ class Finder extends Delegate
     /**
      * Get the direction of a relationship out of a Relation instance.
      *
-     * @param \Everyman\Neo4j\Relationship        $relation
      * @param \Vinelab\NeoEloquent\Eloquent\Model $parent
      * @param \Vinelab\NeoEloquent\Eloquent\Model $related
      *
      * @return string Either 'in' or 'out'
      */
-    public function directionFromRelation(Relationship $relation, Model $parent, Model $related)
+    public function directionFromRelation($relation, Model $parent, Model $related)
     {
         // We will match the ids of the parent model and the start node of the relationship
         // and if they match we know that the direction is outgoing, incoming otherwise.
@@ -168,12 +160,12 @@ class Finder extends Delegate
     /**
      * Get the Edge instance out of a Relationship based on a direction.
      *
-     * @param \Everyman\Neo4j\Relationship $relation
-     * @param string                       $direction
+     * @param RelationInterface $relation
+     * @param string            $direction
      *
      * @return \Vinelab\NeoEloquent\Eloquent\Edges\Edge[In|Out]
      */
-    public function edgeFromRelationWithDirection(Relationship $relation, Model $parent, Model $related, $direction)
+    public function edgeFromRelationWithDirection(RelationInterface $relation, Model $parent, Model $related, $direction)
     {
         // If the direction is of type 'any' we need to figure out the relationship direction
         // from the determined relation.
@@ -199,7 +191,7 @@ class Finder extends Delegate
         // Determine the direction, the real one!
         $direction = $this->getRealDirection($direction);
 
-        return $parent->getRelationships((array) $type, $direction);
+        return $parent->getRelationships($type, $direction);
     }
 
     /**

@@ -2,13 +2,11 @@
 
 namespace Vinelab\NeoEloquent\Eloquent;
 
-use Everyman\Neo4j\Node;
-use Everyman\Neo4j\Query\ResultSet;
-use Everyman\Neo4j\Query\Row;
 use Illuminate\Database\Eloquent\Builder as IlluminateBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 use Vinelab\NeoEloquent\Helpers;
 use Vinelab\NeoEloquent\QueryException;
 
@@ -94,25 +92,24 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model.
      *
-     * @param string                          $connection
-     * @param \Everyman\Neo4j\Query\ResultSet $results
+     * @param string             $connection
+     * @param ResultSetInterface $results
+     * @param array              $columns
      *
      * @return array
      */
-    protected function resultsToModels($connection, ResultSet $results, array $columns = [])
+    protected function resultsToModels($connection, ResultSetInterface $results, array $columns = [])
     {
         $models = [];
 
         if ($results->valid()) {
-            $resultColumns = $results->getColumns();
-
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($resultColumns, $result, $columns);
+            foreach ($results->getResults() as $attributes) {
+                $attributes = $attributes['properties'] ?? $attributes;
 
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
                 if ($this->shouldMutate($attributes)) {
-                    $models[] = $this->mutateToOrigin($result, $attributes);
+                    $models[] = $this->mutateToOrigin($results, $attributes);
                 }
                 // This is a regular record that we should deal with the normal way, creating an instance
                 // of the model out of the fetched attributes.
@@ -130,25 +127,25 @@ class Builder extends IlluminateBuilder
     /**
      * Turn Neo4j result set into the corresponding model with its relations.
      *
-     * @param string                          $connection
-     * @param \Everyman\Neo4j\Query\ResultSet $results
+     * @param string             $connection
+     * @param ResultSetInterface $results
      *
      * @return array
      */
-    protected function resultsToModelsWithRelations($connection, ResultSet $results)
+    protected function resultsToModelsWithRelations($connection, ResultSetInterface $results)
     {
         $models = [];
 
         if ($results->valid()) {
             $grammar = $this->getQuery()->getGrammar();
-            $columns = $results->getColumns();
 
-            foreach ($results as $result) {
-                $attributes = $this->getProperties($columns, $result);
+            foreach ($results->getResults() as $result) {
+                $attributes = $result;
                 // Now that we have the attributes, we first check for mutations
                 // and if exists, we will need to mutate the attributes accordingly.
                 if ($this->shouldMutate($attributes)) {
                     foreach ($attributes as $identifier => $values) {
+                        $values = $values['properties'] ?? $values;
                         $cropped = $grammar->cropLabelIdentifier($identifier);
 
                         if (!isset($models[$cropped])) {
@@ -184,6 +181,7 @@ class Builder extends IlluminateBuilder
 
         // Transform mutations back to their origin
         foreach ($attributes as $mutation => $values) {
+            $values = $values['properties'] ?? $values;
             // First we should see whether this mutation can be resolved so that
             // we take it into consideration otherwise we skip to the next iteration.
             if (!$this->resolvableMutation($mutation)) {
@@ -232,7 +230,7 @@ class Builder extends IlluminateBuilder
 
         foreach ($this->getMutations() as $label => $info) {
             $mutationModel = $this->getMutationModel($label);
-            $model = $mutationModel->newFromBuilder($attributes[$label]);
+            $model = $mutationModel->newFromBuilder($attributes[$label]['properties']);
             $model->setConnection($mutationModel->getConnectionName());
             $mutations[$label] = $model;
         }
@@ -283,118 +281,6 @@ class Builder extends IlluminateBuilder
         $intersect = array_intersect($attributes, $mutations);
 
         return !empty($intersect);
-    }
-
-    /**
-     * Get the properties (attributes in Eloquent terms)
-     * out of a result row.
-     *
-     * @param array                     $columns The columns retrieved by the result
-     * @param \Everyman\Neo4j\Query\Row $row
-     * @param array                     $columns
-     *
-     * @return array
-     */
-    public function getProperties(array $resultColumns, Row $row, array $columns = [])
-    {
-        $attributes = [];
-
-        // when no columns are specified (*) we look for them in the query instead,
-        // this is a workaround to be able to override the columns expected.
-        if ($columns == ['*']) {
-            $columns = $this->query->columns;
-        }
-        // What we get returned from the client is a result set
-        // and each result is either a Node or a single column value
-        // so we first extract the returned value and retrieve
-        // the attributes according to the result type.
-
-        // Only when requesting a single property
-        // will we extract the current() row of result.
-
-        $current = $row->current();
-
-        $result = ($current instanceof Node) ? $current : $row;
-
-        if ($this->isRelationship($resultColumns)) {
-            // You must have chosen certain properties (columns) to be returned
-            // which means that we should map the values to their corresponding keys.
-            foreach ($resultColumns as $key => $property) {
-                $value = $row[$property];
-
-                if ($value instanceof Node) {
-                    $value = $this->getNodeAttributes($value);
-                } else {
-                    // Our property should be extracted from the query columns
-                    // instead of the result columns
-                    $property = $columns[$key];
-
-                    // as already assigned, RETURNed props will be preceded by an 'n.'
-                    // representing the node we're targeting.
-                    $returned = $this->query->modelAsNode().".{$property}";
-
-                    $value = $row[$returned];
-                }
-
-                $attributes[$property] = $value;
-            }
-
-            // If the node id is in the columns we need to treat it differently
-            // since Neo4j's convenience with node ids will be retrieved as id(n)
-            // instead of n.id.
-
-            // WARNING: Do this after setting all the attributes to avoid overriding it
-            // with a null value or colliding it with something else, some Daenerys dragons maybe ?!
-            if (!is_null($columns) && in_array('id', $columns)) {
-                $attributes['id'] = $row['id('.$this->query->modelAsNode().')'];
-            }
-        } elseif ($result instanceof Node) {
-            $attributes = $this->getNodeAttributes($result);
-        } elseif ($result instanceof Row) {
-            $attributes = $this->getRowAttributes($result, $columns, $resultColumns);
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * Gather the properties of a Node including its id.
-     *
-     * @param \Everyman\Neo4j\Node $node
-     *
-     * @return array
-     */
-    public function getNodeAttributes(Node $node)
-    {
-        // Extract the properties of the node
-        $attributes = $node->getProperties();
-
-        // Add the node id to the attributes since \Everyman\Neo4j\Node
-        // does not consider it to be a property, it is treated differently
-        // and available through the getId() method.
-        $attributes['id'] = $node->getId();
-
-        return $attributes;
-    }
-
-    /**
-     * Get the attributes of a result Row.
-     *
-     * @param \Everyman\Neo4j\Query\Row $row
-     * @param array                     $columns       The query columns
-     * @param array                     $resultColumns The result columns that can be extracted from a \Everyman\Neo4j\Query\ResultSet
-     *
-     * @return array
-     */
-    public function getRowAttributes(Row $row, $columns, $resultColumns)
-    {
-        $attributes = [];
-
-        foreach ($resultColumns as $key => $column) {
-            $attributes[$columns[$key]] = $row[$column];
-        }
-
-        return $attributes;
     }
 
     /**
@@ -620,7 +506,7 @@ class Builder extends IlluminateBuilder
      * of a node, otherwise if they're plain strings like 'user' and they're more than one then
      * the reference is assumed to be a Node placeholder rather than a property.
      *
-     * @param \Everyman\Neo4j\Query\Row $row
+     * @param array $columns
      *
      * @return bool
      */

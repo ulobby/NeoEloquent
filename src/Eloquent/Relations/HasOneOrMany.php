@@ -406,7 +406,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
-     * @param  $ids
+     * @param      $ids
      * @param bool $detaching
      *
      * @return array
