@@ -84,7 +84,7 @@ abstract class ClientAbstract
      *
      * @return mixed
      */
-    public function getConfig(string $option = null)
+    public function getConfig($option = null)
     {
         return Arr::get($this->config, $option);
     }
