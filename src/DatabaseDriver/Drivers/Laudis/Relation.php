@@ -41,7 +41,7 @@ class Relation implements RelationInterface
         $cypher = "MATCH (a), (b)
             WHERE id(a) = {$this->start->getId()}
             AND id(b) = {$this->end->getId()}
-            CREATE (a)-[r:{$this->type} ";
+            CREATE (a)-[r:`$this->type` ";
 
         if (!empty($this->properties)) {
             $cypher .= ' { ';
@@ -62,14 +62,14 @@ class Relation implements RelationInterface
     protected function compileNodeRelation(): string
     {
         if ($this->direction === 'out') {
-            return "(a)-[r:$this->type]->(b)";
+            return "(a)-[r:`$this->type`]->(b)";
         }
 
         if ($this->direction === 'in') {
-            return "(a)<-[r:$this->type]-(b)";
+            return "(a)<-[r:`$this->type`]-(b)";
         }
 
-        return "(a)-[r:$this->type]-(b)";
+        return "(a)-[r:`$this->type`]-(b)";
     }
 
     protected function compileUpdateProperties(array $propertiesNotNull): string
@@ -93,7 +93,7 @@ class Relation implements RelationInterface
 
     protected function compileDeleteRelationship(): string
     {
-        return "MATCH ()-[r:{$this->type}]-()
+        return "MATCH ()-[r:`$this->type`]-()
             WHERE id(r) = {$this->getId()}
             DELETE r";
     }

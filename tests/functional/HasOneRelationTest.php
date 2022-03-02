@@ -25,6 +25,11 @@ class User extends Model
     {
         return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Cat', 'HAS');
     }
+
+    public function parrot()
+    {
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Parrot');
+    }
 }
 
 class Profile extends Model
@@ -44,6 +49,13 @@ class Cat extends Model
 class Dog extends Model
 {
     protected $label = 'Dog';
+
+    protected $fillable = ['name'];
+}
+
+class Parrot extends Model
+{
+    protected $label = 'Parrot';
 
     protected $fillable = ['name'];
 }
@@ -222,5 +234,16 @@ class HasOneRelationTest extends TestCase
 
         $resultUser = User::with(['dog', 'cat'])->find($user->id);
         $this->assertEquals($dog2->name, $resultUser->dog->name);
+    }
+
+    public function testHasOneRelationWithoutRelationName()
+    {
+        $user = User::create(['name' => 'Dr. Dolittle']);
+        $parrot = Parrot::create(['name' => 'Bingo']);
+
+        $user->parrot()->save($parrot);
+
+        $resultUser = User::find($user->id);
+        $this->assertEquals($parrot->name, $resultUser->parrot->name);
     }
 }
