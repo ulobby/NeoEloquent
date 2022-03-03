@@ -42,6 +42,11 @@ abstract class ClientAbstract
         return $this->getConfig('host');
     }
 
+    public function getTimeout()
+    {
+        return $this->getConfig('default_timeout');
+    }
+
     /**
      * Get the connection port.
      *

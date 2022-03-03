@@ -7,6 +7,7 @@ use Laudis\Neo4j\Client;
 use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\AuthenticateInterface;
 use Laudis\Neo4j\Databags\Statement;
+use Laudis\Neo4j\Databags\TransactionConfiguration;
 use Laudis\Neo4j\Formatter\OGMFormatter;
 use Laudis\Neo4j\Formatter\SummarizedResultFormatter;
 use Vinelab\NeoEloquent\DatabaseDriver\CypherQuery;
@@ -26,10 +27,15 @@ class Laudis extends ClientAbstract implements ClientInterface
     {
         $this->config = $config;
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
+
+        $timeout = $this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT;
+
         $client = ClientBuilder::create()
             ->withDriver('default', $this->buildUriFromConfig($config), $this->getAuth())
+            ->withDefaultTransactionConfiguration(TransactionConfiguration::default()->withTimeout($timeout))
             ->withFormatter($formatter)
             ->build();
+
         $this->client = $client;
     }
 
