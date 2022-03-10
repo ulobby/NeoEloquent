@@ -14,10 +14,10 @@ class QueryException extends Exception
             $message = $exception->getMessage();
         }
 
-        $message .= ' - Query: ' . $query;
+        $message .= ' - Query: '.$query;
 
-        if (! empty($bindings)) {
-            $message .= ' - Bindings: ' . json_encode($bindings);
+        if (!empty($bindings)) {
+            $message .= ' - Bindings: '.json_encode($bindings);
         }
 
         parent::__construct($message);
