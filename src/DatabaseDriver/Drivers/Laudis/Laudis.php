@@ -28,7 +28,7 @@ class Laudis extends ClientAbstract implements ClientInterface
         $this->config = $config;
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
 
-        $timeout = $this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT;
+        $timeout = (float) $this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT;
 
         $client = ClientBuilder::create()
             ->withDriver('default', $this->buildUriFromConfig($config), $this->getAuth())
