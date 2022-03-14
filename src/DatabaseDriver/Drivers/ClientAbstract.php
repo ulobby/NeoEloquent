@@ -47,6 +47,11 @@ abstract class ClientAbstract
         return $this->getConfig('default_timeout');
     }
 
+    public function getFetchSize()
+    {
+        return $this->getConfig('fetch_size');
+    }
+
     /**
      * Get the connection port.
      *

@@ -6,6 +6,7 @@ use Laudis\Neo4j\Authentication\Authenticate;
 use Laudis\Neo4j\Client;
 use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\AuthenticateInterface;
+use Laudis\Neo4j\Databags\SessionConfiguration;
 use Laudis\Neo4j\Databags\Statement;
 use Laudis\Neo4j\Databags\TransactionConfiguration;
 use Laudis\Neo4j\Formatter\OGMFormatter;
@@ -28,11 +29,13 @@ class Laudis extends ClientAbstract implements ClientInterface
         $this->config = $config;
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
 
-        $timeout = (float) $this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT;
+        $timeout = (float) ($this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT);
+        $fetchSize = (int) ($this->getFetchSize() ?? SessionConfiguration::DEFAULT_FETCH_SIZE);
 
         $client = ClientBuilder::create()
             ->withDriver('default', $this->buildUriFromConfig($config), $this->getAuth())
             ->withDefaultTransactionConfiguration(TransactionConfiguration::default()->withTimeout($timeout))
+            ->withDefaultSessionConfiguration(SessionConfiguration::default()->withFetchSize($fetchSize))
             ->withFormatter($formatter)
             ->build();
 
