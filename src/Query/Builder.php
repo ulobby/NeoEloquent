@@ -10,6 +10,7 @@ use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
 use Vinelab\NeoEloquent\Connection;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 
 class Builder extends IlluminateQueryBuilder
@@ -24,7 +25,7 @@ class Builder extends IlluminateQueryBuilder
     /**
      * The database active client handler.
      *
-     * @var Everyman\Neo4j\Client
+     * @var ClientInterface
      */
     protected $client;
 
@@ -143,7 +144,8 @@ class Builder extends IlluminateQueryBuilder
         $id = $node->getId();
 
         // set the labels
-        $node->addLabels(array_map([$this, 'makeLabel'], $this->from));
+        $from = is_array($this->from) ? $this->from : [$this->from];
+        $node->addLabels(array_map([$this, 'makeLabel'], $from));
 
         return $id;
     }
@@ -162,8 +164,13 @@ class Builder extends IlluminateQueryBuilder
         $bindings = $this->getBindingsMergedWithValues($values);
 
         $updated = $this->connection->update($cypher, $bindings);
+        $updated = $updated->getResults();
 
-        return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
+        if (!isset($updated[0])) {
+            return 0;
+        }
+
+        return reset($updated[0]);
     }
 
     /**
@@ -260,7 +267,7 @@ class Builder extends IlluminateQueryBuilder
         $row = null;
         if ($results->offsetExists(0)) {
             $row = $results->offsetGet(0);
-            $count = $row->offsetGet(0);
+            $count = reset($row);
 
             return $count;
         } else {
@@ -817,7 +824,7 @@ class Builder extends IlluminateQueryBuilder
         $this->columns = $previousColumns;
 
         if ($results->valid()) {
-            return $results->current()[0];
+            return reset($results->getResults()[0]);
         }
     }
 
@@ -860,7 +867,7 @@ class Builder extends IlluminateQueryBuilder
      *
      * @param string $label
      *
-     * @return Everyman\Neo4j\Label
+     * @return string
      */
     public function makeLabel($label)
     {
@@ -945,6 +952,7 @@ class Builder extends IlluminateQueryBuilder
         $cypher = $this->grammar->compileUpdateLabels($this, $labels, $operation);
 
         $updated = $this->connection->update($cypher, $this->getBindings());
+        $updated = $updated->getResults();
 
         return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
     }

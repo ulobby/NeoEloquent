@@ -26,13 +26,16 @@
         "illuminate/pagination": "^8.0",
         "illuminate/events": "^8.0",
         "illuminate/console": "^8.0",
-        "heydavid713/neo4jphp": "0.1.*",
-        "nesbot/carbon": "^2.0"
+        "nesbot/carbon": "^2.0",
+        "laudis/neo4j-php-client": "^2.4",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3.3",
         "mockery/mockery": "^1.4.2",
-        "codacy/coverage": "dev-master"
+        "codacy/coverage": "dev-master",
+        "symfony/var-dumper": "*",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "repositories": [
     ],

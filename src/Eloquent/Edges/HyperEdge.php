@@ -2,6 +2,7 @@
 
 namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Model;
 
@@ -42,7 +43,7 @@ class HyperEdge extends Relation
     /**
      * The Hyper node of the relationship (sits in the middle b/w start and end).
      *
-     * @var \Everyman\Neo4j\Node
+     * @var NodeInterface
      */
     protected $hyper;
 

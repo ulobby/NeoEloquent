@@ -5,6 +5,7 @@ namespace Vinelab\NeoEloquent\Tests\Query;
 use Illuminate\Database\Query\Processors\Processor;
 use InvalidArgumentException;
 use Mockery as M;
+use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\Query\Builder;
 use Vinelab\NeoEloquent\Query\Grammars\CypherGrammar;
 use Vinelab\NeoEloquent\Tests\TestCase;
@@ -19,7 +20,7 @@ class BuilderTest extends TestCase
         $this->connection = M::mock('Vinelab\NeoEloquent\Connection');
         $this->processor = new Processor();
 
-        $this->neoClient = M::mock('Everyman\Neo4j\Client');
+        $this->neoClient = M::mock(ClientInterface::class);
         $this->connection->shouldReceive('getClient')->once()->andReturn($this->neoClient);
 
         $this->builder = new Builder($this->connection, $this->grammar, $this->processor);
@@ -297,7 +298,7 @@ class BuilderTest extends TestCase
     public function setupCacheTestQuery($cache, $driver)
     {
         $connection = m::mock('Vinelab\NeoEloquent\Connection');
-        $connection->shouldReceive('getClient')->once()->andReturn(M::mock('Everyman\Neo4j\Client'));
+        $connection->shouldReceive('getClient')->once()->andReturn(M::mock(ClientInterface::class));
         $connection->shouldReceive('getName')->andReturn('default');
         $connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
         $cache->shouldReceive('driver')->once()->andReturn($driver);
@@ -312,7 +313,7 @@ class BuilderTest extends TestCase
     protected function getBuilder()
     {
         $connection = M::mock('Vinelab\NeoEloquent\Connection');
-        $client = M::mock('Everyman\Neo4j\Client');
+        $client = M::mock(ClientInterface::class);
         $connection->shouldReceive('getClient')->once()->andReturn($client);
         $grammar = new CypherGrammar();
 
