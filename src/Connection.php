@@ -37,12 +37,13 @@ class Connection extends IlluminateConnection
      * @var array
      */
     protected $defaults = [
-        'scheme'   => 'http',
-        'host'     => 'localhost',
-        'port'     => 7474,
-        'username' => null,
-        'password' => null,
-        'ssl'      => false,
+        'scheme'            => 'http',
+        'host'              => 'localhost',
+        'port'              => 7474,
+        'username'          => null,
+        'password'          => null,
+        'ssl'               => false,
+        'enhance_exception' => true,
     ];
 
     /**
@@ -478,7 +479,11 @@ class Connection extends IlluminateConnection
         // message to include the bindings with Cypher, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            throw new QueryException($query, $bindings, $e);
+            $enhanceException = Arr::get($this->config, 'enhance_exception', $this->defaults['enhance_exception']);
+            if ($enhanceException === true) {
+                throw new QueryException($query, $bindings, $e);
+            }
+            throw $e;
         }
 
         // Once we have run the query we will calculate the time that it took to run and
