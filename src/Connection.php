@@ -483,6 +483,7 @@ class Connection extends IlluminateConnection
             if ($enhanceException === true) {
                 throw new QueryException($query, $bindings, $e);
             }
+
             throw $e;
         }
 
