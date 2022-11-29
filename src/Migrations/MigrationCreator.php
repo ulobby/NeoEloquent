@@ -15,7 +15,7 @@ class MigrationCreator extends IlluminateMigrationCreator
      *
      * @return string
      */
-    protected function populateStub($name, $stub, $label)
+    protected function populateStub($stub, $label)
     {
         $stub = str_replace(
             ['DummyClass', '{{ class }}', '{{class}}'],
