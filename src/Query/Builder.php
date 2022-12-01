@@ -457,13 +457,13 @@ class Builder extends IlluminateQueryBuilder
      * Add a where between statement to the query.
      *
      * @param string $column
-     * @param array  $values
+     * @param iterable  $values
      * @param string $boolean
      * @param bool   $not
      *
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 
