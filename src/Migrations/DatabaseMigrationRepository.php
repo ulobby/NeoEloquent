@@ -240,4 +240,20 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             ->get()
             ->pluck('batch', 'migration')->all();
     }
+
+    /**
+     * Get the list of the migrations by batch number.
+     *
+     * @param int $batchNumber
+     *
+     * @return array
+     */
+    public function getMigrationsByBatch($batch)
+    {
+        return $this->model
+            ->where('batch', $batch)
+            ->orderBy('migration', 'desc')
+            ->get()
+            ->all();
+    }
 }

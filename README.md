@@ -4,6 +4,8 @@
 # NeoEloquent
 Neo4j Graph Eloquent Driver for Laravel, this is a fork of [Vinelab/NeoEloquent](https://github.com/Vinelab/NeoEloquent) created by [Ulobby](https://www.ulobby.eu).
 
+We recommend you use and contribute to the original repository if you are just starting out with NeoEloquent - but you are of course free to use our fork and make PRs if use it anyway.
+
 The versioning scheme for this repository follow Laravel, in so that the major version for this package corresponds to the major of laravel supported.
 Ex NeoEloquent v6 supports Laravel v6, and NeoEloquent v8 supports Laravel v8.
 

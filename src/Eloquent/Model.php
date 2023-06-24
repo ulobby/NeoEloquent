@@ -459,7 +459,6 @@ abstract class Model extends IlluminateModel
      */
     public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
     {
-
         // When the name and the type are specified we'll return a MorphedByOne
         // relationship with the given arguments since we know the kind of Model
         // and relationship type we're looking for.

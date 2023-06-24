@@ -160,7 +160,7 @@ abstract class Relation extends Delegate
                 $this->end = $this->asNode($this->parent);
                 // Setup relationship
                 $this->relation = $this->makeRelationship($this->type, $this->relation, $this->parent, $this->attributes);
-            break;
+                break;
 
             case 'out':
                 // Make them nodes
@@ -168,11 +168,11 @@ abstract class Relation extends Delegate
                 $this->end = $this->asNode($this->related);
                 // Setup relationship
                 $this->relation = $this->makeRelationship($this->type, $this->parent, $this->related, $this->attributes);
-            break;
+                break;
 
             default:
                 throw new NoEdgeDirectionException();
-            break;
+                break;
         }
     }
 

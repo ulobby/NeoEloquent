@@ -79,7 +79,7 @@ class EloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
-        $result = $builder->find([1, 2], ['column']);
+        $result = $builder->findMany([1, 2], ['column']);
         $this->assertEquals('baz', $result);
     }
 
