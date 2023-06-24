@@ -244,7 +244,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Get the list of the migrations by batch number.
      *
-     * @param  int  $batchNumber
+     * @param int $batchNumber
+     *
      * @return array
      */
     public function getMigrationsByBatch($batch)

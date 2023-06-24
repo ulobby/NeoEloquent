@@ -157,8 +157,8 @@ class Node implements NodeInterface
 
     /**
      * @param NodeInterface $to
-     * @param $type
-     * @param $direction "all", "in", "out"
+     * @param               $type
+     * @param               $direction "all", "in", "out"
      *
      * @return array
      */
