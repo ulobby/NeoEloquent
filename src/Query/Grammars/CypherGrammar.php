@@ -281,9 +281,21 @@ class CypherGrammar extends Grammar
         }
 
         $values = $this->parameterize($where['values']);
-        $values = str_replace(['{', '}'], "'", $values);
+        $values = str_replace(['$'], "", $values);
+        $values = $this->addCharactersToString($values, "'", "'");
 
         return 'not '.$this->wrap($where['column']).' in ['.$values.']';
+    }
+
+    protected function addCharactersToString(string $inputString, string $startCharacter, string $endCharacter) 
+    {
+        $values = explode(',', $inputString);
+    
+        foreach ($values as &$value) {
+            $value = $startCharacter . trim($value) . $endCharacter;
+        }
+    
+        return implode(',', $values);
     }
 
     /**
@@ -692,7 +704,7 @@ class CypherGrammar extends Grammar
             // Set the WHERE conditions for the heart of the query.
             $cypher .= ' WHERE '.implode(' AND ', $attachments['wheres']);
             // CREATE the relationships between matched nodes
-            $cypher .= ' CREATE UNIQUE'.implode(', ', $attachments['relations']);
+            $cypher .= ' MERGE'.implode(', ', $attachments['relations']);
         }
 
         $cypher .= " RETURN $parentNode, ".implode(', ', array_merge($createdIdsToReturn, $attachedIdsToReturn));
