@@ -46,7 +46,7 @@ class Grammar extends IlluminateGrammar
             $property = explode('.', $property)[1];
         }
 
-        return '{'.$property.'}';
+        return '$'.$property;
     }
 
     /**
