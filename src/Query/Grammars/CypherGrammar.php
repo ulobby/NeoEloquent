@@ -216,15 +216,15 @@ class CypherGrammar extends Grammar
             case 'out':
             default:
                 $relation = '(%s)-[%s]->%s';
-            break;
+                break;
 
             case 'in':
                 $relation = '(%s)<-[%s]-%s';
-            break;
+                break;
 
             case 'in-out':
                 $relation = '(%s)<-[%s]->%s';
-            break;
+                break;
         }
 
         return ($bare) ? sprintf($relation, $parentNode, $relationLabel, $relatedNode)

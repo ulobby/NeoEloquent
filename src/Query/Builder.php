@@ -461,8 +461,9 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Add an "or where in raw" clause for integer values to the query.
      *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     *
      * @return $this
      */
     public function orWhereIntegerInRaw($column, $values)
@@ -473,9 +474,10 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Add a "where not in raw" clause for integer values to the query.
      *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     * @param string                                        $boolean
+     *
      * @return $this
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
@@ -486,8 +488,9 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Add an "or where not in raw" clause for integer values to the query.
      *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     *
      * @return $this
      */
     public function orWhereIntegerNotInRaw($column, $values)
@@ -498,10 +501,10 @@ class Builder extends IlluminateQueryBuilder
     /**
      * Add a where between statement to the query.
      *
-     * @param string $column
-     * @param iterable  $values
-     * @param string $boolean
-     * @param bool   $not
+     * @param string   $column
+     * @param iterable $values
+     * @param string   $boolean
+     * @param bool     $not
      *
      * @return \Illuminate\Database\Query\Builder|static
      */
