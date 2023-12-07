@@ -759,6 +759,28 @@ class QueryingRelationsTest extends TestCase
         $this->assertNotEmpty($tags[0]['id']);
         $this->assertEquals('theTag', $tags[0]['title']);
     }
+
+    public function testMultipleWhereRelationWithSameRelationModel()
+    {
+        $user = User::create([]);
+
+        $task = Task::create([]);
+        $task->creator()->attach($user);
+
+        $task = Task::query()
+            ->whereRelation('creator', 'id', $user->id)
+            ->orWhereRelation('assigned', 'id', $user->id)
+            ->get();
+        dump('final');
+//
+        dump(Task::query()
+            ->whereRelation('creator', 'id', $user->id)
+            ->orWhereRelation('assigned', 'id', $user->id)
+
+            ->toSql());
+//
+//        dump($task);
+    }
 }
 
 class User extends Model
@@ -903,5 +925,22 @@ class Comment extends Model
     public function post()
     {
         return $this->belongsTo('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\Post', 'COMMENT');
+    }
+}
+
+class Task extends Model
+{
+    protected $label = 'Task';
+
+    protected $fillable = ['description'];
+
+    public function creator()
+    {
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\User', 'CREATED_BY');
+    }
+
+    public function assigned()
+    {
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\QueryingRelations\User', 'ASSIGNED_TO');
     }
 }

@@ -11,6 +11,10 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class EloquentBuilderTest extends TestCase
 {
+    protected $query;
+    protected $builder;
+    protected $model;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -684,6 +688,7 @@ class EloquentBuilderTest extends TestCase
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo');
+        $model->shouldReceive('getKeyType')->andReturn('foo');
 
         return $model;
     }

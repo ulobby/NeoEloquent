@@ -13,6 +13,8 @@ class Stub extends Model
 
 class TestCase extends PHPUnit
 {
+    protected $dbConfig;
+
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);

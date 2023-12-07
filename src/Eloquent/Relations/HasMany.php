@@ -8,6 +8,8 @@ use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 
 class HasMany extends HasOneOrMany
 {
+    protected $type;
+
     /**
      * Get the results of the relationship.
      *

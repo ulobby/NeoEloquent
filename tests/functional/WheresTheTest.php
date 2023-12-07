@@ -302,7 +302,9 @@ class WheresTheTest extends TestCase
 
     public function testWhereRaw()
     {
-        $ab = User::whereRaw('individual.name = {name}', ['name' => $this->ab->name])->get();
+        $ab = User::whereRaw('individual.name = $name', ['name' => $this->ab->name])->get();
         $this->assertEquals($this->ab->toArray(), $ab[0]->toArray());
     }
+
+
 }
