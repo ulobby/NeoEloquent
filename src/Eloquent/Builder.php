@@ -714,7 +714,8 @@ class Builder extends IlluminateBuilder
      */
     protected function getMatchMethodName($relation)
     {
-        dump('getMatchMethodName ' . ' ' . 'match'.ucfirst(mb_strtolower($relation->getEdgeDirection())));
+        dump('getMatchMethodName '.' '.'match'.ucfirst(mb_strtolower($relation->getEdgeDirection())));
+
         return 'match'.ucfirst(mb_strtolower($relation->getEdgeDirection()));
     }
 
