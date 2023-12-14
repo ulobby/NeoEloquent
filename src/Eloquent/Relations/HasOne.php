@@ -9,6 +9,8 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 
 class HasOne extends HasOneOrMany
 {
+    protected $type;
+
     /**
      * Initialize the relation on a set of models.
      *

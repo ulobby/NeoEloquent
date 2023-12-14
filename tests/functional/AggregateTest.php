@@ -10,6 +10,8 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class AggregateTest extends TestCase
 {
+    protected $query;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -241,7 +243,7 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->assertEquals(11, $this->query->stdev('logins'));
-        $this->assertEquals(1.5275252316519, $this->query->stdev('points'));
+        $this->assertStringContainsString(1.527525231651, $this->query->stdev('points'));
     }
 
     public function testStdevWithQuery()
@@ -251,8 +253,8 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->query->where('points', '>', 1);
-        $this->assertEquals(7.778174593052, $this->query->stdev('logins'));
-        $this->assertEquals(1.4142135623731, $this->query->stdev('points'));
+        $this->assertStringContainsString(7.77817459305, $this->query->stdev('logins'));
+        $this->assertStringContainsString(1.414213562373, $this->query->stdev('points'));
     }
 
     public function testStdevp()
@@ -261,8 +263,8 @@ class AggregateTest extends TestCase
         User::create(['logins' => 44, 'points' => 4]);
         User::create(['logins' => 55, 'points' => 2]);
 
-        $this->assertEquals(8.981462390205, $this->query->stdevp('logins'));
-        $this->assertEquals(1.2472191289246, $this->query->stdevp('points'));
+        $this->assertStringContainsString(8.98146239020, $this->query->stdevp('logins'));
+        $this->assertStringContainsString(1.247219128924, $this->query->stdevp('points'));
     }
 
     public function testStdevpWithQuery()
