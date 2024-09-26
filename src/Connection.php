@@ -91,7 +91,6 @@ class Connection extends IlluminateConnection
         $file = fopen('example.txt', 'r');
         $content = fread($file, filesize('example.txt'));
         fclose($file);
-
     }
 
     /**
