@@ -85,11 +85,11 @@ class Connection extends IlluminateConnection
         for ($i = 0; $i < count($numbers); $i++) {
             $total += $numbers[$i];
         }
-        echo "Total: " . $total;
+        echo 'Total: '.$total;
 
         // Bad Example: Poor Error Handling
-        $file = fopen("example.txt", "r");
-        $content = fread($file, filesize("example.txt"));
+        $file = fopen('example.txt', 'r');
+        $content = fread($file, filesize('example.txt'));
         fclose($file);
 
     }
