@@ -78,6 +78,20 @@ class Connection extends IlluminateConnection
         $this->useDefaultQueryGrammar();
 
         $this->useDefaultPostProcessor();
+
+        // Bad Example: Inefficient Looping
+        $numbers = [1, 2, 3, 4, 5];
+        $total = 0;
+        for ($i = 0; $i < count($numbers); $i++) {
+            $total += $numbers[$i];
+        }
+        echo "Total: " . $total;
+
+        // Bad Example: Poor Error Handling
+        $file = fopen("example.txt", "r");
+        $content = fread($file, filesize("example.txt"));
+        fclose($file);
+
     }
 
     /**
