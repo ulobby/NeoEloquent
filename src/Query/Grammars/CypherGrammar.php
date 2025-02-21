@@ -123,7 +123,7 @@ class CypherGrammar extends Grammar
 
         $prepared = [];
         foreach ($matches as $match) {
-            $method = 'prepareMatch'.ucfirst($match['type']);
+            $method = 'prepareMatch'.ucfirst((string) $match['type']);
             $prepared[] = $this->$method($match);
         }
 
@@ -212,20 +212,11 @@ class CypherGrammar extends Grammar
      */
     public function craftRelation($parentNode, $relationLabel, $relatedNode, $relatedLabels, $direction, $bare = false)
     {
-        switch ($direction) {
-            case 'out':
-            default:
-                $relation = '(%s)-[%s]->%s';
-                break;
-
-            case 'in':
-                $relation = '(%s)<-[%s]-%s';
-                break;
-
-            case 'in-out':
-                $relation = '(%s)<-[%s]->%s';
-                break;
-        }
+        $relation = match ($direction) {
+            'in' => '(%s)<-[%s]-%s',
+            'in-out' => '(%s)<-[%s]->%s',
+            default => '(%s)-[%s]->%s',
+        };
 
         return ($bare) ? sprintf($relation, $parentNode, $relationLabel, $relatedNode)
             : sprintf($relation, $parentNode, $relationLabel, '('.$relatedNode.$relatedLabels.')');
@@ -466,7 +457,7 @@ class CypherGrammar extends Grammar
                 return $order['sql'];
             }
 
-            return $this->wrap($order['column']).' '.mb_strtoupper($order['direction']);
+            return $this->wrap($order['column']).' '.mb_strtoupper((string) $order['direction']);
         }, $orders));
     }
 
@@ -587,9 +578,7 @@ class CypherGrammar extends Grammar
 
         // Prepare the values to be sent into the entities factory as
         // ['label' => ':Wiz', 'bindings' => ['fiz' => 'foo', 'biz' => 'boo']]
-        $values = array_map(function ($entity) use ($label) {
-            return ['label' => $label, 'bindings' => $entity];
-        }, $values);
+        $values = array_map(fn($entity) => ['label' => $label, 'bindings' => $entity], $values);
         // We need to build a list of parameter place-holders of values that are bound to the query.
         return 'CREATE '.$this->prepareEntities($values);
     }
@@ -725,9 +714,7 @@ class CypherGrammar extends Grammar
         $node = $this->modelAsNode($query->from);
 
         // We need to format the columns to be in the form of n.property unless it is a *.
-        $columns = implode(', ', array_map(function ($column) use ($node) {
-            return $column == '*' ? $column : "$node.$column";
-        }, $aggregate['columns']));
+        $columns = implode(', ', array_map(fn($column) => $column == '*' ? $column : "$node.$column", $aggregate['columns']));
 
         if (isset($aggregate['percentile']) && !is_null($aggregate['percentile'])) {
             $percentile = $aggregate['percentile'];

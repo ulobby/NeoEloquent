@@ -141,9 +141,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerMigrateRollbackCommand()
     {
-        $this->app->singleton('command.neoeloquent.migrate.rollback', function ($app) {
-            return new MigrateRollbackCommand($app['neoeloquent.migrator']);
-        });
+        $this->app->singleton('command.neoeloquent.migrate.rollback', fn($app) => new MigrateRollbackCommand($app['neoeloquent.migrator']));
     }
 
     /**
@@ -153,9 +151,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerMigrateResetCommand()
     {
-        $this->app->singleton('command.neoeloquent.migrate.reset', function ($app) {
-            return new MigrateResetCommand($app['neoeloquent.migrator']);
-        });
+        $this->app->singleton('command.neoeloquent.migrate.reset', fn($app) => new MigrateResetCommand($app['neoeloquent.migrator']));
     }
 
     /**
@@ -165,9 +161,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerMigrateRefreshCommand()
     {
-        $this->app->singleton('command.neoeloquent.migrate.refresh', function ($app) {
-            return new MigrateRefreshCommand();
-        });
+        $this->app->singleton('command.neoeloquent.migrate.refresh', fn($app) => new MigrateRefreshCommand());
     }
 
     /**
@@ -177,9 +171,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerMigrateMakeCommand()
     {
-        $this->app->singleton('migration.neoeloquent.creator', function ($app) {
-            return new MigrationCreator($app['files'], $app->basePath('stubs'));
-        });
+        $this->app->singleton('migration.neoeloquent.creator', fn($app) => new MigrationCreator($app['files'], $app->basePath('stubs')));
 
         $this->app->singleton('command.neoeloquent.migrate.make', function ($app) {
             // Once we have the migration creator registered, we will create the command
@@ -189,7 +181,7 @@ class MigrationServiceProvider extends ServiceProvider
 
             $packagePath = $app->basePath().'/vendor';
 
-            $composer = $app->make('Illuminate\Support\Composer');
+            $composer = $app->make(\Illuminate\Support\Composer::class);
 
             return new MigrateMakeCommand($creator, $composer, $packagePath);
         });
@@ -202,9 +194,7 @@ class MigrationServiceProvider extends ServiceProvider
      */
     protected function registerMigrateStatusCommand()
     {
-        $this->app->singleton('command.neoeloquent.migrate.status', function ($app) {
-            return new MigrateStatusCommand($app['neoeloquent.migrator']);
-        });
+        $this->app->singleton('command.neoeloquent.migrate.status', fn($app) => new MigrateStatusCommand($app['neoeloquent.migrator']));
     }
 
     /**

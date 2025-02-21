@@ -113,10 +113,24 @@ class QueryingRelationsTest extends TestCase
             $q->where('alias', 'admin');
         })->get();
         $this->assertEquals(2, count($admins));
-        $expectedAdmins = [$anotherAdmin, $mrAdmin];
-        foreach ($admins as $key => $admin) {
-            $this->assertEquals($admin->toArray(), $expectedAdmins[$key]->toArray());
-        }
+
+        $actualAdmins = collect($admins)->map->toArray();
+        $expectedAdmins = collect([$anotherAdmin, $mrAdmin])->map->toArray();
+
+        $this->assertCount($expectedAdmins->count(), $actualAdmins, "Number of admins should match");
+
+        // Check if each expected admin exists in the actual results
+        $missing = $expectedAdmins->filter(function ($expected) use ($actualAdmins) {
+            return !$actualAdmins->contains(function ($actual) use ($expected) {
+                return $actual == $expected;
+            });
+        });
+
+        $this->assertEmpty(
+            $missing->toArray(),
+            "Some expected admins were not found in the actual results"
+        );
+
         // check editors
         $editors = User::whereHas('roles', function ($q) {
             $q->where('alias', 'editor');
@@ -129,9 +143,23 @@ class QueryingRelationsTest extends TestCase
             $q->where('alias', 'manager');
         })->get();
         $this->assertEquals(2, count($managers));
-        foreach ($managers as $key => $manager) {
-            $this->assertEquals($manager->toArray(), $expectedManagers[$key]->toArray());
-        }
+
+        $actualManagers = collect($managers)->map->toArray();
+        $expectedManagerArrays = collect($expectedManagers)->map->toArray();
+
+        $this->assertCount($expectedManagerArrays->count(), $actualManagers, "Number of managers should match");
+
+        // Check if each expected manager exists in the actual results
+        $missing = $expectedManagerArrays->filter(function ($expected) use ($actualManagers) {
+            return !$actualManagers->contains(function ($actual) use ($expected) {
+                return $actual == $expected;
+            });
+        });
+
+        $this->assertEmpty(
+            $missing->toArray(),
+            "Some expected managers were not found in the actual results"
+        );
     }
 
     public function testQueryingWhereHasById()
@@ -409,8 +437,15 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $this->assertEquals($tags[$key]->toArray(), $tag->toArray());
+        foreach ($related as $tag) {
+            $found = false;
+            foreach ([$tag1, $tag2] as $expectedTag) {
+                if ($expectedTag->toArray() == $tag->toArray()) {
+                    $found = true;
+                    break;
+                }
+            }
+            $this->assertTrue($found, "Could not find matching tag in expected results");
         }
     }
 
@@ -436,9 +471,15 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
+        foreach ($related as $tag) {
+            $found = false;
+            foreach ([$tag1, $tag2] as $expectedTag) {
+                if ($expectedTag->toArray() == $tag->toArray()) {
+                    $found = true;
+                    break;
+                }
+            }
+            $this->assertTrue($found, "Could not find matching tag in expected results");
         }
     }
 
@@ -461,9 +502,15 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
+        foreach ($related as $tag) {
+            $found = false;
+            foreach ([$tag1, $tag2] as $expectedTag) {
+                if ($expectedTag->toArray() == $tag->toArray()) {
+                    $found = true;
+                    break;
+                }
+            }
+            $this->assertTrue($found, "Could not find matching tag in expected results");
         }
     }
 
@@ -507,10 +554,19 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $actualTags = collect($related)->map->toArray();
+        $expectedTags = collect([$tag1, $tag2])->map->toArray(); // Adjust the number of tags as needed
+
+        $this->assertCount($expectedTags->count(), $actualTags, "Number of tags should match");
+
+        $sortedActual = $actualTags->sortBy('name')->values();
+        $sortedExpected = $expectedTags->sortBy('name')->values();
+
+        $this->assertEquals(
+            $sortedExpected->toArray(),
+            $sortedActual->toArray(),
+            "Tags don't match regardless of their original order"
+        );
     }
 
     public function testCreatingModelWithAttachedSingleId()

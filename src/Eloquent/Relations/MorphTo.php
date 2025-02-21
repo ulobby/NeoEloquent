@@ -18,16 +18,13 @@ class MorphTo extends OneRelation
     protected $edgeDirection = 'in';
 
     /**
-     * The type of the polymorphic relation (in graph this is the relationship label).
-     *
-     * @var string
+     * @param string $type
      */
-    protected $morphType;
-
-    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, $type, $relation)
+    public function __construct(Builder $query, Model $parent, $foreignKey, $otherKey, /**
+     * The type of the polymorphic relation (in graph this is the relationship label).
+     */
+    protected $morphType, $relation)
     {
-        $this->morphType = $type;
-
         parent::__construct($query, $parent, $foreignKey, $otherKey, $relation);
     }
 

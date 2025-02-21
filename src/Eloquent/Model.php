@@ -122,7 +122,7 @@ abstract class Model extends IlluminateModel
         // Since there was no label for this model
         // we take the fully qualified (namespaced) class name and
         // pluck out backslashes to get a clean 'WordsUp' class name and use it as default
-        return [str_replace('\\', '', get_class($this))];
+        return [str_replace('\\', '', static::class)];
     }
 
     /**
@@ -162,7 +162,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -171,7 +171,7 @@ abstract class Model extends IlluminateModel
         // foreign key name by using the name of the calling class, which
         // will be uppercased and used as a relationship label
         if (is_null($foreignKey)) {
-            $foreignKey = strtoupper($caller['class']);
+            $foreignKey = strtoupper((string) $caller['class']);
         }
 
         $instance = new $related();
@@ -202,7 +202,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -211,7 +211,7 @@ abstract class Model extends IlluminateModel
         // foreign key name by using the name of the calling class, which
         // will be uppercased and used as a relationship label
         if (is_null($foreignKey)) {
-            $foreignKey = strtoupper($caller['class']);
+            $foreignKey = strtoupper((string) $caller['class']);
         }
 
         $instance = new $related();
@@ -242,13 +242,13 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
 
         // the $type should be the UPPERCASE of the relation not the foreign key.
-        $type = $type ?: mb_strtoupper($relation);
+        $type = $type ?: mb_strtoupper((string) $relation);
 
         $instance = new $related();
 
@@ -284,7 +284,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -296,7 +296,7 @@ abstract class Model extends IlluminateModel
         // $relation being the function name that called this method and using it in its
         // all uppercase form.
         if (is_null($type)) {
-            $type = mb_strtoupper($relation);
+            $type = mb_strtoupper((string) $relation);
         }
 
         $instance = new $related();
@@ -328,7 +328,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -340,7 +340,7 @@ abstract class Model extends IlluminateModel
         // $relation being the function name that called this method and using it in its
         // all uppercase form.
         if (is_null($type)) {
-            $type = mb_strtoupper($relation);
+            $type = mb_strtoupper((string) $relation);
         }
 
         $instance = new $related();
@@ -379,7 +379,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -391,7 +391,7 @@ abstract class Model extends IlluminateModel
         // $relation being the function name that called this method and using it in its
         // all uppercase form.
         if (is_null($relationType)) {
-            $relationType = mb_strtoupper($relation);
+            $relationType = mb_strtoupper((string) $relation);
         }
 
         $instance = new $related();
@@ -421,7 +421,7 @@ abstract class Model extends IlluminateModel
         // the calling method's name and use that as the relationship name as most
         // of the time this will be what we desire to use for the relationships.
         if (is_null($relation)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $relation = $caller['function'];
         }
@@ -433,7 +433,7 @@ abstract class Model extends IlluminateModel
         // $relation being the function name that called this method and using it in its
         // all uppercase form.
         if (is_null($type)) {
-            $type = mb_strtoupper($relation);
+            $type = mb_strtoupper((string) $relation);
         }
 
         $instance = new $related();
@@ -464,7 +464,7 @@ abstract class Model extends IlluminateModel
         // and relationship type we're looking for.
         if ($name && $type) {
             // Determine the relation function name out of the back trace
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
             $relation = $caller['function'];
 
             return $this->morphedByOne($name, $type, $id, $relation);
@@ -474,12 +474,12 @@ abstract class Model extends IlluminateModel
         // since that is most likely the name of the polymorphic interface. We can
         // use that to get both the class and foreign key that will be utilized.
         if (is_null($name)) {
-            list(, $caller) = debug_backtrace(false);
+            [, $caller] = debug_backtrace(false);
 
             $name = snake_case($caller['function']);
         }
 
-        list($type, $id) = $this->getMorphs($name, $type, $id);
+        [$type, $id] = $this->getMorphs($name, $type, $id);
 
         // If the type value is null it is probably safe to assume we're eager loading
         // the relationship. When that is the case we will pass in a dummy query as
@@ -595,7 +595,7 @@ abstract class Model extends IlluminateModel
             // otherwise we create a collection of the loaded models.
             $related = new Collection($result[$method]);
             // fire model events 'created' and 'saved' on related models.
-            $related->each(function ($model) use ($options) {
+            $related->each(function ($model) use ($options): void {
                 $model->finishSave($options);
                 $model->fireModelEvent('created', false);
             });
@@ -712,7 +712,7 @@ abstract class Model extends IlluminateModel
         }
 
         foreach ($labels as $label) {
-            if (!preg_match('/^[a-z]([a-z0-9]+)$/i', $label)) {
+            if (!preg_match('/^[a-z]([a-z0-9]+)$/i', (string) $label)) {
                 return false;
             }
         }

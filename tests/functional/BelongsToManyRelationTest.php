@@ -301,10 +301,11 @@ class BelongsToManyRelationTest extends TestCase
 
         $expectedEdgesTypes = ['Editor', 'Admin', 'Master'];
 
-        foreach ($edges as $key => $edge) {
+        foreach ($edges as $edge) {
             $attributes = $edge->toArray();
             $this->assertArrayHasKey('type', $attributes);
-            $this->assertEquals($expectedEdgesTypes[$key], $edge->type);
+            $this->assertContains($edge->type, $expectedEdgesTypes,
+                "Edge type '{$edge->type}' not found in expected types");
             $edge->delete();
         }
     }

@@ -145,7 +145,7 @@ class Builder extends IlluminateQueryBuilder
 
         // set the labels
         $from = is_array($this->from) ? $this->from : [$this->from];
-        $node->addLabels(array_map([$this, 'makeLabel'], $from));
+        $node->addLabels(array_map($this->makeLabel(...), $from));
 
         return $id;
     }
@@ -205,7 +205,7 @@ class Builder extends IlluminateQueryBuilder
 
         // We will run through all the bindings and pluck out
         // the component (select, where, etc.)
-        foreach ($this->bindings as $component => $binding) {
+        foreach ($this->bindings as $binding) {
             if (!empty($binding)) {
                 // For every binding there could be multiple
                 // values set so we need to add all of them as
@@ -291,7 +291,7 @@ class Builder extends IlluminateQueryBuilder
     {
         // First we check whether the operator is 'IN' so that we call whereIn() on it
         // as a helping hand and centralization strategy, whereIn knows what to do with the IN operator.
-        if (mb_strtolower($operator) == 'in') {
+        if (mb_strtolower((string) $operator) == 'in') {
             return $this->whereIn($column, $value, $boolean);
         }
 
@@ -299,7 +299,7 @@ class Builder extends IlluminateQueryBuilder
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
         if (is_array($column)) {
-            return $this->whereNested(function (IlluminateQueryBuilder $query) use ($column) {
+            return $this->whereNested(function (IlluminateQueryBuilder $query) use ($column): void {
                 foreach ($column as $key => $value) {
                     $query->where($key, '=', $value);
                 }
@@ -307,7 +307,7 @@ class Builder extends IlluminateQueryBuilder
         }
 
         if (func_num_args() == 2) {
-            list($value, $operator) = [$operator, '='];
+            [$value, $operator] = [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new \InvalidArgumentException('Value must be provided.');
         }
@@ -322,8 +322,8 @@ class Builder extends IlluminateQueryBuilder
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
-        if (!in_array(mb_strtolower($operator), $this->operators, true)) {
-            list($value, $operator) = [$operator, '='];
+        if (!in_array(mb_strtolower((string) $operator), $this->operators, true)) {
+            [$value, $operator] = [$operator, '='];
         }
 
         // If the value is a Closure, it means the developer is performing an entire
@@ -411,9 +411,7 @@ class Builder extends IlluminateQueryBuilder
     protected function columnCountForWhereClause($column)
     {
         if (is_array($this->wheres)) {
-            return count(array_filter($this->wheres, function ($where) use ($column) {
-                return isset($where['column']) && $where['column'] == $column;
-            }));
+            return count(array_filter($this->wheres, fn($where) => isset($where['column']) && $where['column'] == $column));
         }
     }
 
@@ -886,7 +884,7 @@ class Builder extends IlluminateQueryBuilder
         if (is_array($value) && count($value) > 0) {
             $key = array_keys($value)[0];
 
-            if (strpos($key, '.') !== false) {
+            if (str_contains($key, '.')) {
                 $binding = $value[$key];
                 unset($value[$key]);
                 $key = explode('.', $key)[1];

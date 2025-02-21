@@ -8,17 +8,15 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\NodeInterface;
 
 class Node implements NodeInterface
 {
-    /**
-     * @var Client
-     */
-    protected $client;
     protected $id;
     protected $properties = [];
     protected $labels;
 
-    public function __construct($client)
+    /**
+     * @param Client $client
+     */
+    public function __construct(protected $client)
     {
-        $this->client = $client;
     }
 
     public function setProperties($properties)

@@ -50,11 +50,11 @@ class NeoEloquentServiceProvider extends ServiceProvider
             return $conn;
         });
 
-        $this->app->resolving(function ($app) {
+        $this->app->resolving(function ($app): void {
             if (class_exists('Illuminate\Foundation\AliasLoader')) {
                 $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-                $loader->alias('NeoEloquent', 'Vinelab\NeoEloquent\Eloquent\Model');
-                $loader->alias('Neo4jSchema', 'Vinelab\NeoEloquent\Facade\Neo4jSchema');
+                $loader->alias('NeoEloquent', \Vinelab\NeoEloquent\Eloquent\Model::class);
+                $loader->alias('Neo4jSchema', \Vinelab\NeoEloquent\Facade\Neo4jSchema::class);
             }
         });
 
@@ -80,7 +80,7 @@ class NeoEloquentServiceProvider extends ServiceProvider
      */
     protected function registerMigration()
     {
-        $this->app->register('Vinelab\NeoEloquent\MigrationServiceProvider');
+        $this->app->register(\Vinelab\NeoEloquent\MigrationServiceProvider::class);
     }
 
     /**

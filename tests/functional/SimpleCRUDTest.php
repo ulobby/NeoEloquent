@@ -10,6 +10,11 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\SoftDeletes;
 use Vinelab\NeoEloquent\Tests\TestCase;
 
+//class User extends Model
+//{
+//    protected $label = 'Individual';
+//}
+
 class Wiz extends Model
 {
     protected $label = ':Wiz';
@@ -85,10 +90,10 @@ class SimpleCRUDTest extends TestCase
     {
         $u = User::create([]);
         $id = (string) $u->id;
-        $found = User::where('id', "$id")->first();
+        $found = User::where('id', $id)->first();
         $this->assertEquals($found->toArray(), $u->toArray());
 
-        $foundAgain = User::where('id(individual)', "$id")->first();
+        $foundAgain = User::where('id(individual)', $id)->first();
         $this->assertEquals($foundAgain->toArray(), $u->toArray());
     }
 

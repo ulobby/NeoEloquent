@@ -42,7 +42,7 @@ class Grammar extends IlluminateGrammar
 
         $property = $this->getIdReplacement($value);
 
-        if (strpos($property, '.') !== false) {
+        if (str_contains($property, '.')) {
             $property = explode('.', $property)[1];
         }
 
@@ -60,7 +60,7 @@ class Grammar extends IlluminateGrammar
     public function prepareLabels(array $labels)
     {
         // get the labels prepared and back to a string imploded by : they go.
-        return implode('', array_map([$this, 'wrapLabel'], $labels));
+        return implode('', array_map($this->wrapLabel(...), $labels));
     }
 
     /**
@@ -114,7 +114,7 @@ class Grammar extends IlluminateGrammar
         // We will only wrap the value unless it has parentheses
         // in it which is the case where we're matching a node by id, or an *
         // and last whether this is a pre-formatted key.
-        if (preg_match('/[(|)]/', $value) || $value == '*' || strpos($value, '.') !== false) {
+        if (preg_match('/[(|)]/', $value) || $value == '*' || str_contains($value, '.')) {
             return $value;
         }
 
@@ -203,13 +203,13 @@ class Grammar extends IlluminateGrammar
         // @see https://github.com/Vinelab/NeoEloquent/issues/49
         if (is_array($labels)) {
             foreach ($labels as $label) {
-                $firstChar = substr($label, 0, 1);
-                $suffix = substr($label, 1, strlen($label) - 1);
+                $firstChar = substr((string) $label, 0, 1);
+                $suffix = substr((string) $label, 1, strlen((string) $label) - 1);
                 $label = mb_strtolower($firstChar).$suffix;
             }
         } else {
-            $firstChar = substr($labels, 0, 1);
-            $suffix = substr($labels, 1, strlen($labels) - 1);
+            $firstChar = substr((string) $labels, 0, 1);
+            $suffix = substr((string) $labels, 1, strlen((string) $labels) - 1);
             $labels = mb_strtolower($firstChar).$suffix;
         }
 
@@ -234,7 +234,7 @@ class Grammar extends IlluminateGrammar
     public function getIdReplacement($column)
     {
         // If we have id(n) we're removing () and keeping idn
-        $column = preg_replace('/[(|)]/', '', $column);
+        $column = preg_replace('/[(|)]/', '', (string) $column);
         // Check whether the column is still id so that we transform it to the form id(n) and then
         // recursively calling ourself to reformat accordingly.
         if ($column == 'id') {

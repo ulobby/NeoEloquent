@@ -15,16 +15,12 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 class CypherQuery
 {
     protected $client = null;
-    protected $template = null;
-    protected $vars = [];
 
     protected $result = null;
 
-    public function __construct(ClientInterface $client, $template, $vars = [])
+    public function __construct(ClientInterface $client, protected $template, protected $vars = [])
     {
         $this->client = $client;
-        $this->template = $template;
-        $this->vars = $vars;
     }
 
     /**

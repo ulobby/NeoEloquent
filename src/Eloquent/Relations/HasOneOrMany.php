@@ -15,13 +15,6 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationInterface
 {
     /**
-     * The name of the relationship.
-     *
-     * @var string
-     */
-    protected $relation;
-
-    /**
      * The relationships finder instance.
      *
      * @var \Vinelab\NeoEloquent\Eloquent\Edges\Finder
@@ -50,11 +43,14 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      * @param string                                $type
      *
      * @return void
+     * @param string $relation
      */
-    public function __construct(Builder $query, Model $parent, $type, $key, $relation)
+    public function __construct(Builder $query, Model $parent, $type, $key, /**
+     * The name of the relationship.
+     */
+    protected $relation)
     {
         $this->localKey = $key;
-        $this->relation = $relation;
         $this->type = $this->foreignKey = $type;
 
         parent::__construct($query, $parent, $type, $key);
@@ -430,9 +426,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
         // Let's fetch the existing edges first.
         $edges = $this->edges();
         // Collect the current related models IDs out of related models.
-        $current = array_map(function (Relation $edge) {
-            return $edge->getRelated()->getKey();
-        }, $edges->toArray());
+        $current = array_map(fn(Relation $edge) => $edge->getRelated()->getKey(), $edges->toArray());
 
         $records = $this->formatSyncList($ids);
 
@@ -517,7 +511,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
 
         foreach ($records as $id => $attributes) {
             if (!is_array($attributes)) {
-                list($id, $attributes) = [$attributes, []];
+                [$id, $attributes] = [$attributes, []];
             }
 
             $results[$id] = $attributes;
@@ -591,9 +585,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
             return false;
         }
 
-        $notModels = array_filter($models, function ($model) {
-            return !$model instanceof Model;
-        });
+        $notModels = array_filter($models, fn($model) => !$model instanceof Model);
 
         return empty($notModels);
     }

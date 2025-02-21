@@ -241,7 +241,7 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->assertEquals(11, $this->query->stdev('logins'));
-        $this->assertEquals(1.5275252316519, $this->query->stdev('points'));
+        $this->assertEquals(1.5275252316519468, $this->query->stdev('points'));
     }
 
     public function testStdevWithQuery()
@@ -251,8 +251,9 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->query->where('points', '>', 1);
-        $this->assertEquals(7.778174593052, $this->query->stdev('logins'));
-        $this->assertEquals(1.4142135623731, $this->query->stdev('points'));
+
+        $this->assertEquals(7.7781745930520225, $this->query->stdev('logins'));
+        $this->assertEquals(1.4142135623730951, $this->query->stdev('points'));
     }
 
     public function testStdevp()
@@ -261,8 +262,8 @@ class AggregateTest extends TestCase
         User::create(['logins' => 44, 'points' => 4]);
         User::create(['logins' => 55, 'points' => 2]);
 
-        $this->assertEquals(8.981462390205, $this->query->stdevp('logins'));
-        $this->assertEquals(1.2472191289246, $this->query->stdevp('points'));
+        $this->assertEquals(8.981462390204987, $this->query->stdevp('logins'));
+        $this->assertEquals(1.247219128924647, $this->query->stdevp('points'));
     }
 
     public function testStdevpWithQuery()

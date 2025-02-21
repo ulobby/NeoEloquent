@@ -44,7 +44,7 @@ class Grammar extends IlluminateSchemaGrammar
     public function prepareLabels(array $labels)
     {
         // get the labels prepared and back to a string imploded by : they go.
-        return implode('', array_map([$this, 'wrapLabel'], $labels));
+        return implode('', array_map($this->wrapLabel(...), $labels));
     }
 
     /**
@@ -64,6 +64,6 @@ class Grammar extends IlluminateSchemaGrammar
             $labels = reset($labels);
         }
 
-        return mb_strtolower($labels);
+        return mb_strtolower((string) $labels);
     }
 }

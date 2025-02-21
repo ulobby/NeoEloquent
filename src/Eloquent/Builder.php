@@ -39,9 +39,7 @@ class Builder extends IlluminateBuilder
         //If the ID is numeric we cast it to int.
         //otherwise we leave it as it is.
         if (is_array($id)) {
-            return $this->findMany(array_map(function ($id) {
-                return is_numeric($id) ? (int) $id : $id;
-            }, $id), $properties);
+            return $this->findMany(array_map(fn($id) => is_numeric($id) ? (int) $id : $id, $id), $properties);
         }
 
         if ($this->model->getKeyName() === 'id') {
@@ -494,9 +492,7 @@ class Builder extends IlluminateBuilder
      */
     public function getMorphMutations()
     {
-        return array_filter($this->getMutations(), function ($mutation) {
-            return $this->isMorphMutation($mutation);
-        });
+        return array_filter($this->getMutations(), fn($mutation) => $this->isMorphMutation($mutation));
     }
 
     /**
@@ -564,7 +560,7 @@ class Builder extends IlluminateBuilder
             $name = $relation;
             // Get the relation by calling the model's relationship function.
             if (!method_exists($this->model, $relation)) {
-                throw new QueryException("The relation method $relation() does not exist on ".get_class($this->model));
+                throw new QueryException("The relation method $relation() does not exist on ".$this->model::class);
             }
             $relationship = $this->model->$relation();
             // Bring the model from the relationship.
@@ -683,7 +679,7 @@ class Builder extends IlluminateBuilder
     {
         if (is_array($query->getQuery()->wheres)) {
             $query->getQuery()->wheres = array_map(function ($where) use ($prefix) {
-                if ($where['type'] != 'Carried' && $where['type'] != 'raw' && strpos($where['column'], '.') == false) {
+                if ($where['type'] != 'Carried' && $where['type'] != 'raw' && !str_contains((string) $where['column'], '.')) {
                     $column = $where['column'];
                     $where['column'] = ($this->isId($column)) ? $column : $prefix.'.'.$column;
                 }
@@ -714,7 +710,7 @@ class Builder extends IlluminateBuilder
      */
     protected function getMatchMethodName($relation)
     {
-        return 'match'.ucfirst(mb_strtolower($relation->getEdgeDirection()));
+        return 'match'.ucfirst(mb_strtolower((string) $relation->getEdgeDirection()));
     }
 
     /**

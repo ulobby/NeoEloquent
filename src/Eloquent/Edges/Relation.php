@@ -48,34 +48,11 @@ abstract class Relation extends Delegate
     protected $related;
 
     /**
-     * The relationship type.
-     *
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * Relations can also have attributes.
-     *
-     * @var array
-     */
-    protected $attributes = [];
-
-    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
     protected $dates = [];
-
-    /**
-     * Holds the decision on whether
-     * this relation is unique or
-     * there can be many of it.
-     *
-     * @var bool
-     */
-    protected $unique = false;
 
     /**
      * The primary key that is used to
@@ -128,16 +105,25 @@ abstract class Relation extends Delegate
      * @param \Vinelab\NeoEloquent\Eloquent\Model   $parent
      * @param \Vinelab\NeoEloquent\Eloquent\Model   $related
      * @param string                                $type
+     * @param mixed[] $attributes
+     * @param bool $unique
      */
-    public function __construct(Builder $query, Model $parent, Model $related, $type, $attributes = [], $unique = false)
+    public function __construct(Builder $query, Model $parent, Model $related, /**
+     * The relationship type.
+     */
+    protected $type, /**
+     * Relations can also have attributes.
+     */
+    protected $attributes = [], /**
+     * Holds the decision on whether
+     * this relation is unique or
+     * there can be many of it.
+     */
+    protected $unique = false)
     {
         parent::__construct($query);
-
-        $this->type = $type;
         $this->parent = $parent;
         $this->related = $related;
-        $this->unique = $unique;
-        $this->attributes = $attributes;
         $this->finder = $this->newFinder();
 
         $this->initRelation();
@@ -579,7 +565,7 @@ abstract class Relation extends Delegate
         // If the value is in simply year, month, day format, we will instantiate the
         // Carbon instances from that format. Again, this provides for simple date
         // fields on the database, while still supporting Carbonized conversion.
-        elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value)) {
+        elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', (string) $value)) {
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 

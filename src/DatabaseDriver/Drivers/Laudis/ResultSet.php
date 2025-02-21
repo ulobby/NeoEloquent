@@ -9,14 +9,10 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ResultSetInterface;
 
 class ResultSet implements ResultSetInterface
 {
-    protected $rawResult;
-    protected $addLabels;
     protected $parsedResults = [];
 
-    public function __construct($rawResult, $addLabels = false)
+    public function __construct(protected $rawResult, protected $addLabels = false)
     {
-        $this->rawResult = $rawResult;
-        $this->addLabels = $addLabels;
         $this->parse();
     }
 
@@ -55,12 +51,12 @@ class ResultSet implements ResultSetInterface
         foreach ($rawResults as $rawKey => $value) {
             $key = $rawKey;
 
-            if (str_contains($rawKey, 'id(') && str_contains($rawKey, ')')) {
+            if (str_contains((string) $rawKey, 'id(') && str_contains((string) $rawKey, ')')) {
                 $key = 'id';
             }
 
-            if (str_contains($rawKey, '.')) {
-                $keyExploded = explode('.', $rawKey);
+            if (str_contains((string) $rawKey, '.')) {
+                $keyExploded = explode('.', (string) $rawKey);
                 $key = $keyExploded[1];
             }
 

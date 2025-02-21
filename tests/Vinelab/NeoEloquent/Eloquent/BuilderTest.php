@@ -56,9 +56,26 @@ class EloquentBuilderTest extends TestCase
         $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
 
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->andReturn('string');
+        $builder->setModel($model);
+
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', [1, 2]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+
+        // Create a mock model instance for the collection
+        $foundModel = m::mock('Vinelab\NeoEloquent\Eloquent\Model');
+        $foundModel->shouldReceive('getKey')->andReturn(1);
+
+        // Use Eloquent Collection instead of Support Collection
+        $collection = m::mock('Illuminate\Database\Eloquent\Collection');
+        $collection->shouldReceive('modelKeys')->andReturn([1]);
+        $collection->shouldReceive('all')->andReturn([$foundModel]);
+        $collection->shouldReceive('count')->andReturn(1); // Add count expectation
+
+        $builder->shouldReceive('get')
+            ->with(['column'])
+            ->andReturn($collection);
+
         $result = $builder->findOrFail([1, 2], ['column']);
     }
 
@@ -284,7 +301,7 @@ class EloquentBuilderTest extends TestCase
         }]);
         $eagers = $builder->getEagerLoads();
 
-        $this->assertEquals('foo', $eagers['orders']());
+        $this->assertEquals('foo', $eagers['orders']($this->builder));
 
         $builder = $this->getBuilder();
         $builder->with(['orders.lines' => function () {
@@ -294,7 +311,7 @@ class EloquentBuilderTest extends TestCase
 
         $this->assertInstanceOf('Closure', $eagers['orders']);
         $this->assertNull($eagers['orders']());
-        $this->assertEquals('foo', $eagers['orders.lines']());
+        $this->assertEquals('foo', $eagers['orders.lines']($this->builder));
     }
 
     public function testQueryPassThru()
@@ -684,6 +701,7 @@ class EloquentBuilderTest extends TestCase
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo');
+        $model->shouldReceive('getKeyType')->andReturn('string');
 
         return $model;
     }

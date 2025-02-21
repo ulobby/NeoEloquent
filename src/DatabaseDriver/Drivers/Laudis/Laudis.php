@@ -22,18 +22,16 @@ class Laudis extends ClientAbstract implements ClientInterface
      * @var Client
      */
     protected $client;
-    protected $config;
 
-    public function __construct($config)
+    public function __construct(protected $config)
     {
-        $this->config = $config;
         $formatter = new SummarizedResultFormatter(OGMFormatter::create());
 
         $timeout = (float) ($this->getTimeout() ?? TransactionConfiguration::DEFAULT_TIMEOUT);
         $fetchSize = (int) ($this->getFetchSize() ?? SessionConfiguration::DEFAULT_FETCH_SIZE);
 
         $client = ClientBuilder::create()
-            ->withDriver('default', $this->buildUriFromConfig($config), $this->getAuth())
+            ->withDriver('default', $this->buildUriFromConfig($this->config), $this->getAuth())
             ->withDefaultTransactionConfiguration(TransactionConfiguration::default()->withTimeout($timeout))
             ->withDefaultSessionConfiguration(SessionConfiguration::default()->withFetchSize($fetchSize))
             ->withFormatter($formatter)

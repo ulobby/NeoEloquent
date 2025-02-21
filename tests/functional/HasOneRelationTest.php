@@ -28,7 +28,7 @@ class User extends Model
 
     public function parrot()
     {
-        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Parrot');
+        return $this->hasOne('Vinelab\NeoEloquent\Tests\Functional\Relations\HasOne\Parrot', 'HAS');
     }
 }
 

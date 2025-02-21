@@ -7,15 +7,8 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Schema\Grammars\Grammar as IlluminateSchemaGrammar;
 use Illuminate\Support\Fluent;
 
-class Blueprint
+class Blueprint implements \Stringable
 {
-    /**
-     * The label the blueprint describes.
-     *
-     * @var string
-     */
-    protected $label;
-
     /**
      * The commands that should be run for the label.
      *
@@ -29,10 +22,11 @@ class Blueprint
      *
      * @return void
      */
-    public function __construct($label, Closure $callback = null)
+    public function __construct(/**
+     * The label the blueprint describes.
+     */
+    protected $label, Closure $callback = null)
     {
-        $this->label = $label;
-
         if (!is_null($callback)) {
             $callback($this);
         }
@@ -69,7 +63,7 @@ class Blueprint
         // grammar which is used to build the necessary SQL statements to build
         // the blueprint element, so we'll just call that compilers function.
         foreach ($this->commands as $command) {
-            $method = 'compile'.ucfirst($command->name);
+            $method = 'compile'.ucfirst((string) $command->name);
 
             if (method_exists($grammar, $method)) {
                 if (!is_null($cypher = $grammar->$method($this, $command, $connection))) {
@@ -259,7 +253,7 @@ class Blueprint
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLabel();
     }

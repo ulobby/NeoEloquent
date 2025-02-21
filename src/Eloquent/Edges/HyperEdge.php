@@ -19,14 +19,6 @@ class HyperEdge extends Relation
     protected $morph;
 
     /**
-     * The morph relation type name representing the relationship
-     * name b/w the related model and the morph model.
-     *
-     * @var string
-     */
-    protected $morphType;
-
-    /**
      * The left side Edge of the relationship.
      *
      * @var \Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut
@@ -57,10 +49,13 @@ class HyperEdge extends Relation
      * @param string                               $morphType
      * @param Vinelab\NeoEloquent\Eloquent\Model   $morph
      */
-    public function __construct(Builder $query, Model $parent, $type, Model $related, $morphType, Model $morph, $attributes = [])
+    public function __construct(Builder $query, Model $parent, $type, Model $related, /**
+     * The morph relation type name representing the relationship
+     * name b/w the related model and the morph model.
+     */
+    protected $morphType, Model $morph, $attributes = [])
     {
         $this->morph = $morph;
-        $this->morphType = $morphType;
 
         // This is not a unique relationship since it involves multiple models.
         $unique = false;
@@ -89,7 +84,7 @@ class HyperEdge extends Relation
         $this->left = new EdgeOut($this->query, $this->parent, $this->related, $this->type, $this->attributes, $unique);
         $this->right = new EdgeOut($this->query, $this->related, $this->morph, $this->morphType, $this->attributes, $unique);
         // Set the morph type to the relationship so that we know who we're talking to.
-        $this->right->morph_type = get_class($this->morph);
+        $this->right->morph_type = $this->morph::class;
     }
 
     /**

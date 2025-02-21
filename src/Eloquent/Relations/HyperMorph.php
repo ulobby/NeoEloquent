@@ -10,22 +10,6 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 class HyperMorph extends BelongsToMany
 {
     /**
-     * The morph Model instance
-     * representing the 3rd Node of the relationship.
-     *
-     * @var \Vinelab\NeoEloquent\Eloquent\Model
-     */
-    protected $morph;
-
-    /**
-     * The morph relation type name representing the relationship
-     * name b/w the related model and the morph model.
-     *
-     * @var string
-     */
-    protected $morphType;
-
-    /**
      * The edge direction of this relatioship.
      *
      * @var string
@@ -43,11 +27,16 @@ class HyperMorph extends BelongsToMany
      * @param string                                $key
      * @param string                                $relation
      */
-    public function __construct(Builder $query, Model $parent, $morph, $type, $morphType, $key, $relation)
+    public function __construct(Builder $query, Model $parent, /**
+     * The morph Model instance
+     * representing the 3rd Node of the relationship.
+     */
+    protected $morph, $type, /**
+     * The morph relation type name representing the relationship
+     * name b/w the related model and the morph model.
+     */
+    protected $morphType, $key, $relation)
     {
-        $this->morph = $morph;
-        $this->morphType = $morphType;
-
         parent::__construct($query, $parent, $type, $key, $relation);
     }
 

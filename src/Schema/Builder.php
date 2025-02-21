@@ -40,7 +40,7 @@ class Builder
      *
      * @return bool
      */
-    public function hasTable($label)
+    public function hasTable($label): never
     {
         throw new \RuntimeException("
 Please use commands from namespace:

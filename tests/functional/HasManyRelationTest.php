@@ -69,9 +69,19 @@ class HasManyRelationTest extends TestCase
 
         $books = $author->books;
 
-        $this->assertCount(2, $books->toArray());
-        $this->assertEquals($cok->toArray(), $author->books[0]->toArray());
-        $this->assertEquals($got->toArray(), $author->books[1]->toArray());
+        $authorBooks = collect($author->books)->map->toArray();
+        $expectedBooks = collect([$got, $cok])->map->toArray();
+
+        $this->assertCount($expectedBooks->count(), $authorBooks, "Number of books should match");
+
+        $sortedActual = $authorBooks->sortBy('title')->values();
+        $sortedExpected = $expectedBooks->sortBy('title')->values();
+
+        $this->assertEquals(
+            $sortedExpected->toArray(),
+            $sortedActual->toArray(),
+            "Books don't match regardless of their original order"
+        );
 
         $writtenGot->delete();
         $writtenCok->delete();
@@ -360,10 +370,11 @@ class HasManyRelationTest extends TestCase
 
         $expectedEdgesTypes = ['Storm', 'Clash', 'Game'];
 
-        foreach ($edges as $key => $edge) {
+        foreach ($edges as $edge) {
             $attributes = $edge->toArray();
             $this->assertArrayHasKey('series', $attributes);
-            $this->assertEquals($expectedEdgesTypes[$key], $edge->series);
+            $this->assertContains($edge->series, $expectedEdgesTypes,
+                "Edge series '{$edge->series}' not found in expected series");
             $edge->delete();
         }
     }

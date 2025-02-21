@@ -375,10 +375,11 @@ class PolymorphicHyperMorphToTest extends TestCase
 
         $expectedEdgesTypes = ['happy', 'sad'];
 
-        foreach ($edges as $key => $edge) {
+        foreach ($edges as $edge) {
             $attributes = $edge->toArray();
             $this->assertArrayHasKey('feeling', $attributes);
-            $this->assertEquals($expectedEdgesTypes[$key], $edge->feeling);
+            $this->assertContains($edge->feeling, $expectedEdgesTypes,
+                "Edge feeling '{$edge->feeling}' not found in expected series");
             $edge->delete();
         }
     }

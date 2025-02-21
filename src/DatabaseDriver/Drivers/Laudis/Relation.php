@@ -8,10 +8,6 @@ use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\RelationInterface;
 
 class Relation implements RelationInterface
 {
-    /**
-     * @var Client
-     */
-    protected $client;
     protected $id;
     protected $properties = [];
     protected $type;
@@ -19,9 +15,11 @@ class Relation implements RelationInterface
     protected $end;
     protected $direction;
 
-    public function __construct($client)
+    /**
+     * @param Client $client
+     */
+    public function __construct(protected $client)
     {
-        $this->client = $client;
     }
 
     public function hasId(): bool

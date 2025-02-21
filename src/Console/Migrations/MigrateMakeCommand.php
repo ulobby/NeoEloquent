@@ -58,7 +58,7 @@ class MigrateMakeCommand extends BaseCommand
         // It's possible for the developer to specify the labels to modify in this
         // schema operation. The developer may also specify if this label needs
         // to be freshly created so we can create the appropriate migrations.
-        $name = trim($this->input->getArgument('name'));
+        $name = trim((string) $this->input->getArgument('name'));
 
         $label = $this->input->getOption('label');
 

@@ -14,17 +14,17 @@ abstract class ClientAbstract
     public function buildUriFromConfig(array $config): string
     {
         $uri = '';
-        $scheme = $this->getScheme($config);
+        $scheme = $this->getScheme();
         if ($scheme) {
             $uri .= $scheme.'://';
         }
 
-        $host = $this->getHost($config);
+        $host = $this->getHost();
         if ($host) {
             $uri .= '@'.$host;
         }
 
-        $port = $this->getPort($config);
+        $port = $this->getPort();
         if ($port) {
             $uri .= ':'.$port;
         }
