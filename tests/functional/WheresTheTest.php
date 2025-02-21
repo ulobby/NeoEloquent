@@ -27,6 +27,12 @@ class WheresTheTest extends TestCase
         parent::tearDown();
     }
 
+    protected $ab;
+    protected $cd;
+    protected $ef;
+    protected $gh;
+    protected $ij;
+
     public function setUp(): void
     {
         parent::setUp();

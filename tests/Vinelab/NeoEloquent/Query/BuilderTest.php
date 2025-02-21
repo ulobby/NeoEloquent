@@ -12,6 +12,16 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class BuilderTest extends TestCase
 {
+    protected $builder;
+
+    protected $grammar;
+
+    protected $connection;
+
+    protected $processor;
+
+    protected $neoClient;
+
     public function setUp(): void
     {
         parent::setUp();

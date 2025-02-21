@@ -35,6 +35,10 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      */
     protected $properties = [];
 
+    protected $localKey;
+
+    protected $type;
+
     /**
      * Create a new has many relationship instance.
      *

@@ -10,6 +10,8 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class AggregateTest extends TestCase
 {
+    protected $query;
+
     public function setUp(): void
     {
         parent::setUp();

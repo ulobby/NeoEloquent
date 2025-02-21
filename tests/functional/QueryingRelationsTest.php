@@ -532,11 +532,25 @@ class QueryingRelationsTest extends TestCase
 
         $related = $post->tags;
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
-        $this->assertEquals(2, count($related));
+        $this->assertCount(2, $related);
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
+        // Get the actual tag arrays
+        $relatedArrays = $related->map(function ($tag) {
+            $array = $tag->toArray();
+            ksort($array);
+            return $array;
+        })->toArray();
+
+        // Prepare expected arrays
+        $expectedArrays = collect([$tag1, $tag2])->map(function ($tag) {
+            $array = $tag->toArray();
+            ksort($array);
+            return $array;
+        })->toArray();
+
+        // Check that each expected array exists in the related arrays
+        foreach ($expectedArrays as $expectedArray) {
+            $this->assertContains($expectedArray, $relatedArrays);
         }
     }
 

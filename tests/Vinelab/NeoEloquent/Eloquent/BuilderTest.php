@@ -11,6 +11,12 @@ use Vinelab\NeoEloquent\Tests\TestCase;
 
 class EloquentBuilderTest extends TestCase
 {
+    protected $query;
+
+    protected $builder;
+
+    protected $model;
+
     public function setUp(): void
     {
         parent::setUp();

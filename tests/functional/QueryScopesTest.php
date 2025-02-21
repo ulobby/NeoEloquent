@@ -30,6 +30,10 @@ class Misfit extends Model
 
 class QueryScopesTest extends TestCase
 {
+    protected $t;
+
+    protected $e;
+
     public function tearDown(): void
     {
         M::close();
