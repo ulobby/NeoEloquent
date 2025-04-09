@@ -362,7 +362,7 @@ class Connection extends IlluminateConnection
      */
     protected function getDefaultQueryGrammar()
     {
-        return new Query\Grammars\CypherGrammar();
+        return new Query\Grammars\CypherGrammar($this);
     }
 
     /**
