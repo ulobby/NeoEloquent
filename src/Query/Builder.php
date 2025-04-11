@@ -13,6 +13,8 @@ use Vinelab\NeoEloquent\Connection;
 use Vinelab\NeoEloquent\DatabaseDriver\Interfaces\ClientInterface;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 
+
+#[\AllowDynamicProperties]
 class Builder extends IlluminateQueryBuilder
 {
     /**
