@@ -7,6 +7,7 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Schema\Builder as SchemaBuilder;
 
+#[\AllowDynamicProperties]
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
     /**

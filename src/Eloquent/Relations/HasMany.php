@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 
+#[\AllowDynamicProperties]
 class HasMany extends HasOneOrMany
 {
     /**

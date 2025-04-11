@@ -291,7 +291,7 @@ class Builder extends IlluminateQueryBuilder
     {
         // First we check whether the operator is 'IN' so that we call whereIn() on it
         // as a helping hand and centralization strategy, whereIn knows what to do with the IN operator.
-        if (mb_strtolower($operator) == 'in') {
+        if ($operator && mb_strtolower($operator) == 'in') {
             return $this->whereIn($column, $value, $boolean);
         }
 
