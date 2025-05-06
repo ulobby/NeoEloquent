@@ -281,20 +281,20 @@ class CypherGrammar extends Grammar
         }
 
         $values = $this->parameterize($where['values']);
-        $values = str_replace(['$'], "", $values);
+        $values = str_replace(['$'], '', $values);
         $values = $this->addCharactersToString($values, "'", "'");
 
         return 'not '.$this->wrap($where['column']).' in ['.$values.']';
     }
 
-    protected function addCharactersToString(string $inputString, string $startCharacter, string $endCharacter) 
+    protected function addCharactersToString(string $inputString, string $startCharacter, string $endCharacter)
     {
         $values = explode(',', $inputString);
-    
+
         foreach ($values as &$value) {
-            $value = $startCharacter . trim($value) . $endCharacter;
+            $value = $startCharacter.trim($value).$endCharacter;
         }
-    
+
         return implode(',', $values);
     }
 

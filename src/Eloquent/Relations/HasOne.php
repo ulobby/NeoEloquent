@@ -10,6 +10,8 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 #[\AllowDynamicProperties]
 class HasOne extends HasOneOrMany
 {
+    protected $type;
+
     /**
      * Initialize the relation on a set of models.
      *
