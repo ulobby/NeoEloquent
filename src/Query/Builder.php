@@ -371,6 +371,8 @@ class Builder extends IlluminateQueryBuilder
 
         $this->wheres[] = compact('type', 'binding', 'column', 'operator', 'value', 'boolean');
 
+        dump($this->wheres);
+
         $property = $this->wrap($binding);
 
         if (!$value instanceof Expression) {
@@ -719,6 +721,8 @@ class Builder extends IlluminateQueryBuilder
                 'labels' => $relatedLabels,
             ],
         ];
+
+        dump($this->matches);
 
         $this->addBinding([$this->wrap($property) => $value], 'matches');
 
