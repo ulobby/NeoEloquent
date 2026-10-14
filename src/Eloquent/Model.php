@@ -642,6 +642,20 @@ abstract class Model extends IlluminateModel
     }
 
     /**
+     * @override
+     * Node properties are not qualified by label, so return the column as is
+     * (Laravel 13's SoftDeletingScope qualifies the "deleted at" column).
+     *
+     * @param string $column
+     *
+     * @return string
+     */
+    public function qualifyColumn($column)
+    {
+        return $column;
+    }
+
+    /**
      * Add timestamps to this model.
      *
      * @return void
