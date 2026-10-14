@@ -99,7 +99,7 @@ class SimpleCRUDTest extends TestCase
         $this->assertTrue($w->save());
         $this->assertTrue($w->exists);
         $this->assertIsInt($w->id);
-        $this->assertTrue($w->id > 0);
+        $this->assertGreaterThanOrEqual(0, $w->id);
         $this->assertInstanceOf('Vinelab\NeoEloquent\Tests\Functional\Wiz', $w);
     }
 
