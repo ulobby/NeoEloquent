@@ -1,0 +1,58 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+        laravel: ['12', '13']
+        exclude:
+          # Laravel 13 requires PHP 8.3+
+          - php: '8.2'
+            laravel: '13'
+
+    services:
+      neo4j:
+        image: neo4j:5.26-community
+        env:
+          NEO4J_AUTH: none
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell 'RETURN 1'"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install dependencies (Laravel ${{ matrix.laravel }})
+        run: |
+          composer require --no-update --no-interaction \
+            "illuminate/support:^${{ matrix.laravel }}.0" \
+            "illuminate/database:^${{ matrix.laravel }}.0" \
+            "illuminate/pagination:^${{ matrix.laravel }}.0" \
+            "illuminate/events:^${{ matrix.laravel }}.0" \
+            "illuminate/console:^${{ matrix.laravel }}.0"
+          composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run tests
+        run: vendor/bin/phpunit

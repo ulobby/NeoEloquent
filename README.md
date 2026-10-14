@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Ulobby/NeoEloquent.svg?branch=master)](https://travis-ci.org/Ulobby/NeoEloquent)
+[![Tests](https://github.com/ulobby/NeoEloquent/actions/workflows/tests.yml/badge.svg)](https://github.com/ulobby/NeoEloquent/actions/workflows/tests.yml)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4b18de9ea45b4b2c96a8f78a25db6480)](https://www.codacy.com/manual/berteltorp/NeoEloquent?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ulobby/NeoEloquent&amp;utm_campaign=Badge_Grade)
 
 # NeoEloquent
@@ -1115,10 +1115,13 @@ Check out the [createWith()](#createwith) method on how you can achieve this in 
 
 ## Tests
 
-- install a Neo4j instance and run it with the default configuration `localhost:7474`
+- run a Neo4j 5 instance with authentication disabled, reachable over Bolt on `localhost:7687`, e.g.
+  `docker run --rm -p 7687:7687 -e NEO4J_AUTH=none neo4j:5.26-community`
 - make sure the database graph is empty to avoid conflicts
 - after running `composer install` there should be `/vendor/bin/phpunit`
 - run `./vendor/bin/phpunit` after making sure that the Neo4j instance is running
+
+The same suite runs on GitHub Actions for every pull request (see `.github/workflows/tests.yml`).
 
 > Tests marked as incomplete means they are either known issues or non-supported features,
 check included messages for more info.
