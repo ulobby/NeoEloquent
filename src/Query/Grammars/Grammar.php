@@ -86,7 +86,12 @@ class Grammar extends IlluminateGrammar
      */
     public function prepareRelation($relation, $related)
     {
-        return '`rel_'.mb_strtolower($relation).'_'.$related."`:`{$relation}`";
+        // The variable is only a query-local alias. Default relation types are derived from
+        // namespaced class names, and Neo4j 5 parses "\u" inside identifiers as a unicode
+        // escape, so backslashes are replaced in the alias (the type itself is unchanged).
+        $identifier = str_replace('\\', '_', mb_strtolower($relation));
+
+        return '`rel_'.$identifier.'_'.$related."`:`{$relation}`";
     }
 
     /**
