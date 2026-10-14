@@ -7,19 +7,19 @@ return [
     'connections' => [
 
         'neo4j' => [
-            'scheme'   => 'http',
+            'scheme'   => 'bolt',
             'driver'   => 'neo4j',
             'host'     => 'localhost',
-            'port'     => 7474,
+            'port'     => 7687,
             'username' => 'neo4j',
             'password' => 'test',
         ],
 
         'default' => [
-            'scheme'   => 'http',
+            'scheme'   => 'bolt',
             'driver'   => 'neo4j',
             'host'     => 'localhost',
-            'port'     => 7474,
+            'port'     => 7687,
             'username' => 'neo4j',
             'password' => 'test',
         ],

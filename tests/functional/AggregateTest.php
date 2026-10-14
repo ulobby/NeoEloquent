@@ -14,7 +14,7 @@ class AggregateTest extends TestCase
     {
         parent::setUp();
 
-        $this->query = new Builder((new User())->getConnection(), new CypherGrammar(), new Processor());
+        $this->query = new Builder((new User())->getConnection(), new CypherGrammar((new User())->getConnection()), new Processor());
         $this->query->from = 'User';
     }
 
@@ -40,17 +40,17 @@ class AggregateTest extends TestCase
         User::create(['email' => 'bar@mail.net', 'points' => 2]);
         // we need a fresh query every time so that we make sure we're not reusing the same
         // one over and over which ends up with irreliable results.
-        $query = new Builder((new User())->getConnection(), new CypherGrammar(), new Processor());
+        $query = new Builder((new User())->getConnection(), new CypherGrammar((new User())->getConnection()), new Processor());
         $query->from = 'User';
         $query->where('email', 'foo@mail.net');
         $this->assertEquals(1, $query->count());
 
-        $query = new Builder((new User())->getConnection(), new CypherGrammar(), new Processor());
+        $query = new Builder((new User())->getConnection(), new CypherGrammar((new User())->getConnection()), new Processor());
         $query->from = 'User';
         $query->where('email', 'bar@mail.net');
         $this->assertEquals(1, $query->count());
 
-        $query = new Builder((new User())->getConnection(), new CypherGrammar(), new Processor());
+        $query = new Builder((new User())->getConnection(), new CypherGrammar((new User())->getConnection()), new Processor());
         $query->from = 'User';
         $query->where('points', 2);
         $this->assertEquals(2, $query->count());
@@ -102,7 +102,7 @@ class AggregateTest extends TestCase
         $this->query->where('points', '<', 4);
         $this->assertEquals(11, $this->query->max('logins'));
 
-        $query = new Builder((new User())->getConnection(), new CypherGrammar(), new Processor());
+        $query = new Builder((new User())->getConnection(), new CypherGrammar((new User())->getConnection()), new Processor());
         $query->from = 'User';
         $query->where('points', '<', 4);
         $this->assertEquals(2, $query->max('points'));
@@ -241,7 +241,7 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->assertEquals(11, $this->query->stdev('logins'));
-        $this->assertEquals(1.5275252316519, $this->query->stdev('points'));
+        $this->assertEqualsWithDelta(1.5275252316519, $this->query->stdev('points'), 1e-9);
     }
 
     public function testStdevWithQuery()
@@ -251,8 +251,8 @@ class AggregateTest extends TestCase
         User::create(['logins' => 55, 'points' => 2]);
 
         $this->query->where('points', '>', 1);
-        $this->assertEquals(7.778174593052, $this->query->stdev('logins'));
-        $this->assertEquals(1.4142135623731, $this->query->stdev('points'));
+        $this->assertEqualsWithDelta(7.778174593052, $this->query->stdev('logins'), 1e-9);
+        $this->assertEqualsWithDelta(1.4142135623731, $this->query->stdev('points'), 1e-9);
     }
 
     public function testStdevp()
@@ -261,8 +261,8 @@ class AggregateTest extends TestCase
         User::create(['logins' => 44, 'points' => 4]);
         User::create(['logins' => 55, 'points' => 2]);
 
-        $this->assertEquals(8.981462390205, $this->query->stdevp('logins'));
-        $this->assertEquals(1.2472191289246, $this->query->stdevp('points'));
+        $this->assertEqualsWithDelta(8.981462390205, $this->query->stdevp('logins'), 1e-9);
+        $this->assertEqualsWithDelta(1.2472191289246, $this->query->stdevp('points'), 1e-9);
     }
 
     public function testStdevpWithQuery()

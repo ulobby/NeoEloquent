@@ -60,6 +60,28 @@ class TestCase extends PHPUnit
     }
 
     /**
+     * Assert two sets of models have the same attributes, ignoring order:
+     * Neo4j does not guarantee result order without an ORDER BY.
+     *
+     * @param iterable $expected
+     * @param iterable $actual
+     */
+    protected function assertSameModels($expected, $actual)
+    {
+        $normalize = function ($models) {
+            $byKey = [];
+            foreach ($models as $model) {
+                $byKey[$model->getKey()] = $model->toArray();
+            }
+            ksort($byKey);
+
+            return $byKey;
+        };
+
+        $this->assertEquals($normalize($expected), $normalize($actual));
+    }
+
+    /**
      * Flush all database records.
      *
      * @return void

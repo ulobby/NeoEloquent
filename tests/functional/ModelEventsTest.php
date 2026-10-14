@@ -286,7 +286,13 @@ class OBOne extends Model
         });
 
         static::$dispatcher = $dispatcher;
-        self::observe(new UserObserver());
+    }
+
+    // Observers must be registered after booting: since Laravel 13, observe()
+    // instantiates the model, which is not allowed while it is still booting.
+    protected static function booted()
+    {
+        static::observe(new UserObserver());
     }
 }
 

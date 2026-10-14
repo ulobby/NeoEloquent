@@ -239,7 +239,7 @@ class BuilderTest extends TestCase
         $builder->select('*')->from('User')->where('username', '=', 'bakalazma');
 
         $bindings = $builder->getBindings();
-        $this->assertEquals('MATCH (user:User) WHERE user.username = {userusername} RETURN *', $builder->toCypher());
+        $this->assertEquals('MATCH (user:User) WHERE user.username = $userusername RETURN *', $builder->toCypher());
         $this->assertEquals(['userusername' => 'bakalazma'], $bindings);
     }
 
@@ -302,7 +302,7 @@ class BuilderTest extends TestCase
         $connection->shouldReceive('getName')->andReturn('default');
         $connection->shouldReceive('getCacheManager')->once()->andReturn($cache);
         $cache->shouldReceive('driver')->once()->andReturn($driver);
-        $grammar = new CypherGrammar();
+        $grammar = new CypherGrammar($connection);
 
         $builder = $this->getMock('Vinelab\NeoEloquent\Query\Builder', ['getFresh'], [$connection, $grammar]);
         $builder->expects($this->once())->method('getFresh')->with($this->equalTo(['*']))->will($this->returnValue(['results']));
@@ -315,7 +315,7 @@ class BuilderTest extends TestCase
         $connection = M::mock('Vinelab\NeoEloquent\Connection');
         $client = M::mock(ClientInterface::class);
         $connection->shouldReceive('getClient')->once()->andReturn($client);
-        $grammar = new CypherGrammar();
+        $grammar = new CypherGrammar($connection);
 
         return new Builder($connection, $grammar, $this->processor);
     }

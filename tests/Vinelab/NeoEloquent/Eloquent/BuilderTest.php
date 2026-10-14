@@ -55,10 +55,14 @@ class EloquentBuilderTest extends TestCase
     {
         $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
 
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKey')->andReturn(1);
+
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', [1, 2]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo', [1, 2]);
+        // findOrFail() reads the found keys via modelKeys(), so return an Eloquent collection.
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new \Illuminate\Database\Eloquent\Collection([$model]));
         $result = $builder->findOrFail([1, 2], ['column']);
     }
 
@@ -75,7 +79,7 @@ class EloquentBuilderTest extends TestCase
     public function testFindWithMany()
     {
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', [1, 2]);
+        $builder->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('foo', [1, 2]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
 
@@ -86,7 +90,7 @@ class EloquentBuilderTest extends TestCase
     public function testFirstMethod()
     {
         $builder = m::mock('Vinelab\NeoEloquent\Eloquent\Builder[get,take]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('take')->with(1)->andReturn($builder);
+        $builder->shouldReceive('limit')->with(1)->andReturnSelf();
         $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
 
         $result = $builder->first();
@@ -284,7 +288,7 @@ class EloquentBuilderTest extends TestCase
         }]);
         $eagers = $builder->getEagerLoads();
 
-        $this->assertEquals('foo', $eagers['orders']());
+        $this->assertEquals('foo', $eagers['orders']($this->getBuilder()));
 
         $builder = $this->getBuilder();
         $builder->with(['orders.lines' => function () {
@@ -294,7 +298,7 @@ class EloquentBuilderTest extends TestCase
 
         $this->assertInstanceOf('Closure', $eagers['orders']);
         $this->assertNull($eagers['orders']());
-        $this->assertEquals('foo', $eagers['orders.lines']());
+        $this->assertEquals('foo', $eagers['orders.lines']($this->getBuilder()));
     }
 
     public function testQueryPassThru()
@@ -367,7 +371,7 @@ class EloquentBuilderTest extends TestCase
 
         $this->query->shouldReceive('where')->once()->with('id(n)', '=', 1);
         $this->query->shouldReceive('from')->once()->with('Model')->andReturn(['Model']);
-        $this->query->shouldReceive('take')->once()->with(1)->andReturn($this->query);
+        $this->query->shouldReceive('limit')->once()->with(1)->andReturn($this->query);
         $this->query->shouldReceive('get')->once()->with(['*'])->andReturn($resultSet);
 
         $resultSet->shouldReceive('valid')->once()->andReturn(false);
@@ -684,6 +688,7 @@ class EloquentBuilderTest extends TestCase
         $model->shouldReceive('getKeyName')->andReturn('foo');
         $model->shouldReceive('getTable')->andReturn('foo_table');
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo');
+        $model->shouldReceive('getKeyType')->andReturn('int');
 
         return $model;
     }

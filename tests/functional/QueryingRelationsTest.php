@@ -114,9 +114,7 @@ class QueryingRelationsTest extends TestCase
         })->get();
         $this->assertEquals(2, count($admins));
         $expectedAdmins = [$anotherAdmin, $mrAdmin];
-        foreach ($admins as $key => $admin) {
-            $this->assertEquals($admin->toArray(), $expectedAdmins[$key]->toArray());
-        }
+        $this->assertSameModels($expectedAdmins, $admins);
         // check editors
         $editors = User::whereHas('roles', function ($q) {
             $q->where('alias', 'editor');
@@ -129,9 +127,7 @@ class QueryingRelationsTest extends TestCase
             $q->where('alias', 'manager');
         })->get();
         $this->assertEquals(2, count($managers));
-        foreach ($managers as $key => $manager) {
-            $this->assertEquals($manager->toArray(), $expectedManagers[$key]->toArray());
-        }
+        $this->assertSameModels($expectedManagers, $managers);
     }
 
     public function testQueryingWhereHasById()
@@ -409,9 +405,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $this->assertEquals($tags[$key]->toArray(), $tag->toArray());
-        }
+        $this->assertSameModels($tags, $related);
     }
 
     /**
@@ -436,10 +430,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertSameModels([$tag1, $tag2], $related);
     }
 
     public function testCreatWithPassesThroughFillables()
@@ -461,10 +452,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertSameModels([$tag1, $tag2], $related);
     }
 
     public function testCreatingModelWithNullAndBooleanValues()
@@ -487,10 +475,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertSameModels([$tag1, $tag2], $related);
     }
 
     public function testCreatingModeWithAttachedModelIds()
@@ -507,10 +492,7 @@ class QueryingRelationsTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $related);
         $this->assertEquals(2, count($related));
 
-        foreach ($related as $key => $tag) {
-            $expected = 'tag'.($key + 1);
-            $this->assertEquals($$expected->toArray(), $tag->toArray());
-        }
+        $this->assertSameModels([$tag1, $tag2], $related);
     }
 
     public function testCreatingModelWithAttachedSingleId()

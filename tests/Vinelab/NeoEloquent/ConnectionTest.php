@@ -22,7 +22,7 @@ class ConnectionTest extends TestCase
 
     public function tearDown(): void
     {
-        $query = 'MATCH (n:User) WHERE n.username = {username} DELETE n RETURN count(n)';
+        $query = 'MATCH (n:User) WHERE n.username = $username DELETE n RETURN count(n)';
 
         $c = $this->getConnectionWithConfig('default');
 
@@ -54,7 +54,7 @@ class ConnectionTest extends TestCase
     {
         $c = $this->getConnectionWithConfig('neo4j');
 
-        $this->assertEquals($c->getConfig('port'), 7474);
+        $this->assertEquals($c->getConfig('port'), 7687);
         $this->assertEquals($c->getConfig('host'), 'localhost');
     }
 
@@ -85,7 +85,7 @@ class ConnectionTest extends TestCase
 
         $port = $c->getPort();
 
-        $this->assertEquals(7474, $port);
+        $this->assertEquals(7687, $port);
         $this->assertIsInt($port);
     }
 
@@ -243,7 +243,7 @@ class ConnectionTest extends TestCase
     {
         $created = $this->createUser();
 
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} RETURN * LIMIT 1';
+        $query = 'MATCH (n:`User`) WHERE n.username = $username RETURN * LIMIT 1';
 
         $bindings = [['username' => $this->user['username']]];
 
@@ -279,7 +279,7 @@ class ConnectionTest extends TestCase
         $c = $this->getConnectionWithConfig('default');
         $c->enableQueryLog();
 
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} RETURN * LIMIT 1';
+        $query = 'MATCH (n:`User`) WHERE n.username = $username RETURN * LIMIT 1';
 
         // Get the ID of the created record
         $results = $c->select($query, [['username' => $this->user['username']]]);
@@ -292,7 +292,7 @@ class ConnectionTest extends TestCase
         ];
 
         // Select the Node containing the User record by its id
-        $query = 'MATCH (n:`User`) WHERE id(n) = {idn} RETURN * LIMIT 1';
+        $query = 'MATCH (n:`User`) WHERE id(n) = $idn RETURN * LIMIT 1';
 
         $results = $c->select($query, $bindings);
 
@@ -317,8 +317,8 @@ class ConnectionTest extends TestCase
         $type = 'dev';
 
         // Now we update the type and set it to $type
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} '.
-                 'SET n.type = {type}, n.updated_at = {updated_at} '.
+        $query = 'MATCH (n:`User`) WHERE n.username = $username '.
+                 'SET n.type = $type, n.updated_at = $updated_at '.
                  'RETURN count(n)';
 
         $bindings = [
@@ -337,7 +337,7 @@ class ConnectionTest extends TestCase
         }
 
         // Try to find the updated one and make sure it was updated successfully
-        $query = 'MATCH (n:User) WHERE n.username = {username} RETURN n';
+        $query = 'MATCH (n:User) WHERE n.username = $username RETURN n';
         $cypher = $c->getCypherQuery($query, [['username' => $this->user['username']]]);
 
         $results = $cypher->getResultSet();
@@ -356,8 +356,8 @@ class ConnectionTest extends TestCase
         $type = 'dev';
 
         // Now we update the type and set it to $type
-        $query = 'MATCH (n:`User`) WHERE n.username = {username} '.
-                 'SET n.type = {type}, n.updated_at = {updated_at} '.
+        $query = 'MATCH (n:`User`) WHERE n.username = $username '.
+                 'SET n.type = $type, n.updated_at = $updated_at '.
                  'RETURN count(n)';
 
         $bindings = [
@@ -508,7 +508,7 @@ class ConnectionTest extends TestCase
         $c = $this->getConnectionWithConfig('default');
 
         // First we create the record that we need to update
-        $create = 'CREATE (u:User {name: {name}, email: {email}, username: {username}})';
+        $create = 'CREATE (u:User {name: $name, email: $email, username: $username})';
         // The bindings structure is a little weird, I know
         // but this is how they are collected internally
         // so bare with it =)
