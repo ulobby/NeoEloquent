@@ -29,18 +29,35 @@ class Relation implements RelationInterface
         return $this->id !== null;
     }
 
+    /**
+     * Node and relationship ids are sent as parameters rather than inlined in
+     * the Cypher, so every statement of a kind has the same text and Neo4j can
+     * reuse its cached plan instead of planning each one.
+     */
     protected function runStatement($cypher, $binding)
     {
-        $statement = new Statement($cypher, $binding);
+        $statement = new Statement($cypher, $binding + $this->idBindings());
 
         return $this->client->runStatement($statement);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    protected function idBindings(): array
+    {
+        return array_filter([
+            '__start_id' => $this->start?->getId(),
+            '__end_id' => $this->end?->getId(),
+            '__rel_id' => $this->id,
+        ], fn ($id) => $id !== null);
     }
 
     protected function compileCreateRelationship(): string
     {
         $cypher = "MATCH (a), (b)
-            WHERE id(a) = {$this->start->getId()}
-            AND id(b) = {$this->end->getId()}
+            WHERE id(a) = \$__start_id
+            AND id(b) = \$__end_id
             CREATE (a)-[r:`$this->type` ";
 
         if (!empty($this->properties)) {
@@ -75,9 +92,9 @@ class Relation implements RelationInterface
     protected function compileUpdateProperties(array $propertiesNotNull): string
     {
         $cypher = "MATCH {$this->compileNodeRelation()}
-            WHERE id(a) = {$this->start->getId()}
-            AND id(b) = {$this->end->getId()}
-            AND id(r) = $this->id
+            WHERE id(a) = \$__start_id
+            AND id(b) = \$__end_id
+            AND id(r) = \$__rel_id
             SET ";
 
         foreach ($propertiesNotNull as $property => $value) {
@@ -94,7 +111,7 @@ class Relation implements RelationInterface
     protected function compileDeleteRelationship(): string
     {
         return "MATCH ()-[r:`$this->type`]-()
-            WHERE id(r) = {$this->getId()}
+            WHERE id(r) = \$__rel_id
             DELETE r";
     }
 
@@ -103,11 +120,11 @@ class Relation implements RelationInterface
         $withEnd = '';
 
         if ($this->end !== null) {
-            $withEnd = "AND id(b) = {$this->end->getId()}";
+            $withEnd = 'AND id(b) = $__end_id';
         }
 
         return "MATCH {$this->compileNodeRelation()}
-            WHERE id(a) = {$this->start->getId()}
+            WHERE id(a) = \$__start_id
             $withEnd
             RETURN a, b, r";
     }
@@ -115,9 +132,9 @@ class Relation implements RelationInterface
     protected function compileRemoveProperties(array $propertiesNull): string
     {
         $cypher = "MATCH {$this->compileNodeRelation()}
-            WHERE id(a) = {$this->start->getId()}
-            AND id(b) = {$this->end->getId()}
-            AND id(r) = $this->id 
+            WHERE id(a) = \$__start_id
+            AND id(b) = \$__end_id
+            AND id(r) = \$__rel_id
             REMOVE ";
 
         foreach ($propertiesNull as $property) {
